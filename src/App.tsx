@@ -5,7 +5,8 @@ import {
   Eye, Clock, Award, Zap, MessageCircle, Flag,
   Star, Filter, ChevronDown, X, Send, Image, Link2,
   Code, List, Quote, Bold, Italic, Globe, Lock, Sparkles,
-  BarChart3, AlertCircle, CheckCircle2, Copy, Download, Pin
+  BarChart3, AlertCircle, CheckCircle2, Copy, Download, Pin,
+  Heart, ExternalLink, BookOpen
 } from 'lucide-react';
 
 interface Post {
@@ -279,27 +280,136 @@ const App: React.FC = () => {
         </div>
       </aside>
 
+      {/* Right Sidebar */}
+      <aside style={{ position: 'fixed', right: 0, top: 64, bottom: 0, width: 320, padding: 16, overflowY: 'auto', display: 'none' }}>
+        {/* Trending Topics */}
+        <div className="glass-card" style={{ padding: 20, marginBottom: 16 }}>
+          <h3 style={{ fontSize: 14, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
+            <TrendingUp size={16} color="#818cf8" />
+            Mada Zinazovuma
+          </h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {[
+              { name: "AI & Machine Learning", posts: "12.4K", trend: "+24%" },
+              { name: "Web3 & Blockchain", posts: "8.7K", trend: "+18%" },
+              { name: "Startup Ecosystem", posts: "6.2K", trend: "+31%" },
+              { name: "Cybersecurity", posts: "5.8K", trend: "+15%" },
+            ].map((topic, i) => (
+              <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}>
+                <div>
+                  <p style={{ fontSize: 14, fontWeight: 500, color: '#e2e8f0' }}>{topic.name}</p>
+                  <p style={{ fontSize: 12, color: '#64748b' }}>{topic.posts} posts</p>
+                </div>
+                <span style={{ fontSize: 12, color: '#34d399', fontWeight: 500 }}>{topic.trend}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Top Contributors */}
+        <div className="glass-card" style={{ padding: 20, marginBottom: 16 }}>
+          <h3 style={{ fontSize: 14, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
+            <Award size={16} color="#fcd34d" />
+            Wachangiaji Bora
+          </h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {[
+              { name: "Amina H.", role: "AI Expert", points: "12.4K", rank: 1 },
+              { name: "Juma B.", role: "Developer", points: "9.8K", rank: 2 },
+              { name: "Fatma O.", role: "Data Scientist", points: "8.2K", rank: 3 },
+            ].map((user) => (
+              <div key={user.rank} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <span style={{ fontSize: 12, fontWeight: 'bold', color: '#fcd34d', width: 16 }}>#{user.rank}</span>
+                <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'linear-gradient(135deg, #6366f1, #9333ea)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 'bold' }}>
+                  {user.name.split(' ').map(n => n[0]).join('')}
+                </div>
+                <div style={{ flex: 1 }}>
+                  <p style={{ fontSize: 14, fontWeight: 500 }}>{user.name}</p>
+                  <p style={{ fontSize: 12, color: '#64748b' }}>{user.role}</p>
+                </div>
+                <span style={{ fontSize: 12, color: '#a5b4fc' }}>{user.points}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Stats */}
+        <div className="glass-card" style={{ padding: 20 }}>
+          <h3 style={{ fontSize: 14, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
+            <BarChart3 size={16} color="#34d399" />
+            Takwimu za Nijuze
+          </h3>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <div style={{ textAlign: 'center', padding: 12, borderRadius: 12, background: 'rgba(99, 102, 241, 0.05)', border: '1px solid rgba(99, 102, 241, 0.1)' }}>
+              <p style={{ fontSize: 18, fontWeight: 'bold', color: '#a5b4fc' }}>2.4M</p>
+              <p style={{ fontSize: 12, color: '#94a3b8' }}>Maswali</p>
+            </div>
+            <div style={{ textAlign: 'center', padding: 12, borderRadius: 12, background: 'rgba(147, 51, 234, 0.05)', border: '1px solid rgba(147, 51, 234, 0.1)' }}>
+              <p style={{ fontSize: 18, fontWeight: 'bold', color: '#c4b5fd' }}>8.1M</p>
+              <p style={{ fontSize: 12, color: '#94a3b8' }}>Majibu</p>
+            </div>
+            <div style={{ textAlign: 'center', padding: 12, borderRadius: 12, background: 'rgba(16, 185, 129, 0.05)', border: '1px solid rgba(16, 185, 129, 0.1)' }}>
+              <p style={{ fontSize: 18, fontWeight: 'bold', color: '#6ee7b7' }}>450K</p>
+              <p style={{ fontSize: 12, color: '#94a3b8' }}>Watumiaji</p>
+            </div>
+            <div style={{ textAlign: 'center', padding: 12, borderRadius: 12, background: 'rgba(245, 158, 11, 0.05)', border: '1px solid rgba(245, 158, 11, 0.1)' }}>
+              <p style={{ fontSize: 18, fontWeight: 'bold', color: '#fcd34d' }}>98%</p>
+              <p style={{ fontSize: 12, color: '#94a3b8' }}>Satisfaction</p>
+            </div>
+          </div>
+        </div>
+      </aside>
+
       {/* Main Content */}
       <main style={{ paddingTop: 80, paddingBottom: 32, paddingLeft: 16, paddingRight: 16 }}>
         <div style={{ maxWidth: 800, margin: '0 auto' }}>
           {/* Welcome Banner */}
           <div className="glass-card" style={{ padding: 20, marginBottom: 24, position: 'relative', overflow: 'hidden' }}>
-            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, rgba(99, 102, 241, 0.1), rgba(147, 51, 234, 0.1))' }} />
+            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(147, 51, 234, 0.15), rgba(236, 72, 153, 0.1))' }} />
             <div style={{ position: 'relative' }}>
-              <h2 style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 4 }}>Karibu tena, Neema! 👋</h2>
-              <p style={{ fontSize: 14, color: '#94a3b8' }}>Umeacha maswali 3 bila kujibiwa. Jiunge na mazungumzo 12 mapya leo.</p>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginTop: 12 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#a5b4fc' }}>
-                  <Zap size={14} /><span>Streak: 7 siku</span>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#fcd34d' }}>
-                  <Star size={14} /><span>Rank: #142</span>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#6ee7b7' }}>
-                  <Award size={14} /><span>Badges: 12</span>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+                <h2 style={{ fontSize: 20, fontWeight: 'bold' }}>Karibu tena, Neema! 👋</h2>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 12px', borderRadius: 20, background: 'rgba(99, 102, 241, 0.2)', border: '1px solid rgba(99, 102, 241, 0.3)' }}>
+                  <Zap size={14} color="#a5b4fc" />
+                  <span style={{ fontSize: 12, color: '#a5b4fc', fontWeight: 500 }}>Streak: 7 siku 🔥</span>
                 </div>
               </div>
+              <p style={{ fontSize: 14, color: '#94a3b8', marginBottom: 16 }}>Umeacha maswali 3 bila kujibiwa. Jiunge na mazungumzo 12 mapya leo.</p>
+              
+              {/* Quick Stats */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
+                {[
+                  { icon: Star, label: 'Rank', value: '#142', color: '#fcd34d' },
+                  { icon: Award, label: 'Badges', value: '12', color: '#6ee7b7' },
+                  { icon: TrendingUp, label: 'Posts', value: '234', color: '#a5b4fc' },
+                  { icon: Heart, label: 'Likes', value: '1.2K', color: '#f472b6' },
+                ].map((stat, i) => (
+                  <div key={i} style={{ padding: 12, borderRadius: 12, background: 'rgba(30, 41, 59, 0.3)', border: '1px solid rgba(51, 65, 85, 0.3)', textAlign: 'center' }}>
+                    <stat.icon size={20} color={stat.color} style={{ margin: '0 auto 4px' }} />
+                    <p style={{ fontSize: 16, fontWeight: 'bold', color: stat.color }}>{stat.value}</p>
+                    <p style={{ fontSize: 11, color: '#64748b' }}>{stat.label}</p>
+                  </div>
+                ))}
+              </div>
             </div>
+          </div>
+
+          {/* Quick Actions Bar */}
+          <div style={{ display: 'flex', gap: 8, marginBottom: 16, overflowX: 'auto', paddingBottom: 4 }}>
+            {[
+              { emoji: '🔥', label: 'Moto', color: '#ef4444' },
+              { emoji: '💡', label: 'Mawazo', color: '#f59e0b' },
+              { emoji: '🎯', label: 'Malengo', color: '#10b981' },
+              { emoji: '📚', label: 'Elimu', color: '#6366f1' },
+              { emoji: '💼', label: 'Kazi', color: '#8b5cf6' },
+              { emoji: '🌍', label: 'Dunia', color: '#06b6d4' },
+              { emoji: '🎨', label: 'Sanaa', color: '#ec4899' },
+            ].map((topic, i) => (
+              <button key={i} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 16px', borderRadius: 20, background: 'rgba(30, 41, 59, 0.5)', border: '1px solid rgba(51, 65, 85, 0.3)', color: '#cbd5e1', cursor: 'pointer', whiteSpace: 'nowrap', fontSize: 13, fontWeight: 500 }}>
+                <span>{topic.emoji}</span>
+                <span>{topic.label}</span>
+              </button>
+            ))}
           </div>
 
           {/* Create Post */}
@@ -430,31 +540,111 @@ const App: React.FC = () => {
               </div>
 
               <div style={{ borderTop: '1px solid rgba(51, 65, 85, 0.3)', paddingTop: 16 }}>
-                <h4 style={{ fontSize: 14, fontWeight: 600, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <MessageCircle size={16} color="#818cf8" />Majibu ({expandedPost.answerCount})
-                </h4>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+                  <h4 style={{ fontSize: 14, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <MessageCircle size={16} color="#818cf8" />Majibu ({expandedPost.answerCount})
+                  </h4>
+                  <select style={{ padding: '6px 12px', borderRadius: 8, background: 'rgba(30, 41, 59, 0.5)', border: '1px solid rgba(51, 65, 85, 0.5)', color: '#cbd5e1', fontSize: 13 }}>
+                    <option>Mpya zaidi</option>
+                    <option>Ya zamani</option>
+                    <option>Bora zaidi</option>
+                  </select>
+                </div>
 
                 {[
-                  { author: "Said M.", text: "Nakubaliana sana na hili. Pia ningependekeza kutumia resources za free kama freeCodeCamp.", time: "Saa 1", likes: 12 },
-                  { author: "Grace W.", text: "Asante kwa swali hili! Nimejifunza mengi kutoka kwenye majibu.", time: "Saa 3", likes: 8 },
+                  { author: "Said M.", text: "Nakubaliana sana na hili. Pia ningependekeza kutumia resources za free kama freeCodeCamp.", time: "Saa 1", likes: 12, isBest: true },
+                  { author: "Grace W.", text: "Asante kwa swali hili! Nimejifunza mengi kutoka kwenye majibu.", time: "Saa 3", likes: 8, isBest: false },
+                  { author: "Hassan K.", text: "Ningependa kuongeza kwamba practice ni muhimu sana. Jaribu kufanya projects halisi.", time: "Saa 5", likes: 5, isBest: false },
                 ].map((c, i) => (
-                  <div key={i} style={{ display: 'flex', gap: 12, marginBottom: 16, padding: 12, borderRadius: 12, background: 'rgba(30, 41, 59, 0.2)' }}>
+                  <div key={i} style={{ display: 'flex', gap: 12, marginBottom: 16, padding: 12, borderRadius: 12, background: c.isBest ? 'rgba(99, 102, 241, 0.1)' : 'rgba(30, 41, 59, 0.2)', border: c.isBest ? '1px solid rgba(99, 102, 241, 0.3)' : 'none' }}>
                     <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'linear-gradient(135deg, #10b981, #0d9488)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 'bold', flexShrink: 0 }}>
                       {c.author.split(' ').map(n => n[0]).join('')}
                     </div>
                     <div style={{ flex: 1 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4, flexWrap: 'wrap' }}>
                         <span style={{ fontSize: 14, fontWeight: 500 }}>{c.author}</span>
+                        {c.isBest && (
+                          <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, background: 'rgba(99, 102, 241, 0.2)', color: '#a5b4fc', padding: '2px 8px', borderRadius: 12 }}>
+                            <CheckCircle2 size={10} /> Jibu Bora
+                          </span>
+                        )}
                         <span style={{ fontSize: 12, color: '#64748b' }}>{c.time}</span>
                       </div>
-                      <p style={{ fontSize: 14, color: '#cbd5e1' }}>{c.text}</p>
+                      <p style={{ fontSize: 14, color: '#cbd5e1', lineHeight: 1.5 }}>{c.text}</p>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 8 }}>
                         <button className="tool-btn" style={{ fontSize: 12 }}><ThumbsUp size={12} /> {c.likes}</button>
-                        <button className="tool-btn" style={{ fontSize: 12 }}>Jibu</button>
+                        <button className="tool-btn" style={{ fontSize: 12 }}><ThumbsDown size={12} /></button>
+                        <button className="tool-btn" style={{ fontSize: 12 }}><MessageCircle size={12} /> Jibu</button>
+                        <button className="tool-btn" style={{ fontSize: 12 }}><Share2 size={12} /> Shiriki</button>
                       </div>
                     </div>
                   </div>
                 ))}
+
+                {/* Comment Input */}
+                <div style={{ display: 'flex', gap: 12, marginTop: 16 }}>
+                  <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'linear-gradient(135deg, #6366f1, #9333ea)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 'bold', flexShrink: 0 }}>NK</div>
+                  <div style={{ flex: 1 }}>
+                    <textarea placeholder="Andika jibu lako..." style={{ width: '100%', padding: 12, borderRadius: 12, background: 'rgba(30, 41, 59, 0.5)', border: '1px solid rgba(51, 65, 85, 0.5)', color: '#e2e8f0', fontSize: 14, resize: 'none', height: 80 }} />
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 8 }}>
+                      <div style={{ display: 'flex', gap: 4 }}>
+                        <button style={{ padding: 6, borderRadius: 4, background: 'transparent', border: 'none', cursor: 'pointer' }}><Bold size={16} color="#94a3b8" /></button>
+                        <button style={{ padding: 6, borderRadius: 4, background: 'transparent', border: 'none', cursor: 'pointer' }}><Italic size={16} color="#94a3b8" /></button>
+                        <button style={{ padding: 6, borderRadius: 4, background: 'transparent', border: 'none', cursor: 'pointer' }}><Code size={16} color="#94a3b8" /></button>
+                        <button style={{ padding: 6, borderRadius: 4, background: 'transparent', border: 'none', cursor: 'pointer' }}><Image size={16} color="#94a3b8" /></button>
+                      </div>
+                      <button className="btn-primary" style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, padding: '8px 16px' }}>
+                        <Send size={14} />Tuma
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Related Questions */}
+                <div style={{ marginTop: 24, padding: 16, borderRadius: 12, background: 'rgba(30, 41, 59, 0.2)' }}>
+                  <h4 style={{ fontSize: 14, fontWeight: 600, marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <BookOpen size={16} color="#818cf8" />Maswali Yanayohusiana
+                  </h4>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    {[
+                      "Je, Python ni lugha bora kwa beginners?",
+                      "Tofauti kati ya Data Science na Machine Learning",
+                      "Resources bora za kujifunza programming",
+                    ].map((q, i) => (
+                      <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', padding: '8px 0', borderBottom: i < 2 ? '1px solid rgba(51, 65, 85, 0.3)' : 'none' }}>
+                        <ChevronDown size={14} color="#64748b" style={{ transform: 'rotate(-90deg)' }} />
+                        <span style={{ fontSize: 13, color: '#cbd5e1' }}>{q}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Author Card */}
+                <div style={{ marginTop: 24, padding: 16, borderRadius: 12, background: 'rgba(30, 41, 59, 0.2)' }}>
+                  <h4 style={{ fontSize: 14, fontWeight: 600, marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <Users size={16} color="#818cf8" />Kuhusu Mwandishi
+                  </h4>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <div className="avatar-ring">
+                      <div style={{ width: 48, height: 48, borderRadius: '50%', background: 'linear-gradient(135deg, #6366f1, #9333ea)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, fontWeight: 'bold' }}>
+                        {expandedPost.avatar}
+                      </div>
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                        <span style={{ fontSize: 15, fontWeight: 600 }}>{expandedPost.author}</span>
+                        <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, color: '#34d399' }}><CheckCircle2 size={12} /> Verified</span>
+                      </div>
+                      <p style={{ fontSize: 13, color: '#94a3b8', marginBottom: 8 }}>{expandedPost.role}</p>
+                      <div style={{ display: 'flex', gap: 16, fontSize: 12, color: '#64748b' }}>
+                        <span><strong style={{ color: '#cbd5e1' }}>234</strong> posts</span>
+                        <span><strong style={{ color: '#cbd5e1' }}>1.2K</strong> followers</span>
+                        <span><strong style={{ color: '#cbd5e1' }}>89</strong> following</span>
+                      </div>
+                    </div>
+                    <button className="btn-primary" style={{ fontSize: 13, padding: '8px 16px' }}>Fuata</button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -466,6 +656,7 @@ const App: React.FC = () => {
 
 const PostCard: React.FC<{ post: Post; onExpand: (post: Post) => void }> = ({ post, onExpand }) => {
   const [localPost, setLocalPost] = useState(post);
+  const [showMoreOptions, setShowMoreOptions] = useState(false);
 
   const handleUpvote = () => {
     setLocalPost(prev => ({
@@ -520,7 +711,25 @@ const PostCard: React.FC<{ post: Post; onExpand: (post: Post) => void }> = ({ po
             </div>
           </div>
         </div>
-        <button className="tool-btn"><MoreHorizontal size={16} /></button>
+        <div style={{ position: 'relative' }}>
+          <button className="tool-btn" onClick={() => setShowMoreOptions(!showMoreOptions)}><MoreHorizontal size={16} /></button>
+          {showMoreOptions && (
+            <div className="glass-card" style={{ position: 'absolute', right: 0, top: 40, width: 200, padding: 8, zIndex: 20 }}>
+              {[
+                { icon: Share2, label: 'Shiriki' },
+                { icon: Bookmark, label: 'Hifadhi' },
+                { icon: Copy, label: 'Nakili Link' },
+                { icon: ExternalLink, label: 'Fungua' },
+                { icon: Flag, label: 'Ripoti' },
+              ].map((item, i) => (
+                <button key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', borderRadius: 8, width: '100%', background: 'transparent', border: 'none', color: '#cbd5e1', cursor: 'pointer', fontSize: 14 }} onClick={() => setShowMoreOptions(false)}>
+                  <item.icon size={16} />
+                  <span>{item.label}</span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       <h2 style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 12, cursor: 'pointer', lineHeight: 1.5 }} onClick={() => onExpand(localPost)}>
@@ -550,7 +759,17 @@ const PostCard: React.FC<{ post: Post; onExpand: (post: Post) => void }> = ({ po
         {Object.entries(localPost.reactions).map(([emoji, count]) => (
           <button key={emoji} className="reaction-btn"><span>{emoji}</span><span style={{ fontSize: 12 }}>{count}</span></button>
         ))}
-        <button className="reaction-btn"><span>+</span></button>
+        <button className="reaction-btn" title="Ongeza reaction">
+          <span>+</span>
+        </button>
+        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8 }}>
+          <button className="tool-btn" style={{ fontSize: 12 }} title="Penda">
+            <Heart size={14} />
+          </button>
+          <button className="tool-btn" style={{ fontSize: 12 }} title="Fuata mwandishi">
+            <Users size={14} /> Fuata
+          </button>
+        </div>
       </div>
 
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
