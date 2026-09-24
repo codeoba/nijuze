@@ -14,7 +14,7 @@ interface PostCardProps {
 }
 
 export const PostCard: React.FC<PostCardProps> = ({ post, onExpand }) => {
-  const { upvotePost, downvotePost, bookmarkPost, addReaction, isAuthenticated } = useApp();
+  const { upvotePost, downvotePost, toggleBookmark, addReaction, isAuthenticated } = useApp();
   const [showMoreOptions, setShowMoreOptions] = useState(false);
   const [showReactionPicker, setShowReactionPicker] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -44,7 +44,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onExpand }) => {
 
   const handleBookmark = () => {
     if (!isAuthenticated) return;
-    bookmarkPost(post.id);
+    toggleBookmark(post.id);
   };
 
   const totalReactions = Object.values(post.reactions).reduce((sum, arr) => sum + arr.length, 0);

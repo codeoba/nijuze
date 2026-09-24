@@ -2,6 +2,7 @@ export interface User {
   id: string;
   username: string;
   email: string;
+  password?: string; // Only used during registration
   avatar: string;
   role: string;
   bio: string;
@@ -73,7 +74,17 @@ export interface Notification {
   link: string;
   createdAt: string;
   isRead: boolean;
+  fromUserId?: string;
   fromUser?: User;
+}
+
+export interface Message {
+  id: string;
+  senderId: string;
+  receiverId: string;
+  content: string;
+  createdAt: string;
+  isRead: boolean;
 }
 
 export interface Category {
@@ -91,13 +102,4 @@ export interface TrendingTopic {
   postsCount: number;
   growth: number;
   category: string;
-}
-
-export interface Analytics {
-  totalPosts: number;
-  totalComments: number;
-  totalUsers: number;
-  totalViews: number;
-  topCategories: { name: string; count: number }[];
-  recentActivity: { date: string; posts: number; comments: number }[];
 }

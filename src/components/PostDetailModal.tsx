@@ -1,9 +1,6 @@
-import React, { useState } from 'react';
-import {
-  X, MessageCircle, ThumbsUp, ThumbsDown, Share2, Bold, Italic, Code, Image,
-  Send, CheckCircle2, Users, BookOpen, ChevronDown
-} from 'lucide-react';
-import { Post } from '../types';
+import React, { useState, useEffect } from 'react';
+import { X, MessageCircle, ThumbsUp, ThumbsDown, Share2, Bold, Italic, Code, Image, Send, CheckCircle2, Users, BookOpen, ChevronDown } from 'lucide-react';
+import { Post, Comment } from '../types';
 import { useApp } from '../contexts/AppContext';
 import { formatDate } from '../utils/data';
 
@@ -13,36 +10,27 @@ interface PostDetailModalProps {
 }
 
 export const PostDetailModal: React.FC<PostDetailModalProps> = ({ post, onClose }) => {
-  const { comments, addComment, upvoteComment, downvoteComment, markBestAnswer, users, isAuthenticated, currentUser, incrementViews } = useApp();
+  const { getCommentsByPost, addComment, isAuthenticated, currentUser, incrementViews } = useApp();
   const [commentText, setCommentText] = useState('');
-  const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'best'>('best');
+  const [comments, setComments] = useState<Comment[]>([]);
+
+  useEffect(() => {
+    if (post) {
+      setComments(getCommentsByPost(post.id));
+      incrementViews(post.id);
+    }
+  }, [post?.id]);
 
   if (!post) return null;
 
-  const postComments = comments[post.id] || [];
-  
-  const sortedComments = [...postComments].sort((a, b) => {
-    if (sortBy === 'best') {
-      if (a.isBestAnswer) return -1;
-      if (b.isBestAnswer) return 1;
-      return b.upvotes - a.upvotes;
-    }
-    if (sortBy === 'newest') {
-      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-    }
-    return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
-  });
-
   const handleSubmitComment = () => {
     if (!commentText.trim() || !isAuthenticated) return;
-    addComment(post.id, commentText);
-    setCommentText('');
+    const newComment = addComment(post.id, commentText);
+    if (newComment) {
+      setComments([...comments, newComment]);
+      setCommentText('');
+    }
   };
-
-  // Increment views when modal opens
-  React.useEffect(() => {
-    incrementViews(post.id);
-  }, [post.id]);
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -54,7 +42,6 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({ post, onClose 
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
         <div style={{
           position: 'sticky', top: 0, background: 'rgba(15, 23, 42, 0.95)',
           backdropFilter: 'blur(12px)', padding: 16,
@@ -71,7 +58,6 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({ post, onClose 
         </div>
 
         <div style={{ padding: 24 }}>
-          {/* Post Content */}
           <div style={{ marginBottom: 24 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
               <div className="avatar-ring">
@@ -98,31 +84,13 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({ post, onClose 
             </div>
           </div>
 
-          {/* Comments Section */}
           <div style={{ borderTop: '1px solid rgba(51, 65, 85, 0.3)', paddingTop: 16 }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-              <h4 style={{ fontSize: 14, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8 }}>
-                <MessageCircle size={16} color="#818cf8" />
-                Majibu ({postComments.length})
-              </h4>
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as any)}
-                style={{
-                  padding: '6px 12px', borderRadius: 8,
-                  background: 'rgba(30, 41, 59, 0.5)',
-                  border: '1px solid rgba(51, 65, 85, 0.5)',
-                  color: '#cbd5e1', fontSize: 13
-                }}
-              >
-                <option value="best">Bora zaidi</option>
-                <option value="newest">Mpya zaidi</option>
-                <option value="oldest">Ya zamani</option>
-              </select>
-            </div>
+            <h4 style={{ fontSize: 14, fontWeight: 600, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
+              <MessageCircle size={16} color="#818cf8" />
+              Majibu ({comments.length})
+            </h4>
 
-            {/* Comments List */}
-            {sortedComments.map((comment) => (
+            {comments.map((comment) => (
               <div
                 key={comment.id}
                 style={{
@@ -155,46 +123,17 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({ post, onClose 
                     <span style={{ fontSize: 12, color: '#64748b' }}>{formatDate(comment.createdAt)}</span>
                   </div>
                   <p style={{ fontSize: 14, color: '#cbd5e1', lineHeight: 1.5 }}>{comment.content}</p>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 8 }}>
-                    <button
-                      className={`tool-btn ${comment.isUpvoted ? 'active' : ''}`}
-                      style={{ fontSize: 12, padding: '4px 8px' }}
-                      onClick={() => upvoteComment(post.id, comment.id)}
-                    >
-                      <ThumbsUp size={12} /> {comment.upvotes}
-                    </button>
-                    <button
-                      className={`tool-btn ${comment.isDownvoted ? 'active' : ''}`}
-                      style={{ fontSize: 12, padding: '4px 8px' }}
-                      onClick={() => downvoteComment(post.id, comment.id)}
-                    >
-                      <ThumbsDown size={12} /> {comment.downvotes}
-                    </button>
-                    <button className="tool-btn" style={{ fontSize: 12, padding: '4px 8px' }}>
-                      <MessageCircle size={12} /> Jibu
-                    </button>
-                    {isAuthenticated && currentUser?.id === post.authorId && (
-                      <button
-                        className="tool-btn"
-                        style={{ fontSize: 12, padding: '4px 8px' }}
-                        onClick={() => markBestAnswer(post.id, comment.id)}
-                      >
-                        <CheckCircle2 size={12} /> {comment.isBestAnswer ? 'Ondoa Best' : 'Weka Best'}
-                      </button>
-                    )}
-                  </div>
                 </div>
               </div>
             ))}
 
-            {postComments.length === 0 && (
+            {comments.length === 0 && (
               <div style={{ textAlign: 'center', padding: 32, color: '#64748b' }}>
                 <MessageCircle size={32} style={{ margin: '0 auto 12px', opacity: 0.5 }} />
                 <p style={{ fontSize: 14 }}>Bado hakuna majibu. Kuwa wa kwanza kujibu!</p>
               </div>
             )}
 
-            {/* Comment Input */}
             {isAuthenticated ? (
               <div style={{ display: 'flex', gap: 12, marginTop: 16 }}>
                 <div style={{
@@ -217,13 +156,7 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({ post, onClose 
                       color: '#e2e8f0', fontSize: 14, resize: 'none', height: 80
                     }}
                   />
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 8 }}>
-                    <div style={{ display: 'flex', gap: 4 }}>
-                      <button style={{ padding: 6, borderRadius: 4, background: 'transparent', border: 'none', cursor: 'pointer' }}><Bold size={16} color="#94a3b8" /></button>
-                      <button style={{ padding: 6, borderRadius: 4, background: 'transparent', border: 'none', cursor: 'pointer' }}><Italic size={16} color="#94a3b8" /></button>
-                      <button style={{ padding: 6, borderRadius: 4, background: 'transparent', border: 'none', cursor: 'pointer' }}><Code size={16} color="#94a3b8" /></button>
-                      <button style={{ padding: 6, borderRadius: 4, background: 'transparent', border: 'none', cursor: 'pointer' }}><Image size={16} color="#94a3b8" /></button>
-                    </div>
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 8 }}>
                     <button
                       className="btn-primary"
                       style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, padding: '8px 16px' }}
@@ -247,61 +180,6 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({ post, onClose 
                 </p>
               </div>
             )}
-
-            {/* Related Questions */}
-            <div style={{ marginTop: 24, padding: 16, borderRadius: 12, background: 'rgba(30, 41, 59, 0.2)' }}>
-              <h4 style={{ fontSize: 14, fontWeight: 600, marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
-                <BookOpen size={16} color="#818cf8" /> Maswali Yanayohusiana
-              </h4>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                {[
-                  "Je, Python ni lugha bora kwa beginners?",
-                  "Tofauti kati ya Data Science na Machine Learning",
-                  "Resources bora za kujifunza programming",
-                ].map((q, i) => (
-                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', padding: '8px 0', borderBottom: i < 2 ? '1px solid rgba(51, 65, 85, 0.3)' : 'none' }}>
-                    <ChevronDown size={14} color="#64748b" style={{ transform: 'rotate(-90deg)' }} />
-                    <span style={{ fontSize: 13, color: '#cbd5e1' }}>{q}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Author Card */}
-            <div style={{ marginTop: 24, padding: 16, borderRadius: 12, background: 'rgba(30, 41, 59, 0.2)' }}>
-              <h4 style={{ fontSize: 14, fontWeight: 600, marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
-                <Users size={16} color="#818cf8" /> Kuhusu Mwandishi
-              </h4>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <div className="avatar-ring">
-                  <div style={{
-                    width: 48, height: 48, borderRadius: '50%',
-                    background: 'linear-gradient(135deg, #6366f1, #9333ea)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: 16, fontWeight: 'bold'
-                  }}>
-                    {post.author.avatar}
-                  </div>
-                </div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                    <span style={{ fontSize: 15, fontWeight: 600 }}>{post.author.username}</span>
-                    {post.author.isVerified && (
-                      <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, color: '#34d399' }}>
-                        <CheckCircle2 size={12} /> Verified
-                      </span>
-                    )}
-                  </div>
-                  <p style={{ fontSize: 13, color: '#94a3b8', marginBottom: 8 }}>{post.author.bio}</p>
-                  <div style={{ display: 'flex', gap: 16, fontSize: 12, color: '#64748b' }}>
-                    <span><strong style={{ color: '#cbd5e1' }}>{post.author.postsCount}</strong> posts</span>
-                    <span><strong style={{ color: '#cbd5e1' }}>{post.author.followers}</strong> followers</span>
-                    <span><strong style={{ color: '#cbd5e1' }}>{post.author.following}</strong> following</span>
-                  </div>
-                </div>
-                <button className="btn-primary" style={{ fontSize: 13, padding: '8px 16px' }}>Fuata</button>
-              </div>
-            </div>
           </div>
         </div>
       </div>
