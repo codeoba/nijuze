@@ -5,6 +5,7 @@ import {
   AlertCircle, Heart, LogOut, Trophy, BookOpen, User, Keyboard
 } from 'lucide-react';
 import { AppProvider, useApp } from './contexts/AppContext';
+import { RouterProvider, useRouter } from './router/Router';
 import { PostCard } from './components/PostCard';
 import { PostDetailModal } from './components/PostDetailModal';
 import { CreatePostModal } from './components/CreatePostModal';
@@ -19,16 +20,50 @@ import { UserProfileModal } from './components/UserProfileModal';
 import { SettingsModal } from './components/SettingsModal';
 import { FeedSelector, useFeedPosts } from './components/FeedSelector';
 import { KeyboardShortcutsModal } from './components/KeyboardShortcuts';
+import { ProfilePage } from './pages/ProfilePage';
+import { AccountSettingsPage } from './pages/AccountSettingsPage';
+import { LoginPage } from './pages/LoginPage';
+import { RegisterPage } from './pages/RegisterPage';
+import { ForgotPasswordPage } from './pages/ForgotPasswordPage';
 import { Post } from './types';
 import { formatDate } from './utils/data';
 
 const AppContent: React.FC = () => {
+  const { currentPath, navigate } = useRouter();
   const {
     posts, currentUser, isAuthenticated, logout,
     notifications, unreadCount, markAllNotificationsRead,
     trendingTopics, categories,
     searchQuery, setSearchQuery, searchPosts
   } = useApp();
+
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!isAuthenticated && !['/login', '/register', '/forgot-password'].includes(currentPath)) {
+      // Don't redirect, just show login prompt
+    }
+  }, [isAuthenticated, currentPath]);
+
+  // Handle routing
+  if (currentPath === '/login') {
+    return <LoginPage />;
+  }
+
+  if (currentPath === '/register') {
+    return <RegisterPage />;
+  }
+
+  if (currentPath === '/forgot-password') {
+    return <ForgotPasswordPage />;
+  }
+
+  if (currentPath.startsWith('/profile')) {
+    return <ProfilePage />;
+  }
+
+  if (currentPath === '/settings') {
+    return <AccountSettingsPage />;
+  }
 
   const [activeTab, setActiveTab] = useState('home');
   const [showAskModal, setShowAskModal] = useState(false);
@@ -169,7 +204,7 @@ const AppContent: React.FC = () => {
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                   <button
-                    onClick={() => setShowProfile(true)}
+                    onClick={() => navigate('/profile')}
                     className="avatar-ring"
                     style={{ border: 'none', background: 'transparent', cursor: 'pointer', padding: 0 }}
                   >
@@ -183,7 +218,7 @@ const AppContent: React.FC = () => {
                     </div>
                   </button>
                   <button
-                    onClick={() => setShowSettings(true)}
+                    onClick={() => navigate('/settings')}
                     style={{ padding: 8, borderRadius: 8, background: 'transparent', border: 'none', cursor: 'pointer' }}
                     title="Mipangilio"
                   >
@@ -201,14 +236,14 @@ const AppContent: React.FC = () => {
             ) : (
               <>
                 <button
-                  onClick={() => { setAuthMode('login'); setShowAuthModal(true); }}
+                  onClick={() => navigate('/login')}
                   className="btn-ghost"
                   style={{ fontSize: 14 }}
                 >
                   Ingia
                 </button>
                 <button
-                  onClick={() => { setAuthMode('register'); setShowAuthModal(true); }}
+                  onClick={() => navigate('/register')}
                   className="btn-primary"
                   style={{ fontSize: 14 }}
                 >
@@ -316,12 +351,18 @@ const AppContent: React.FC = () => {
   );
 };
 
-const App: React.FC = () => {
+const AppWrapper: React.FC = () => {
   return (
-    <AppProvider>
-      <AppContent />
-    </AppProvider>
+    <RouterProvider>
+      <AppProvider>
+        <AppContent />
+      </AppProvider>
+    </RouterProvider>
   );
+};
+
+const App: React.FC = () => {
+  return <AppWrapper />;
 };
 
 export default App;

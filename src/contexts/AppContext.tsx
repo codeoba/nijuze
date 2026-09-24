@@ -22,6 +22,7 @@ interface AppState {
   searchPosts: (query: string) => Post[];
 
   // Comments
+  comments: Comment[];
   getCommentsByPost: (postId: string) => Comment[];
   addComment: (postId: string, content: string) => Comment | null;
   deleteComment: (commentId: string) => boolean;
@@ -62,6 +63,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [posts, setPosts] = useState<Post[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [comments, setComments] = useState<Comment[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
 
   // Load data from database
@@ -74,6 +76,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       isBookmarked: currentUser ? db.isBookmarked(p.id, currentUser.id) : false,
     })));
     setUsers(db.getUsers());
+    setComments(db.getComments());
     if (currentUser) {
       setNotifications(db.getNotificationsByUser(currentUser.id));
     }
@@ -276,6 +279,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     addReaction,
     incrementViews,
     searchPosts,
+    comments,
     getCommentsByPost,
     addComment,
     deleteComment,
