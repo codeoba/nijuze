@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {
   Search, Bell, MessageSquare, Home, Compass, Bookmark, Users, Settings,
   TrendingUp, Plus, Clock, Award, Zap, Star, Sparkles, BarChart3,
-  AlertCircle, Heart, LogOut, Trophy, BookOpen, User
+  AlertCircle, Heart, LogOut, Trophy, BookOpen, User, Keyboard
 } from 'lucide-react';
 import { AppProvider, useApp } from './contexts/AppContext';
 import { PostCard } from './components/PostCard';
@@ -17,6 +17,8 @@ import { ThemeToggle } from './components/ThemeToggle';
 import { MobileNav } from './components/MobileNav';
 import { UserProfileModal } from './components/UserProfileModal';
 import { SettingsModal } from './components/SettingsModal';
+import { FeedSelector, useFeedPosts } from './components/FeedSelector';
+import { KeyboardShortcutsModal } from './components/KeyboardShortcuts';
 import { Post } from './types';
 import { formatDate } from './utils/data';
 
@@ -39,8 +41,61 @@ const AppContent: React.FC = () => {
   const [showReadingList, setShowReadingList] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [showShortcuts, setShowShortcuts] = useState(false);
+  const [activeFeed, setActiveFeed] = useState<'following' | 'trending' | 'hot' | 'top' | 'rising'>('trending');
+  
+  const feedPosts = useFeedPosts(activeFeed, currentUser?.id);
 
-  const displayPosts = searchQuery ? searchPosts(searchQuery) : posts;
+  const displayPosts = searchQuery ? searchPosts(searchQuery) : feedPosts;
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ignore if typing in input
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+        return;
+      }
+
+      if (e.ctrlKey || e.metaKey) {
+        switch (e.key) {
+          case 'k':
+            e.preventDefault();
+            document.querySelector<HTMLInputElement>('.search-input')?.focus();
+            break;
+          case 'n':
+            e.preventDefault();
+            if (isAuthenticated) setShowAskModal(true);
+            break;
+          case 'b':
+            e.preventDefault();
+            setShowReadingList(true);
+            break;
+          case 'm':
+            e.preventDefault();
+            if (isAuthenticated) setShowChat(true);
+            break;
+          case ',':
+            e.preventDefault();
+            if (isAuthenticated) setShowSettings(true);
+            break;
+        }
+      } else if (e.key === 'Escape') {
+        setShowAskModal(false);
+        setShowNotifications(false);
+        setShowChat(false);
+        setShowLeaderboard(false);
+        setShowReadingList(false);
+        setShowProfile(false);
+        setShowSettings(false);
+        setShowShortcuts(false);
+      } else if (e.key === '?') {
+        setShowShortcuts(true);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isAuthenticated]);
 
   const menuItems = [
     { id: "home", icon: Home, label: "Nyumbani" },
@@ -213,6 +268,9 @@ const AppContent: React.FC = () => {
             </div>
           )}
 
+          {/* Feed Selector */}
+          <FeedSelector activeFeed={activeFeed} onFeedChange={setActiveFeed} />
+
           {/* Posts */}
           {displayPosts.map((post) => (
             <PostCard key={post.id} post={post} onExpand={setExpandedPost} />
@@ -245,6 +303,7 @@ const AppContent: React.FC = () => {
       <ReadingList isOpen={showReadingList} onClose={() => setShowReadingList(false)} />
       <UserProfileModal isOpen={showProfile} onClose={() => setShowProfile(false)} />
       <SettingsModal isOpen={showSettings} onClose={() => setShowSettings(false)} />
+      <KeyboardShortcutsModal isOpen={showShortcuts} onClose={() => setShowShortcuts(false)} />
 
       {showLeaderboard && (
         <div className="modal-overlay" onClick={() => setShowLeaderboard(false)}>
