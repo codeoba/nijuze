@@ -45,6 +45,7 @@ export interface Post {
   isBookmarked: boolean;
   isPinned: boolean;
   isAnonymous: boolean;
+  isRead?: boolean;
   category: string;
 }
 

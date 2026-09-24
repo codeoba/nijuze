@@ -2,13 +2,17 @@ import React, { useState } from 'react';
 import {
   Search, Bell, MessageSquare, Home, Compass, Bookmark, Users, Settings,
   TrendingUp, Plus, Clock, Award, Zap, Star, Filter, ChevronDown,
-  Sparkles, BarChart3, AlertCircle, Heart, LogOut
+  Sparkles, BarChart3, AlertCircle, Heart, LogOut, Trophy, BookOpen
 } from 'lucide-react';
 import { AppProvider, useApp } from './contexts/AppContext';
 import { PostCard } from './components/PostCard';
 import { PostDetailModal } from './components/PostDetailModal';
 import { CreatePostModal } from './components/CreatePostModal';
 import { AuthModal } from './components/AuthModal';
+import { ChatModal } from './components/ChatModal';
+import { StoriesBar } from './components/StoriesBar';
+import { Leaderboard } from './components/Leaderboard';
+import { ReadingList } from './components/ReadingList';
 import { Post } from './types';
 import { formatDate } from './utils/data';
 
@@ -26,6 +30,9 @@ const AppContent: React.FC = () => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
+  const [showChat, setShowChat] = useState(false);
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const [showReadingList, setShowReadingList] = useState(false);
 
   const menuItems = [
     { id: "home", icon: Home, label: "Nyumbani" },
@@ -117,7 +124,7 @@ const AppContent: React.FC = () => {
                   )}
                 </div>
 
-                <button style={{ padding: 10, borderRadius: 12, background: 'transparent', border: 'none', cursor: 'pointer' }}>
+                <button onClick={() => setShowChat(true)} style={{ padding: 10, borderRadius: 12, background: 'transparent', border: 'none', cursor: 'pointer' }}>
                   <MessageSquare size={20} color="#cbd5e1" />
                 </button>
 
@@ -240,6 +247,41 @@ const AppContent: React.FC = () => {
           </div>
         </div>
 
+        {/* Quick Links */}
+        <div className="glass-card" style={{ padding: 16, marginBottom: 16 }}>
+          <h3 style={{ fontSize: 14, fontWeight: 600, marginBottom: 12 }}>Viungo vya Haraka</h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <button
+              onClick={() => setShowLeaderboard(true)}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 8,
+                padding: '10px 12px', borderRadius: 10,
+                background: 'rgba(99, 102, 241, 0.1)',
+                border: '1px solid rgba(99, 102, 241, 0.2)',
+                color: '#a5b4fc', cursor: 'pointer',
+                fontSize: 13, fontWeight: 500
+              }}
+            >
+              <Trophy size={16} />
+              <span>Orodha ya Bora</span>
+            </button>
+            <button
+              onClick={() => setShowReadingList(true)}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 8,
+                padding: '10px 12px', borderRadius: 10,
+                background: 'rgba(16, 185, 129, 0.1)',
+                border: '1px solid rgba(16, 185, 129, 0.2)',
+                color: '#6ee7b7', cursor: 'pointer',
+                fontSize: 13, fontWeight: 500
+              }}
+            >
+              <BookOpen size={16} />
+              <span>Orodha ya Kusoma</span>
+            </button>
+          </div>
+        </div>
+
         <div className="glass-card" style={{ padding: 20 }}>
           <h3 style={{ fontSize: 14, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
             <BarChart3 size={16} color="#34d399" />
@@ -301,6 +343,9 @@ const AppContent: React.FC = () => {
               </div>
             </div>
           )}
+
+          {/* Stories */}
+          <StoriesBar />
 
           {/* Quick Actions */}
           <div style={{ display: 'flex', gap: 8, marginBottom: 16, overflowX: 'auto', paddingBottom: 4 }}>
@@ -409,6 +454,27 @@ const AppContent: React.FC = () => {
         mode={authMode}
         onToggleMode={() => setAuthMode(authMode === 'login' ? 'register' : 'login')}
       />
+      <ChatModal isOpen={showChat} onClose={() => setShowChat(false)} />
+      <ReadingList isOpen={showReadingList} onClose={() => setShowReadingList(false)} />
+      
+      {/* Leaderboard Modal */}
+      {showLeaderboard && (
+        <div className="modal-overlay" onClick={() => setShowLeaderboard(false)}>
+          <div
+            className="glass-card"
+            style={{
+              width: '100%',
+              maxWidth: 800,
+              margin: '0 16px',
+              maxHeight: '90vh',
+              overflowY: 'auto',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <Leaderboard />
+          </div>
+        </div>
+      )}
     </div>
   );
 };
