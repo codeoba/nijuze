@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import {
   Search, Bell, MessageSquare, Home, Compass, Bookmark, Users, Settings,
   TrendingUp, Plus, Clock, Award, Zap, Star, Filter, ChevronDown,
-  Sparkles, BarChart3, AlertCircle, Heart, LogOut, Trophy, BookOpen
+  Sparkles, BarChart3, AlertCircle, Heart, LogOut, Trophy, BookOpen,
+  Flag, Code
 } from 'lucide-react';
 import { AppProvider, useApp } from './contexts/AppContext';
 import { PostCard } from './components/PostCard';
@@ -13,6 +14,11 @@ import { ChatModal } from './components/ChatModal';
 import { StoriesBar } from './components/StoriesBar';
 import { Leaderboard } from './components/Leaderboard';
 import { ReadingList } from './components/ReadingList';
+import { AchievementsModal } from './components/AchievementsModal';
+import { ThemeToggle } from './components/ThemeToggle';
+import { MobileNav } from './components/MobileNav';
+import { ReportModal } from './components/ReportModal';
+import { AnalyticsModal } from './components/AnalyticsModal';
 import { Post } from './types';
 import { formatDate } from './utils/data';
 
@@ -33,6 +39,9 @@ const AppContent: React.FC = () => {
   const [showChat, setShowChat] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [showReadingList, setShowReadingList] = useState(false);
+  const [showAchievements, setShowAchievements] = useState(false);
+  const [showAnalytics, setShowAnalytics] = useState(false);
+  const [showReport, setShowReport] = useState(false);
 
   const menuItems = [
     { id: "home", icon: Home, label: "Nyumbani" },
@@ -127,6 +136,7 @@ const AppContent: React.FC = () => {
                 <button onClick={() => setShowChat(true)} style={{ padding: 10, borderRadius: 12, background: 'transparent', border: 'none', cursor: 'pointer' }}>
                   <MessageSquare size={20} color="#cbd5e1" />
                 </button>
+                <ThemeToggle />
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                   <div className="avatar-ring">
@@ -278,6 +288,34 @@ const AppContent: React.FC = () => {
             >
               <BookOpen size={16} />
               <span>Orodha ya Kusoma</span>
+            </button>
+            <button
+              onClick={() => setShowAchievements(true)}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 8,
+                padding: '10px 12px', borderRadius: 10,
+                background: 'rgba(251, 191, 36, 0.1)',
+                border: '1px solid rgba(251, 191, 36, 0.2)',
+                color: '#fbbf24', cursor: 'pointer',
+                fontSize: 13, fontWeight: 500
+              }}
+            >
+              <Award size={16} />
+              <span>Mafanikio</span>
+            </button>
+            <button
+              onClick={() => setShowAnalytics(true)}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 8,
+                padding: '10px 12px', borderRadius: 10,
+                background: 'rgba(147, 51, 234, 0.1)',
+                border: '1px solid rgba(147, 51, 234, 0.2)',
+                color: '#c4b5fd', cursor: 'pointer',
+                fontSize: 13, fontWeight: 500
+              }}
+            >
+              <BarChart3 size={16} />
+              <span>Analytics</span>
             </button>
           </div>
         </div>
@@ -456,6 +494,14 @@ const AppContent: React.FC = () => {
       />
       <ChatModal isOpen={showChat} onClose={() => setShowChat(false)} />
       <ReadingList isOpen={showReadingList} onClose={() => setShowReadingList(false)} />
+      <AchievementsModal isOpen={showAchievements} onClose={() => setShowAchievements(false)} />
+      <AnalyticsModal isOpen={showAnalytics} onClose={() => setShowAnalytics(false)} />
+      <ReportModal
+        isOpen={showReport}
+        onClose={() => setShowReport(false)}
+        contentType="post"
+        contentId=""
+      />
       
       {/* Leaderboard Modal */}
       {showLeaderboard && (
@@ -475,6 +521,15 @@ const AppContent: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Mobile Navigation */}
+      <div style={{ display: 'none' }}>
+        <MobileNav
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          onCreatePost={() => setShowAskModal(true)}
+        />
+      </div>
     </div>
   );
 };
