@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, Send, Bold, Italic, Code, Link2, List, Quote, Image, Lock } from 'lucide-react';
 import { useApp } from '../contexts/AppContext';
+import { ImageUpload } from './ImageUpload';
 
 interface CreatePostModalProps {
   isOpen: boolean;
@@ -16,6 +17,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
   const [category, setCategory] = useState('Teknolojia');
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [error, setError] = useState('');
+  const [imageData, setImageData] = useState<string | null>(null);
 
   if (!isOpen) return null;
 
@@ -134,6 +136,18 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
               }}
             />
           </div>
+        </div>
+
+        {/* Image Upload */}
+        <div style={{ marginBottom: 16 }}>
+          <label style={{ fontSize: 14, fontWeight: 500, color: '#cbd5e1', marginBottom: 8, display: 'block' }}>
+            Picha (Hiari)
+          </label>
+          <ImageUpload
+            onImageSelect={setImageData}
+            currentImage={imageData || undefined}
+            onRemove={() => setImageData(null)}
+          />
         </div>
 
         {/* Category */}
