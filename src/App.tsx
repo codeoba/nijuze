@@ -20,6 +20,7 @@ import { UserProfileModal } from './components/UserProfileModal';
 import { SettingsModal } from './components/SettingsModal';
 import { FeedSelector, useFeedPosts } from './components/FeedSelector';
 import { KeyboardShortcutsModal } from './components/KeyboardShortcuts';
+import { MobileBottomNav } from './components/MobileBottomNav';
 import { ProfilePage } from './pages/ProfilePage';
 import { AccountSettingsPage } from './pages/AccountSettingsPage';
 import { LoginPage } from './pages/LoginPage';
@@ -347,6 +348,9 @@ const AppContent: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Mobile Bottom Navigation */}
+      <MobileBottomNav />
     </div>
   );
 };
