@@ -30,6 +30,8 @@ import { ForgotPasswordPage } from './pages/ForgotPasswordPage';
 import { AdminPanel } from './pages/AdminPanel';
 import { ForumPage } from './pages/ForumPage';
 import { ActivityFeedPage } from './pages/ActivityFeedPage';
+import { UserAnalyticsPage } from './pages/UserAnalyticsPage';
+import { AdvancedSearchPage } from './pages/AdvancedSearchPage';
 import { Post } from './types';
 import { formatDate } from './utils/data';
 
@@ -80,6 +82,14 @@ const AppContent: React.FC = () => {
 
   if (currentPath === '/activities') {
     return <ActivityFeedPage />;
+  }
+
+  if (currentPath === '/analytics') {
+    return <UserAnalyticsPage />;
+  }
+
+  if (currentPath === '/search') {
+    return <AdvancedSearchPage />;
   }
 
   const [activeTab, setActiveTab] = useState('home');
@@ -192,6 +202,14 @@ const AppContent: React.FC = () => {
                 <button onClick={() => navigate('/activities')} className="btn-ghost" style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14 }}>
                   <Activity size={16} />
                   <span style={{ display: 'none' }}>Shughuli</span>
+                </button>
+                <button onClick={() => navigate('/analytics')} className="btn-ghost" style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14 }}>
+                  <BarChart3 size={16} />
+                  <span style={{ display: 'none' }}>Analytics</span>
+                </button>
+                <button onClick={() => navigate('/search')} className="btn-ghost" style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14 }}>
+                  <Search size={16} />
+                  <span style={{ display: 'none' }}>Tafuta</span>
                 </button>
                 {currentUser?.role === 'Admin' && (
                   <button onClick={() => navigate('/admin')} className="btn-ghost" style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14 }}>
