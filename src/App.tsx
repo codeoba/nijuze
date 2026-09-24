@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import {
   Search, Bell, MessageSquare, Home, Compass, Bookmark, Users, Settings,
   TrendingUp, Plus, Clock, Award, Zap, Star, Sparkles, BarChart3,
-  AlertCircle, Heart, LogOut, Trophy, BookOpen, User, Keyboard
+  AlertCircle, Heart, LogOut, Trophy, BookOpen, User, Keyboard,
+  Activity, Shield
 } from 'lucide-react';
 import { AppProvider, useApp } from './contexts/AppContext';
 import { RouterProvider, useRouter } from './router/Router';
@@ -26,6 +27,9 @@ import { AccountSettingsPage } from './pages/AccountSettingsPage';
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
 import { ForgotPasswordPage } from './pages/ForgotPasswordPage';
+import { AdminPanel } from './pages/AdminPanel';
+import { ForumPage } from './pages/ForumPage';
+import { ActivityFeedPage } from './pages/ActivityFeedPage';
 import { Post } from './types';
 import { formatDate } from './utils/data';
 
@@ -64,6 +68,18 @@ const AppContent: React.FC = () => {
 
   if (currentPath === '/settings') {
     return <AccountSettingsPage />;
+  }
+
+  if (currentPath === '/admin') {
+    return <AdminPanel />;
+  }
+
+  if (currentPath === '/forum') {
+    return <ForumPage />;
+  }
+
+  if (currentPath === '/activities') {
+    return <ActivityFeedPage />;
   }
 
   const [activeTab, setActiveTab] = useState('home');
@@ -169,6 +185,20 @@ const AppContent: React.FC = () => {
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             {isAuthenticated ? (
               <>
+                <button onClick={() => navigate('/forum')} className="btn-ghost" style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14 }}>
+                  <MessageSquare size={16} />
+                  <span style={{ display: 'none' }}>Forum</span>
+                </button>
+                <button onClick={() => navigate('/activities')} className="btn-ghost" style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14 }}>
+                  <Activity size={16} />
+                  <span style={{ display: 'none' }}>Shughuli</span>
+                </button>
+                {currentUser?.role === 'Admin' && (
+                  <button onClick={() => navigate('/admin')} className="btn-ghost" style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14 }}>
+                    <Shield size={16} />
+                    <span style={{ display: 'none' }}>Admin</span>
+                  </button>
+                )}
                 <button onClick={() => setShowAskModal(true)} className="btn-primary" style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14 }}>
                   <Plus size={16} />
                   <span style={{ display: 'none' }}>Uliza Swali</span>
