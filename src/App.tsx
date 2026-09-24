@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Search, Bell, MessageSquare, Home, Compass, Bookmark, Users, Settings,
   TrendingUp, Plus, Clock, Award, Zap, Star, Filter, ChevronDown,
   Sparkles, BarChart3, AlertCircle, Heart, LogOut, Trophy, BookOpen,
-  Flag, Code
+  Flag, Code, User
 } from 'lucide-react';
 import { AppProvider, useApp } from './contexts/AppContext';
 import { PostCard } from './components/PostCard';
@@ -19,6 +19,8 @@ import { ThemeToggle } from './components/ThemeToggle';
 import { MobileNav } from './components/MobileNav';
 import { ReportModal } from './components/ReportModal';
 import { AnalyticsModal } from './components/AnalyticsModal';
+import { UserProfileModal } from './components/UserProfileModal';
+import { SettingsModal } from './components/SettingsModal';
 import { Post } from './types';
 import { formatDate } from './utils/data';
 
@@ -42,6 +44,52 @@ const AppContent: React.FC = () => {
   const [showAchievements, setShowAchievements] = useState(false);
   const [showAnalytics, setShowAnalytics] = useState(false);
   const [showReport, setShowReport] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.ctrlKey || e.metaKey) {
+        switch (e.key) {
+          case 'k':
+            e.preventDefault();
+            document.querySelector<HTMLInputElement>('.search-input')?.focus();
+            break;
+          case 'n':
+            e.preventDefault();
+            if (isAuthenticated) setShowAskModal(true);
+            break;
+          case 'b':
+            e.preventDefault();
+            setShowReadingList(true);
+            break;
+          case 'm':
+            e.preventDefault();
+            if (isAuthenticated) setShowChat(true);
+            break;
+          case ',':
+            e.preventDefault();
+            if (isAuthenticated) setShowSettings(true);
+            break;
+        }
+      } else if (e.key === 'Escape') {
+        setShowAskModal(false);
+        setShowNotifications(false);
+        setShowChat(false);
+        setShowLeaderboard(false);
+        setShowReadingList(false);
+        setShowAchievements(false);
+        setShowAnalytics(false);
+        setShowReport(false);
+        setShowProfile(false);
+        setShowSettings(false);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isAuthenticated]);
 
   const menuItems = [
     { id: "home", icon: Home, label: "Nyumbani" },
@@ -139,7 +187,12 @@ const AppContent: React.FC = () => {
                 <ThemeToggle />
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <div className="avatar-ring">
+                  <button
+                    onClick={() => setShowProfile(true)}
+                    className="avatar-ring"
+                    style={{ border: 'none', background: 'transparent', cursor: 'pointer', padding: 0 }}
+                    title="Profile"
+                  >
                     <div style={{
                       width: 32, height: 32, borderRadius: '50%',
                       background: 'linear-gradient(135deg, #6366f1, #9333ea)',
@@ -148,7 +201,14 @@ const AppContent: React.FC = () => {
                     }}>
                       {currentUser?.avatar}
                     </div>
-                  </div>
+                  </button>
+                  <button
+                    onClick={() => setShowSettings(true)}
+                    style={{ padding: 8, borderRadius: 8, background: 'transparent', border: 'none', cursor: 'pointer' }}
+                    title="Mipangilio (Ctrl+,)"
+                  >
+                    <Settings size={18} color="#94a3b8" />
+                  </button>
                   <button
                     onClick={logout}
                     style={{ padding: 8, borderRadius: 8, background: 'transparent', border: 'none', cursor: 'pointer' }}
@@ -502,6 +562,8 @@ const AppContent: React.FC = () => {
         contentType="post"
         contentId=""
       />
+      <UserProfileModal isOpen={showProfile} onClose={() => setShowProfile(false)} />
+      <SettingsModal isOpen={showSettings} onClose={() => setShowSettings(false)} />
       
       {/* Leaderboard Modal */}
       {showLeaderboard && (
