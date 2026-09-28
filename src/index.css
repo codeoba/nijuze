@@ -797,3 +797,10 @@ article {
   color: var(--text-muted);
   font-size: 11px;
 }
+
+/* Responsive Post Detail Grid */
+@media (max-width: 900px) {
+  .post-detail-grid {
+    grid-template-columns: 1fr !important;
+  }
+}

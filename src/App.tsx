@@ -24,8 +24,10 @@ import { FeedSelector, useFeedPosts } from './components/FeedSelector';
 import { KeyboardShortcutsModal } from './components/KeyboardShortcuts';
 import { MobileBottomNav } from './components/MobileBottomNav';
 import { AIChatbot } from './components/AIChatbot';
+import { Footer } from './components/Footer';
 
 // Pages
+import { PostDetailPage } from './pages/PostDetailPage';
 import { ProfilePage } from './pages/ProfilePage';
 import { AccountSettingsPage } from './pages/AccountSettingsPage';
 import { LoginPage } from './pages/LoginPage';
@@ -172,6 +174,7 @@ const AppContent: React.FC = () => {
   }, [isAuthenticated, navigate]);
 
   const renderCurrentView = () => {
+    if (currentPath.startsWith('/post/') || currentPath.startsWith('/swali/')) return <PostDetailPage />;
     if (currentPath.startsWith('/profile')) return <ProfilePage />;
     if (currentPath === '/settings') return <AccountSettingsPage />;
     if (currentPath === '/admin') return <AdminPanel />;
@@ -258,7 +261,7 @@ const AppContent: React.FC = () => {
 
         {/* Posts Feed */}
         {displayPosts.map((post) => (
-          <PostCard key={post.id} post={post} onExpand={setExpandedPost} />
+          <PostCard key={post.id} post={post} onExpand={(p) => navigate('/post/' + p.id)} />
         ))}
 
         {displayPosts.length === 0 && (
@@ -694,9 +697,12 @@ const AppContent: React.FC = () => {
       </header>
 
       {/* Main Content Area */}
-      <main style={{ paddingTop: 80, paddingBottom: 64, paddingLeft: 16, paddingRight: 16 }}>
+      <main style={{ paddingTop: 80, paddingBottom: 64, paddingLeft: 16, paddingRight: 16, minHeight: 'calc(100vh - 280px)' }}>
         {renderCurrentView()}
       </main>
+
+      {/* Footer */}
+      <Footer />
 
       {/* Floating AI Assistant */}
       <AIChatbot />

@@ -13,13 +13,30 @@ interface RouterContextType {
 
 const RouterContext = createContext<RouterContextType | undefined>(undefined);
 
+const extractParams = (path: string): { [key: string]: string } => {
+  const parts = path.split('/').filter(Boolean);
+  const newParams: { [key: string]: string } = {};
+
+  if (parts[0] === 'profile' && parts[1]) {
+    newParams.userId = parts[1];
+  }
+  if ((parts[0] === 'post' || parts[0] === 'swali') && parts[1]) {
+    newParams.postId = parts[1];
+    newParams.id = parts[1];
+  }
+  return newParams;
+};
+
 export const RouterProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [currentPath, setCurrentPath] = useState(window.location.pathname);
-  const [params, setParams] = useState<{ [key: string]: string }>({});
+  const [params, setParams] = useState<{ [key: string]: string }>(() =>
+    extractParams(window.location.pathname)
+  );
 
   useEffect(() => {
     const handlePopState = () => {
       setCurrentPath(window.location.pathname);
+      setParams(extractParams(window.location.pathname));
     };
 
     window.addEventListener('popstate', handlePopState);
@@ -29,16 +46,8 @@ export const RouterProvider: React.FC<{ children: ReactNode }> = ({ children }) 
   const navigate = (path: string) => {
     window.history.pushState({}, '', path);
     setCurrentPath(path);
-    
-    // Extract params from path
-    const pathParts = path.split('/');
-    const newParams: { [key: string]: string } = {};
-    
-    if (pathParts[1] === 'profile' && pathParts[2]) {
-      newParams.userId = pathParts[2];
-    }
-    
-    setParams(newParams);
+    setParams(extractParams(path));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
