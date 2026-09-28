@@ -9,6 +9,9 @@ import {
   TrendingUp, Clock, Star, Heart
 } from 'lucide-react';
 
+import { db } from '../services/database';
+import { usersAPI } from '../services/api';
+
 export const ProfilePage: React.FC = () => {
   const { userId } = useParams();
   const { currentUser, users, posts, comments, toggleFollow, isFollowing } = useApp();
@@ -23,11 +26,23 @@ export const ProfilePage: React.FC = () => {
     linkedin: '',
   });
 
+  const [asyncUser, setAsyncUser] = useState<any>(null);
+
   const profileUser = userId 
-    ? users.find(u => u.id === userId) 
+    ? (users.find(u => u.id === userId || u.username?.toLowerCase() === userId?.toLowerCase()) || db.getUserById(userId) || asyncUser) 
     : currentUser;
 
   const isOwnProfile = currentUser?.id === profileUser?.id;
+
+  useEffect(() => {
+    if (userId && !users.find(u => u.id === userId || u.username?.toLowerCase() === userId?.toLowerCase()) && !db.getUserById(userId)) {
+      usersAPI.getById(userId).then(res => {
+        if (res) setAsyncUser(res);
+      }).catch(() => {});
+    }
+  }, [userId, users]);
+
+
 
   useEffect(() => {
     if (profileUser) {
