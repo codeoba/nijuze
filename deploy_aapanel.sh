@@ -24,17 +24,31 @@ echo "   Domain:   $DOMAIN"
 echo "   Database: $DB_NAME"
 echo "========================================================="
 
+# Auto-detect Node.js & npm in aaPanel paths
+for node_dir in /www/server/nodejs/v*/bin; do
+    if [ -d "$node_dir" ]; then
+        export PATH="$node_dir:$PATH"
+    fi
+done
+export PATH="/usr/local/bin:/usr/bin:/bin:$PATH"
+
 # 1. Create Web Root Directory
 mkdir -p "$WEB_ROOT"
 cd "$WEB_ROOT"
 
+# Unlock .user.ini if aaPanel locked it
+chattr -i "$WEB_ROOT/.user.ini" 2>/dev/null || true
+
 # 2. Clone or Pull Latest Code
 if [ ! -d "$WEB_ROOT/.git" ]; then
-    echo "📥 [1/6] Cloning repository from GitHub..."
-    git clone -b "$BRANCH" "$REPO" .
+    echo "📥 [1/6] Initializing and fetching code from GitHub into $WEB_ROOT..."
+    git init
+    git remote add origin "$REPO" 2>/dev/null || git remote set-url origin "$REPO"
+    git fetch origin "$BRANCH"
+    git checkout -f -B "$BRANCH" "origin/$BRANCH"
 else
     echo "🔄 [1/6] Pulling latest code from GitHub..."
-    git fetch origin
+    git fetch origin "$BRANCH"
     git reset --hard "origin/$BRANCH"
 fi
 
