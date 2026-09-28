@@ -332,6 +332,7 @@ export const StoriesBar: React.FC = () => {
               height: 120,
               background: getUserGradient(selectedUser.id || selectedUser.username),
               position: 'relative',
+              zIndex: 1,
               display: 'flex',
               justifyContent: 'flex-end',
               padding: 12,
@@ -351,6 +352,8 @@ export const StoriesBar: React.FC = () => {
                   color: '#ffffff',
                   cursor: 'pointer',
                   transition: 'background 0.2s',
+                  position: 'relative',
+                  zIndex: 2,
                 }}
                 onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(0, 0, 0, 0.6)')}
                 onMouseLeave={(e) => (e.currentTarget.style.background = 'rgba(0, 0, 0, 0.4)')}
@@ -360,12 +363,12 @@ export const StoriesBar: React.FC = () => {
             </div>
 
             {/* Profile Content Body */}
-            <div style={{ padding: '0 24px 24px 24px', marginTop: -42 }}>
+            <div style={{ padding: '0 24px 24px 24px', marginTop: -42, position: 'relative', zIndex: 10 }}>
               {/* Profile Image & Badges */}
               <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: 16 }}>
                 <div style={{
-                  width: 80,
-                  height: 80,
+                  width: 84,
+                  height: 84,
                   borderRadius: '50%',
                   border: '4px solid var(--modal-bg, #ffffff)',
                   background: getUserGradient(selectedUser.id || selectedUser.username),
@@ -373,9 +376,12 @@ export const StoriesBar: React.FC = () => {
                   alignItems: 'center',
                   justifyContent: 'center',
                   color: '#ffffff',
-                  fontSize: 26,
+                  fontSize: 28,
                   fontWeight: 800,
-                  boxShadow: '0 8px 20px rgba(0,0,0,0.15)',
+                  boxShadow: '0 8px 24px rgba(0,0,0,0.18)',
+                  position: 'relative',
+                  zIndex: 20,
+                  flexShrink: 0,
                   overflow: 'hidden',
                 }}>
                   {selectedUser.avatar && selectedUser.avatar.startsWith('http') ? (
