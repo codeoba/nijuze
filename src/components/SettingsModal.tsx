@@ -27,6 +27,22 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
     allowMessages: true,
   });
 
+  const [aiDisabled, setAiDisabled] = useState(() => {
+    try {
+      return localStorage.getItem('nijuze_ai_disabled') === 'true';
+    } catch {
+      return false;
+    }
+  });
+
+  const handleToggleAi = (disabled: boolean) => {
+    setAiDisabled(disabled);
+    try {
+      localStorage.setItem('nijuze_ai_disabled', String(disabled));
+    } catch {}
+    window.dispatchEvent(new Event('nijuze_toggle_ai'));
+  };
+
   if (!isOpen) return null;
 
   const handleExportData = () => {
@@ -323,6 +339,54 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
                       </button>
                     ))}
                   </div>
+                </div>
+
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: 16,
+                    borderRadius: 12,
+                    background: 'var(--bg-subtle)',
+                    border: '1px solid var(--border-app)',
+                    marginTop: 8,
+                  }}
+                >
+                  <div>
+                    <p style={{ fontSize: 14, fontWeight: 600, marginBottom: 4, color: 'var(--text-main)' }}>
+                      Msaidizi wa AI (AI Chatbot)
+                    </p>
+                    <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>
+                      Onyesha au zima kijisehemu cha Nijuze AI kinachoelea kulia chini
+                    </p>
+                  </div>
+                  <label style={{ position: 'relative', display: 'inline-block', width: 48, height: 24, cursor: 'pointer' }}>
+                    <input
+                      type="checkbox"
+                      checked={!aiDisabled}
+                      onChange={(e) => handleToggleAi(!e.target.checked)}
+                      style={{ opacity: 0, width: 0, height: 0 }}
+                    />
+                    <span style={{
+                      position: 'absolute',
+                      inset: 0,
+                      background: !aiDisabled ? '#6366f1' : 'rgba(100, 116, 139, 0.4)',
+                      borderRadius: 24,
+                      transition: '0.3s',
+                    }}>
+                      <span style={{
+                        position: 'absolute',
+                        height: 18,
+                        width: 18,
+                        left: !aiDisabled ? 26 : 3,
+                        bottom: 3,
+                        background: 'white',
+                        borderRadius: '50%',
+                        transition: '0.3s',
+                      }} />
+                    </span>
+                  </label>
                 </div>
               </div>
             </div>

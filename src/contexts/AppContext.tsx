@@ -48,6 +48,8 @@ interface AppState {
 
   // Categories & Topics
   categories: Category[];
+  createCategory: (name: string, icon?: string, description?: string) => void;
+  deleteCategory: (id: string) => void;
   trendingTopics: TrendingTopic[];
 
   // Search
@@ -508,7 +510,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   };
 
   // Categories & Topics
-  const categories: Category[] = [
+  const DEFAULT_CATEGORIES: Category[] = [
     { id: 'cat1', name: 'Teknolojia', icon: '💻', description: 'Programming, AI, Web Dev', postsCount: 42, followersCount: 1200 },
     { id: 'cat2', name: 'Biashara', icon: '📊', description: 'Startups, Finance, Marketing', postsCount: 28, followersCount: 890 },
     { id: 'cat3', name: 'Sayansi', icon: '🔬', description: 'Research, Innovation', postsCount: 19, followersCount: 650 },
@@ -517,6 +519,43 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     { id: 'cat6', name: 'Elimu', icon: '📚', description: 'Masomo, Vyuo, Scholarships', postsCount: 31, followersCount: 940 },
     { id: 'cat7', name: 'Afya', icon: '🏥', description: 'Uzazi, Lishe, Tiba', postsCount: 22, followersCount: 710 },
   ];
+
+  const [categories, setCategories] = useState<Category[]>(() => {
+    try {
+      const saved = localStorage.getItem('nijuze_categories');
+      return saved ? JSON.parse(saved) : DEFAULT_CATEGORIES;
+    } catch {
+      return DEFAULT_CATEGORIES;
+    }
+  });
+
+  const createCategory = (name: string, icon: string = '📁', description: string = '') => {
+    const newCat: Category = {
+      id: `cat-${Date.now()}`,
+      name: name.trim(),
+      icon: icon.trim() || '📁',
+      description: description.trim(),
+      postsCount: 0,
+      followersCount: 0,
+    };
+    setCategories(prev => {
+      const updated = [...prev, newCat];
+      try {
+        localStorage.setItem('nijuze_categories', JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
+  };
+
+  const deleteCategory = (id: string) => {
+    setCategories(prev => {
+      const updated = prev.filter(c => c.id !== id);
+      try {
+        localStorage.setItem('nijuze_categories', JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
+  };
 
   const trendingTopics: TrendingTopic[] = [
     { id: 't1', name: 'AI & Machine Learning', postsCount: 45, growth: 24, category: 'Teknolojia' },
@@ -558,6 +597,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     getConversation,
     sendMessage,
     categories,
+    createCategory,
+    deleteCategory,
     trendingTopics,
     searchQuery,
     setSearchQuery,

@@ -452,34 +452,187 @@ const AdminReports: React.FC = () => {
 
 // Categories Management Component
 const AdminCategories: React.FC = () => {
+  const { categories, createCategory, deleteCategory } = useApp();
+  const [showModal, setShowModal] = useState(false);
+  const [name, setName] = useState('');
+  const [icon, setIcon] = useState('📁');
+  const [desc, setDesc] = useState('');
+  const [error, setError] = useState('');
+
+  const handleCreate = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!name.trim()) {
+      setError('Tafadhali weka jina la kategoria');
+      return;
+    }
+    createCategory(name.trim(), icon.trim() || '📁', desc.trim());
+    setName('');
+    setIcon('📁');
+    setDesc('');
+    setError('');
+    setShowModal(false);
+  };
+
   return (
     <div>
-      <h3 style={{ fontSize: 18, fontWeight: 600, marginBottom: 20 }}>Forum Categories</h3>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: 16 }}>
-        {[
-          { name: 'Teknolojia', icon: '💻', posts: 45200, followers: 12400 },
-          { name: 'Biashara', icon: '📊', posts: 32100, followers: 8900 },
-          { name: 'Sayansi', icon: '🔬', posts: 28400, followers: 6700 },
-          { name: 'Sanaa', icon: '🎨', posts: 19800, followers: 5400 },
-          { name: 'Michezo', icon: '⚽', posts: 15600, followers: 9800 },
-        ].map((cat, i) => (
-          <div key={i} className="glass-card" style={{ padding: 20 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
-              <span style={{ fontSize: 32 }}>{cat.icon}</span>
-              <div>
-                <h4 style={{ fontSize: 16, fontWeight: 600 }}>{cat.name}</h4>
-                <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>{cat.posts.toLocaleString()} posts</p>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20, flexWrap: 'wrap', gap: 12 }}>
+        <div>
+          <h3 style={{ fontSize: 18, fontWeight: 600, margin: 0, color: 'var(--text-main)' }}>Kategoria za Jukwaa ({categories.length})</h3>
+          <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: '4px 0 0 0' }}>Dhibiti mada na kategoria za maswali na mijadala</p>
+        </div>
+        <button
+          onClick={() => setShowModal(true)}
+          className="btn-primary"
+          style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, padding: '8px 16px', borderRadius: 10 }}
+        >
+          <span>+ Unda Kategoria Mpya</span>
+        </button>
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 16 }}>
+        {categories.map((cat) => (
+          <div key={cat.id} className="glass-card" style={{ padding: 20, position: 'relative' }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 12 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <span style={{ fontSize: 32 }}>{cat.icon}</span>
+                <div>
+                  <h4 style={{ fontSize: 16, fontWeight: 600, margin: 0, color: 'var(--text-main)' }}>{cat.name}</h4>
+                  <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: '2px 0 0 0' }}>
+                    {cat.description || 'Hakuna maelezo'}
+                  </p>
+                </div>
               </div>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#64748b' }}>
-              <span>{cat.followers.toLocaleString()} followers</span>
-              <button style={{ color: 'var(--btn-ghost-text)', background: 'transparent', border: 'none', cursor: 'pointer', fontSize: 13 }}>
-                Edit
+
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 12, color: 'var(--text-muted)', borderTop: '1px solid var(--border-app)', paddingTop: 10 }}>
+              <span>{cat.postsCount || 0} posts</span>
+              <button
+                onClick={() => {
+                  if (confirm(`Una uhakika unataka kufuta kategoria ya "${cat.name}"?`)) {
+                    deleteCategory(cat.id);
+                  }
+                }}
+                style={{
+                  color: '#ef4444',
+                  background: 'rgba(239, 68, 68, 0.1)',
+                  border: 'none',
+                  borderRadius: 6,
+                  padding: '4px 8px',
+                  cursor: 'pointer',
+                  fontSize: 12,
+                  fontWeight: 500,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 4
+                }}
+                title="Futa Kategoria"
+              >
+                <Trash2 size={12} />
+                <span>Futa</span>
               </button>
             </div>
           </div>
         ))}
       </div>
+
+      {/* Modal ya kuunda Kategoria */}
+      {showModal && (
+        <div className="modal-overlay" onClick={() => setShowModal(false)}>
+          <div
+            className="glass-card"
+            style={{ width: '100%', maxWidth: 440, padding: 24, margin: 16 }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+              <h3 style={{ fontSize: 18, fontWeight: 700, margin: 0, color: 'var(--text-main)' }}>Unda Kategoria Mpya</h3>
+              <button
+                onClick={() => setShowModal(false)}
+                style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {error && (
+              <div style={{ padding: 10, background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', borderRadius: 8, fontSize: 13, marginBottom: 14 }}>
+                {error}
+              </div>
+            )}
+
+            <form onSubmit={handleCreate}>
+              <div style={{ marginBottom: 14 }}>
+                <label style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-main)', display: 'block', marginBottom: 6 }}>
+                  Jina la Kategoria *
+                </label>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="mfano: Elimu ya Fedha, AI, Kilimo..."
+                  style={{
+                    width: '100%', padding: 10, borderRadius: 8,
+                    background: 'var(--input-bg)', border: '1px solid var(--border-app)',
+                    color: 'var(--text-main)', fontSize: 14
+                  }}
+                  autoFocus
+                />
+              </div>
+
+              <div style={{ marginBottom: 14 }}>
+                <label style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-main)', display: 'block', marginBottom: 6 }}>
+                  Emoji / Icon (mfano: 💰, 🤖, 🌾, 📱)
+                </label>
+                <input
+                  type="text"
+                  value={icon}
+                  onChange={(e) => setIcon(e.target.value)}
+                  placeholder="Emoji kama 💡, 💻, 📊"
+                  style={{
+                    width: '100%', padding: 10, borderRadius: 8,
+                    background: 'var(--input-bg)', border: '1px solid var(--border-app)',
+                    color: 'var(--text-main)', fontSize: 14
+                  }}
+                />
+              </div>
+
+              <div style={{ marginBottom: 20 }}>
+                <label style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-main)', display: 'block', marginBottom: 6 }}>
+                  Maelezo Mafupi (Hiari)
+                </label>
+                <textarea
+                  value={desc}
+                  onChange={(e) => setDesc(e.target.value)}
+                  placeholder="Maelezo mafupi kuhusu mada hii..."
+                  rows={2}
+                  style={{
+                    width: '100%', padding: 10, borderRadius: 8,
+                    background: 'var(--input-bg)', border: '1px solid var(--border-app)',
+                    color: 'var(--text-main)', fontSize: 14, resize: 'none'
+                  }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
+                <button
+                  type="button"
+                  onClick={() => setShowModal(false)}
+                  className="btn-ghost"
+                  style={{ padding: '8px 14px', fontSize: 13, borderRadius: 8 }}
+                >
+                  Ghairi
+                </button>
+                <button
+                  type="submit"
+                  className="btn-primary"
+                  style={{ padding: '8px 18px', fontSize: 13, borderRadius: 8, fontWeight: 600 }}
+                >
+                  Unda Sasa
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

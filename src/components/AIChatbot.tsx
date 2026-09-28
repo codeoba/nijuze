@@ -13,6 +13,24 @@ interface Message {
 export const AIChatbot: React.FC = () => {
   const { currentUser, posts, users } = useApp();
   const [isOpen, setIsOpen] = useState(false);
+  const [isDisabled, setIsDisabled] = useState(() => {
+    try {
+      return localStorage.getItem('nijuze_ai_disabled') === 'true';
+    } catch {
+      return false;
+    }
+  });
+
+  useEffect(() => {
+    const handleToggle = () => {
+      try {
+        setIsDisabled(localStorage.getItem('nijuze_ai_disabled') === 'true');
+      } catch {}
+    };
+    window.addEventListener('nijuze_toggle_ai', handleToggle);
+    return () => window.removeEventListener('nijuze_toggle_ai', handleToggle);
+  }, []);
+
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
@@ -28,6 +46,8 @@ export const AIChatbot: React.FC = () => {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  if (isDisabled) return null;
 
   // Simple AI response generator (fallback)
   const generateResponse = (userMessage: string): string => {
@@ -133,32 +153,75 @@ export const AIChatbot: React.FC = () => {
 
   return (
     <>
-      {/* Chat Button */}
+      {/* Chat Button & Dismiss */}
       {!isOpen && (
-        <button
-          onClick={() => setIsOpen(true)}
+        <div
           style={{
             position: 'fixed',
-            bottom: 24,
-            right: 24,
-            width: 60,
-            height: 60,
-            borderRadius: '50%',
-            background: 'linear-gradient(135deg, #6366f1, #9333ea)',
-            border: 'none',
-            cursor: 'pointer',
-            boxShadow: '0 4px 20px rgba(99, 102, 241, 0.4)',
+            bottom: 20,
+            right: 20,
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center',
+            gap: 6,
             zIndex: 1000,
-            transition: 'transform 0.2s ease',
           }}
-          onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
-          onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
         >
-          <Bot size={28} color="white" />
-        </button>
+          {/* Quick close / dismiss button */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              try {
+                localStorage.setItem('nijuze_ai_disabled', 'true');
+              } catch {}
+              setIsDisabled(true);
+            }}
+            title="Zima / Funga AI Chat"
+            style={{
+              width: 22,
+              height: 22,
+              borderRadius: '50%',
+              background: 'rgba(15, 23, 42, 0.65)',
+              backdropFilter: 'blur(4px)',
+              border: '1px solid rgba(255, 255, 255, 0.2)',
+              color: '#ffffff',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              fontSize: 11,
+              padding: 0,
+              boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
+              transition: 'all 0.2s ease',
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.background = '#ef4444')}
+            onMouseLeave={(e) => (e.currentTarget.style.background = 'rgba(15, 23, 42, 0.65)')}
+          >
+            ✕
+          </button>
+
+          {/* Compact Chat Button */}
+          <button
+            onClick={() => setIsOpen(true)}
+            title="Fungua Nijuze AI"
+            style={{
+              width: 44,
+              height: 44,
+              borderRadius: '50%',
+              background: 'linear-gradient(135deg, #6366f1, #9333ea)',
+              border: 'none',
+              cursor: 'pointer',
+              boxShadow: '0 4px 15px rgba(99, 102, 241, 0.35)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transition: 'transform 0.2s ease',
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.08)')}
+            onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+          >
+            <Bot size={22} color="white" />
+          </button>
+        </div>
       )}
 
       {/* Chat Window */}
