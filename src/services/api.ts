@@ -229,6 +229,14 @@ export const usersAPI = {
     });
     return response.data;
   },
+
+  updateProfile: async (data: any) => {
+    const response = await apiCall('/users/profile', {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+    return response.data;
+  },
 };
 
 // ============================================

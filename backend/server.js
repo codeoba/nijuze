@@ -62,6 +62,12 @@ async function connectDB() {
     } catch (cleanupErr) {
       // ignore
     }
+
+    try {
+      await db.query(`ALTER TABLE users ADD COLUMN cover_image VARCHAR(500) NULL`);
+    } catch (colErr) {
+      // column already exists
+    }
   } catch (error) {
     console.warn('⚠️ MySQL server unavailable (' + error.message + '). Activating Local Storage Engine fallback...');
     db = getStorageEngine();
@@ -1126,9 +1132,7 @@ app.get('/api/users/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const [users] = await db.query(`
-      SELECT id, username, email, avatar, role, bio, reputation, is_verified,
-             followers_count, following_count, posts_count, answers_count, created_at
-      FROM users WHERE id = ?
+      SELECT * FROM users WHERE id = ?
     `, [id]);
 
     if (users.length === 0) return res.status(404).json({ success: false, error: 'User not found' });
@@ -1143,6 +1147,8 @@ app.get('/api/users/:id', async (req, res) => {
         username: u.username,
         email: u.email,
         avatar: u.avatar,
+        cover_image: u.cover_image || null,
+        coverImage: u.cover_image || null,
         role: u.role,
         bio: u.bio,
         reputation: u.reputation,
@@ -1153,6 +1159,65 @@ app.get('/api/users/:id', async (req, res) => {
         answersCount: u.answers_count,
         joinedAt: u.created_at,
         badges
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Update current user profile (avatar, cover_image, bio, etc.)
+app.put('/api/users/profile', authenticateToken, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { bio, avatar, cover_image, coverImage } = req.body;
+    const finalCover = cover_image || coverImage;
+
+    const updates = [];
+    const params = [];
+
+    if (bio !== undefined) {
+      updates.push('bio = ?');
+      params.push(bio);
+    }
+    if (avatar !== undefined) {
+      updates.push('avatar = ?');
+      params.push(avatar);
+    }
+    if (finalCover !== undefined) {
+      try {
+        updates.push('cover_image = ?');
+        params.push(finalCover);
+      } catch {}
+    }
+
+    if (updates.length > 0) {
+      params.push(userId);
+      await db.query(`UPDATE users SET ${updates.join(', ')} WHERE id = ?`, params);
+    }
+
+    const [users] = await db.query('SELECT * FROM users WHERE id = ?', [userId]);
+    if (users.length === 0) return res.status(404).json({ success: false, error: 'User not found' });
+    const u = users[0];
+
+    res.json({
+      success: true,
+      data: {
+        id: u.id,
+        username: u.username,
+        email: u.email,
+        avatar: u.avatar,
+        cover_image: u.cover_image || null,
+        coverImage: u.cover_image || null,
+        role: u.role,
+        bio: u.bio,
+        reputation: u.reputation,
+        isVerified: Boolean(u.is_verified),
+        followers: u.followers_count,
+        following: u.following_count,
+        postsCount: u.posts_count,
+        answersCount: u.answers_count,
+        joinedAt: u.created_at,
       }
     });
   } catch (error) {

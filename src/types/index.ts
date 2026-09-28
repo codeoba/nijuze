@@ -4,9 +4,17 @@ export interface User {
   email: string;
   password?: string; // Only used during registration
   avatar: string;
+  cover_image?: string;
+  coverImage?: string;
   role: string;
   bio: string;
+  location?: string;
+  website?: string;
+  twitter?: string;
+  github?: string;
+  linkedin?: string;
   joinedAt: string;
+  created_at?: string;
   followers: number;
   following: number;
   postsCount: number;

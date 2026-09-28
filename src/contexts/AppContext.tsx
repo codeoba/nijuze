@@ -35,6 +35,7 @@ interface AppState {
   toggleFollow: (userId: string) => Promise<boolean>;
   isFollowing: (userId: string) => boolean;
   getUserById: (userId: string) => User | undefined;
+  updateUserProfile: (updates: Partial<User>) => Promise<User | null>;
 
   // Notifications
   notifications: Notification[];
@@ -522,6 +523,28 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     return users.find(u => u.id === userId) || db.getUserById(userId);
   };
 
+  const updateUserProfile = async (updates: Partial<User>): Promise<User | null> => {
+    if (!currentUser) return null;
+
+    let updatedUser: User = { ...currentUser, ...updates };
+
+    try {
+      const res = await usersAPI.updateProfile(updates);
+      if (res) {
+        updatedUser = { ...updatedUser, ...res };
+      }
+    } catch {}
+
+    setCurrentUser(updatedUser);
+    localStorage.setItem('nijuze_user', JSON.stringify(updatedUser));
+    localStorage.setItem('nijuze_current_user', JSON.stringify(updatedUser));
+
+    db.updateUser(currentUser.id, updates);
+    setUsers(prev => prev.map(u => u.id === currentUser.id ? { ...u, ...updates } : u));
+
+    return updatedUser;
+  };
+
   // Notification methods
   const markNotificationRead = (notifId: string) => {
     setNotifications(prev => prev.map(n => n.id === notifId ? { ...n, isRead: true } : n));
@@ -634,6 +657,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     toggleFollow,
     isFollowing,
     getUserById,
+    updateUserProfile,
     notifications,
     markNotificationRead,
     markAllNotificationsRead,

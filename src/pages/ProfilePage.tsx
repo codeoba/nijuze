@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from '../router/Router';
 import { useApp } from '../contexts/AppContext';
 import { Comment } from '../types';
@@ -6,15 +6,15 @@ import {
   Camera, Edit3, MapPin, Calendar, Link as LinkIcon, 
   Award, BookOpen, MessageCircle, ThumbsUp, Users, 
   CheckCircle2, Settings, Share2, Flag, MoreHorizontal,
-  TrendingUp, Clock, Star, Heart
+  TrendingUp, Clock, Star, Heart, Loader2
 } from 'lucide-react';
 
 import { db } from '../services/database';
-import { usersAPI } from '../services/api';
+import { usersAPI, uploadAPI } from '../services/api';
 
 export const ProfilePage: React.FC = () => {
   const { userId } = useParams();
-  const { currentUser, users, posts, comments, toggleFollow, isFollowing } = useApp();
+  const { currentUser, users, posts, comments, toggleFollow, isFollowing, updateUserProfile } = useApp();
   const [activeTab, setActiveTab] = useState<'posts' | 'answers' | 'about' | 'activity'>('posts');
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState({
@@ -25,6 +25,11 @@ export const ProfilePage: React.FC = () => {
     github: '',
     linkedin: '',
   });
+
+  const bannerInputRef = useRef<HTMLInputElement>(null);
+  const avatarInputRef = useRef<HTMLInputElement>(null);
+  const [isUploadingBanner, setIsUploadingBanner] = useState(false);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
 
   const [asyncUser, setAsyncUser] = useState<any>(null);
 
@@ -42,17 +47,15 @@ export const ProfilePage: React.FC = () => {
     }
   }, [userId, users]);
 
-
-
   useEffect(() => {
     if (profileUser) {
       setEditData({
         bio: profileUser.bio || '',
-        location: '',
-        website: '',
-        twitter: '',
-        github: '',
-        linkedin: '',
+        location: profileUser.location || '',
+        website: profileUser.website || '',
+        twitter: profileUser.twitter || '',
+        github: profileUser.github || '',
+        linkedin: profileUser.linkedin || '',
       });
     }
   }, [profileUser]);
@@ -70,8 +73,69 @@ export const ProfilePage: React.FC = () => {
   const userComments = (comments as Comment[]).filter(c => c.authorId === profileUser.id);
   const totalUpvotes = userPosts.reduce((sum, p) => sum + p.upvotes, 0);
 
-  const handleSaveProfile = () => {
-    // TODO: Implement save to backend
+  const handleBannerUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setIsUploadingBanner(true);
+    try {
+      let imageUrl = '';
+      try {
+        const res = await uploadAPI.upload(file);
+        if (res && res.url) imageUrl = res.url;
+      } catch {
+        imageUrl = await new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result as string);
+          reader.readAsDataURL(file);
+        });
+      }
+      if (imageUrl) {
+        await updateUserProfile({ cover_image: imageUrl, coverImage: imageUrl });
+      }
+    } catch (err) {
+      console.error('Error uploading banner:', err);
+    } finally {
+      setIsUploadingBanner(false);
+      if (bannerInputRef.current) bannerInputRef.current.value = '';
+    }
+  };
+
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setIsUploadingAvatar(true);
+    try {
+      let imageUrl = '';
+      try {
+        const res = await uploadAPI.upload(file);
+        if (res && res.url) imageUrl = res.url;
+      } catch {
+        imageUrl = await new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result as string);
+          reader.readAsDataURL(file);
+        });
+      }
+      if (imageUrl) {
+        await updateUserProfile({ avatar: imageUrl });
+      }
+    } catch (err) {
+      console.error('Error uploading avatar:', err);
+    } finally {
+      setIsUploadingAvatar(false);
+      if (avatarInputRef.current) avatarInputRef.current.value = '';
+    }
+  };
+
+  const handleSaveProfile = async () => {
+    await updateUserProfile({
+      bio: editData.bio,
+      location: editData.location,
+      website: editData.website,
+      twitter: editData.twitter,
+      github: editData.github,
+      linkedin: editData.linkedin,
+    });
     setIsEditing(false);
   };
 
@@ -81,38 +145,79 @@ export const ProfilePage: React.FC = () => {
     }
   };
 
+  const formatJoinDate = (d?: string, options?: Intl.DateTimeFormatOptions) => {
+    const rawDate = d || (profileUser as any).created_at || (profileUser as any).createdAt;
+    if (!rawDate) return 'Hivi karibuni';
+    try {
+      const parsed = new Date(rawDate);
+      return isNaN(parsed.getTime()) ? 'Hivi karibuni' : parsed.toLocaleDateString('sw-TZ', options || { month: 'long', year: 'numeric' });
+    } catch {
+      return 'Hivi karibuni';
+    }
+  };
+
+  const coverUrl = profileUser.cover_image || profileUser.coverImage;
+  const avatarUrl = profileUser.avatar;
+  const isImageAvatar = avatarUrl && (avatarUrl.startsWith('http') || avatarUrl.startsWith('data:'));
+
   return (
     <div style={{ maxWidth: 1000, margin: '0 auto', padding: '24px 16px' }}>
-      {/* Cover Image */}
+      {/* Cover Image Banner */}
       <div style={{
         height: 200,
         borderRadius: 16,
-        background: 'linear-gradient(135deg, #6366f1, #9333ea, #ec4899)',
+        background: coverUrl ? `url(${coverUrl}) center/cover no-repeat` : 'linear-gradient(135deg, #6366f1, #9333ea, #ec4899)',
         position: 'relative',
         marginBottom: 80,
+        overflow: 'hidden',
+        boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
       }}>
         {isOwnProfile && (
-          <button style={{
-            position: 'absolute',
-            top: 16,
-            right: 16,
-            padding: 8,
-            borderRadius: 8,
-            background: 'rgba(0, 0, 0, 0.5)',
-            border: 'none',
-            cursor: 'pointer',
-            color: 'white',
-          }}>
-            <Camera size={20} />
-          </button>
+          <>
+            <input 
+              type="file" 
+              ref={bannerInputRef} 
+              onChange={handleBannerUpload} 
+              accept="image/*" 
+              style={{ display: 'none' }} 
+            />
+            <button 
+              onClick={() => bannerInputRef.current?.click()}
+              disabled={isUploadingBanner}
+              title="Badilisha picha ya cover"
+              style={{
+                position: 'absolute',
+                top: 16,
+                right: 16,
+                padding: '8px 14px',
+                borderRadius: 10,
+                background: 'rgba(0, 0, 0, 0.55)',
+                backdropFilter: 'blur(6px)',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                cursor: isUploadingBanner ? 'wait' : 'pointer',
+                color: 'white',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                fontSize: 13,
+                fontWeight: 600,
+                transition: 'all 0.2s',
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(0, 0, 0, 0.75)')}
+              onMouseLeave={(e) => (e.currentTarget.style.background = 'rgba(0, 0, 0, 0.55)')}
+            >
+              {isUploadingBanner ? <Loader2 size={16} className="animate-spin" /> : <Camera size={16} />}
+              <span>{isUploadingBanner ? 'Inapakia...' : 'Weka Cover'}</span>
+            </button>
+          </>
         )}
       </div>
 
       {/* Profile Header */}
-      <div style={{ marginTop: -60, marginBottom: 24 }}>
+      <div style={{ marginTop: -60, marginBottom: 24, position: 'relative', zIndex: 10 }}>
         <div style={{ display: 'flex', alignItems: 'flex-end', gap: 24, marginBottom: 16 }}>
           {/* Avatar */}
-          <div style={{ position: 'relative' }}>
+          <div style={{ position: 'relative', flexShrink: 0 }}>
             <div className="avatar-ring" style={{ padding: 4 }}>
               <div style={{
                 width: 120,
@@ -122,32 +227,60 @@ export const ProfilePage: React.FC = () => {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: 48,
+                fontSize: 44,
                 fontWeight: 'bold',
                 border: '4px solid var(--bg-surface)',
                 color: 'white',
+                overflow: 'hidden',
+                boxShadow: '0 8px 24px rgba(0,0,0,0.18)',
               }}>
-                {profileUser.avatar}
+                {isImageAvatar ? (
+                  <img 
+                    src={avatarUrl} 
+                    alt={profileUser.username} 
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                  />
+                ) : (
+                  profileUser.avatar || (profileUser.username ? profileUser.username.slice(0, 2).toUpperCase() : 'NJ')
+                )}
               </div>
             </div>
             {isOwnProfile && (
-              <button style={{
-                position: 'absolute',
-                bottom: 0,
-                right: 0,
-                width: 36,
-                height: 36,
-                borderRadius: '50%',
-                background: '#6366f1',
-                border: '3px solid var(--bg-surface)',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: 'white',
-              }}>
-                <Camera size={18} />
-              </button>
+              <>
+                <input 
+                  type="file" 
+                  ref={avatarInputRef} 
+                  onChange={handleAvatarUpload} 
+                  accept="image/*" 
+                  style={{ display: 'none' }} 
+                />
+                <button 
+                  onClick={() => avatarInputRef.current?.click()}
+                  disabled={isUploadingAvatar}
+                  title="Badilisha picha ya wasifu"
+                  style={{
+                    position: 'absolute',
+                    bottom: 4,
+                    right: 4,
+                    width: 38,
+                    height: 38,
+                    borderRadius: '50%',
+                    background: '#6366f1',
+                    border: '3px solid var(--bg-surface)',
+                    cursor: isUploadingAvatar ? 'wait' : 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: 'white',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+                    transition: 'transform 0.15s, background 0.2s',
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.1)')}
+                  onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+                >
+                  {isUploadingAvatar ? <Loader2 size={16} className="animate-spin" /> : <Camera size={18} />}
+                </button>
+              </>
             )}
           </div>
 
@@ -308,7 +441,7 @@ export const ProfilePage: React.FC = () => {
             <MapPin size={16} /> Dar es Salaam, Tanzania
           </span>
           <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <Calendar size={16} /> Amejiunga {new Date(profileUser.joinedAt).toLocaleDateString('sw-TZ', { month: 'long', year: 'numeric' })}
+            <Calendar size={16} /> Amejiunga {formatJoinDate(profileUser.joinedAt)}
           </span>
           {editData.website && (
             <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -554,7 +687,7 @@ export const ProfilePage: React.FC = () => {
                 <div style={{ padding: 16, borderRadius: 12, background: 'var(--bg-subtle)', border: '1px solid var(--border-app)' }}>
                   <p style={{ fontSize: 14, color: 'var(--text-muted)', marginBottom: 4 }}>Amejiunga</p>
                   <p style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-main)' }}>
-                    {new Date(profileUser.joinedAt).toLocaleDateString('sw-TZ', {
+                    {formatJoinDate(profileUser.joinedAt, {
                       year: 'numeric',
                       month: 'long',
                       day: 'numeric'
