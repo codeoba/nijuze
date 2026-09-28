@@ -44,11 +44,50 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
     }, 50);
   };
 
-  const addTag = () => {
-    if (tagInput && tags.length < 5 && !tags.includes(tagInput.trim())) {
-      setTags([...tags, tagInput.trim()]);
-      setTagInput('');
+  const parseAndAddTags = (inputText: string, existingTags: string[] = tags): { updatedTags: string[]; remainingText: string } => {
+    if (!inputText) return { updatedTags: existingTags, remainingText: '' };
+
+    const parts = inputText.split(/[,،]+/).map(t => t.trim().replace(/^#+/, '')).filter(Boolean);
+    const newTags = [...existingTags];
+    let remaining = '';
+
+    parts.forEach((part, index) => {
+      // If it doesn't end with a delimiter and it's the last token, leave it in input
+      if (index === parts.length - 1 && !inputText.endsWith(',') && !inputText.endsWith('،')) {
+        remaining = part;
+        return;
+      }
+      if (part && !newTags.includes(part) && newTags.length < 5) {
+        newTags.push(part);
+      }
+    });
+
+    return { updatedTags: newTags, remainingText: remaining };
+  };
+
+  const handleTagInputChange = (val: string) => {
+    if (val.includes(',') || val.includes('،')) {
+      const { updatedTags, remainingText } = parseAndAddTags(val);
+      setTags(updatedTags);
+      setTagInput(remainingText);
+    } else {
+      setTagInput(val);
     }
+  };
+
+  const addTag = (text?: string) => {
+    const raw = (text !== undefined ? text : tagInput).trim().replace(/^#+/, '');
+    if (!raw) return;
+
+    const parts = raw.split(/[,،\s]+/).map(t => t.trim().replace(/^#+/, '')).filter(Boolean);
+    const newTags = [...tags];
+    for (const p of parts) {
+      if (!newTags.includes(p) && newTags.length < 5) {
+        newTags.push(p);
+      }
+    }
+    setTags(newTags);
+    setTagInput('');
   };
 
   const removeTag = (tagToRemove: string) => {
@@ -73,8 +112,21 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
       return;
     }
 
-    if (tags.length === 0) {
-      setError('Tafadhali ongeza angalau tag moja');
+    // Auto-parse any remaining text in tagInput before validating
+    let currentTags = [...tags];
+    if (tagInput.trim()) {
+      const pendingParts = tagInput.split(/[,،\s]+/).map(t => t.trim().replace(/^#+/, '')).filter(Boolean);
+      for (const p of pendingParts) {
+        if (!currentTags.includes(p) && currentTags.length < 5) {
+          currentTags.push(p);
+        }
+      }
+      setTags(currentTags);
+      setTagInput('');
+    }
+
+    if (currentTags.length === 0) {
+      setError('Tafadhali ongeza angalau tag moja (mfano: #Teknolojia, #AI)');
       return;
     }
 
@@ -85,10 +137,11 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
     }
 
     try {
-      await createPost(title.trim(), finalContent, tags, category, isAnonymous);
+      await createPost(title.trim(), finalContent, currentTags, category, isAnonymous);
       setTitle('');
       setContent('');
       setTags([]);
+      setTagInput('');
       setCategory('Teknolojia');
       setImageData(null);
       setIsAnonymous(false);
@@ -212,42 +265,89 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
 
         {/* Tags */}
         <div style={{ marginBottom: 16 }}>
-          <label style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-main)', marginBottom: 8, display: 'block' }}>
-            Tags (max 5) *
-          </label>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+            <label style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-main)', display: 'block' }}>
+              Tags (max 5) *
+            </label>
+            <span style={{ fontSize: 12, color: tags.length >= 5 ? '#eab308' : 'var(--text-muted)' }}>
+              {tags.length}/5 tags zilizoongezwa
+            </span>
+          </div>
+
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              flexWrap: 'wrap',
+              padding: 8,
+              borderRadius: 10,
+              background: 'var(--input-bg)',
+              border: '1px solid var(--input-border)',
+              minHeight: 46
+            }}
+          >
             {tags.map((tag, i) => (
-              <span key={i} className="tag" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                {tag}
+              <span
+                key={i}
+                className="tag"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  padding: '4px 10px',
+                  borderRadius: 16,
+                  fontSize: 12,
+                  fontWeight: 600,
+                  background: 'var(--tag-bg)',
+                  color: 'var(--tag-text)',
+                  border: '1px solid var(--tag-border)'
+                }}
+              >
+                #{tag}
                 <button
+                  type="button"
                   onClick={() => removeTag(tag)}
-                  style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: 0, color: 'inherit' }}
+                  style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: 0, color: 'inherit', display: 'flex', alignItems: 'center' }}
+                  title="Ondoa tag"
                 >
                   <X size={12} />
                 </button>
               </span>
             ))}
-            {tags.length < 5 && (
+            {tags.length < 5 ? (
               <input
                 type="text"
                 value={tagInput}
-                onChange={(e) => setTagInput(e.target.value)}
+                onChange={(e) => handleTagInputChange(e.target.value)}
+                onBlur={() => addTag()}
                 onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
+                  if (e.key === 'Enter' || e.key === ',') {
                     e.preventDefault();
                     addTag();
                   }
                 }}
-                placeholder="Ongeza tag..."
+                placeholder={tags.length === 0 ? "Andika tag kisha piga koma (,) au Enter..." : "Ongeza nyingine..."}
                 style={{
-                  flex: 1, minWidth: 120, padding: 8, borderRadius: 8,
-                  background: 'var(--input-bg)',
-                  border: '1px solid var(--input-border)',
-                  color: 'var(--input-text)', fontSize: 13
+                  flex: 1,
+                  minWidth: 140,
+                  padding: '4px 8px',
+                  background: 'transparent',
+                  border: 'none',
+                  outline: 'none',
+                  color: 'var(--input-text)',
+                  fontSize: 13
                 }}
               />
+            ) : (
+              <span style={{ fontSize: 12, color: 'var(--text-muted)', fontStyle: 'italic', padding: '4px 8px' }}>
+                Upeo wa tags 5 umekamilika
+              </span>
             )}
           </div>
+          <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4, marginBottom: 0 }}>
+            Tenganisha tags kwa koma (,) au piga Enter (mfano: <code>React, WebDev, AI</code>)
+          </p>
         </div>
 
         {/* Anonymous Option */}
