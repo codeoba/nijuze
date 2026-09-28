@@ -556,16 +556,42 @@ header.glass-card {
 }
 
 /* Mobile Bottom Nav responsive display */
+.mobile-bottom-nav {
+  position: fixed !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  z-index: 9999 !important;
+  touch-action: manipulation;
+}
+
 @media (min-width: 768px) {
   .mobile-bottom-nav {
     display: none !important;
   }
 }
 
+/* On mobile, float AI trigger safely ABOVE the bottom navigation bar */
+@media (max-width: 767px) {
+  .ai-floating-trigger {
+    bottom: calc(72px + env(safe-area-inset-bottom, 0px)) !important;
+    right: 16px !important;
+    z-index: 9990 !important;
+  }
+
+  .ai-chat-window {
+    bottom: calc(74px + env(safe-area-inset-bottom, 0px)) !important;
+    right: 12px !important;
+    left: 12px !important;
+    width: auto !important;
+    max-height: calc(100vh - 120px) !important;
+  }
+}
+
 [data-theme="light"] .mobile-bottom-nav {
-  background: rgba(255, 255, 255, 0.95) !important;
+  background: rgba(255, 255, 255, 0.96) !important;
   border-top: 1px solid #e2e8f0 !important;
-  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.04) !important;
+  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.06) !important;
 }
 
 /* Placeholder contrast in Light Mode */

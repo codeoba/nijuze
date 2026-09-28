@@ -156,6 +156,7 @@ export const AIChatbot: React.FC = () => {
       {/* Chat Button & Dismiss */}
       {!isOpen && (
         <div
+          className="ai-floating-trigger"
           style={{
             position: 'fixed',
             bottom: 20,
@@ -227,7 +228,7 @@ export const AIChatbot: React.FC = () => {
       {/* Chat Window */}
       {isOpen && (
         <div
-          className="glass-card"
+          className="glass-card ai-chat-window"
           style={{
             position: 'fixed',
             bottom: 24,

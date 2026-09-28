@@ -145,6 +145,32 @@ const AppContent: React.FC = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isAuthenticated]);
 
+  // Listen for mobile nav actions
+  useEffect(() => {
+    const handleOpenCreatePost = () => {
+      if (!isAuthenticated) {
+        navigate('/login');
+      } else {
+        setShowAskModal(true);
+      }
+    };
+    const handleOpenChat = () => {
+      if (!isAuthenticated) {
+        navigate('/login');
+      } else {
+        setShowChat(true);
+      }
+    };
+
+    window.addEventListener('openCreatePost', handleOpenCreatePost);
+    window.addEventListener('openChatModal', handleOpenChat);
+
+    return () => {
+      window.removeEventListener('openCreatePost', handleOpenCreatePost);
+      window.removeEventListener('openChatModal', handleOpenChat);
+    };
+  }, [isAuthenticated, navigate]);
+
   const renderCurrentView = () => {
     if (currentPath.startsWith('/profile')) return <ProfilePage />;
     if (currentPath === '/settings') return <AccountSettingsPage />;
@@ -699,7 +725,22 @@ const AppContent: React.FC = () => {
       )}
 
       {/* Mobile Bottom Navigation */}
-      <MobileBottomNav />
+      <MobileBottomNav
+        onOpenCreatePost={() => {
+          if (!isAuthenticated) {
+            navigate('/login');
+          } else {
+            setShowAskModal(true);
+          }
+        }}
+        onOpenChat={() => {
+          if (!isAuthenticated) {
+            navigate('/login');
+          } else {
+            setShowChat(true);
+          }
+        }}
+      />
     </div>
   );
 };
