@@ -119,7 +119,7 @@ export const AdvancedSecurity: React.FC = () => {
         <Shield size={32} color="#6366f1" />
         <div>
           <h2 style={{ fontSize: 28, fontWeight: 700, margin: 0 }}>Usalama wa Akaunti</h2>
-          <p style={{ fontSize: 14, color: '#94a3b8', margin: 0 }}>
+          <p style={{ fontSize: 14, color: 'var(--text-muted)', margin: 0 }}>
             Dhibiti usalama wa akaunti yako
           </p>
         </div>
@@ -142,7 +142,7 @@ export const AdvancedSecurity: React.FC = () => {
             </div>
             <div>
               <h3 style={{ fontSize: 18, fontWeight: 600, margin: 0 }}>Two-Factor Authentication</h3>
-              <p style={{ fontSize: 13, color: '#94a3b8', margin: 0 }}>
+              <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>
                 {twoFactorEnabled ? '2FA imefunguliwa' : '2FA haijafunguliwa'}
               </p>
             </div>
@@ -200,7 +200,7 @@ export const AdvancedSecurity: React.FC = () => {
             onClick={(e) => e.stopPropagation()}
           >
             <h3 style={{ fontSize: 20, fontWeight: 700, marginBottom: 16 }}>Weka 2FA</h3>
-            <p style={{ fontSize: 14, color: '#94a3b8', marginBottom: 24 }}>
+            <p style={{ fontSize: 14, color: 'var(--text-muted)', marginBottom: 24 }}>
               Tumia app ya authenticator (kama Google Authenticator) kuskani QR code hii:
             </p>
 
@@ -220,7 +220,7 @@ export const AdvancedSecurity: React.FC = () => {
             </div>
 
             <div style={{ marginBottom: 24 }}>
-              <label style={{ fontSize: 14, fontWeight: 500, color: '#cbd5e1', marginBottom: 8, display: 'block' }}>
+              <label style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-body)', marginBottom: 8, display: 'block' }}>
                 Ingiza code ya 6-digit
               </label>
               <input
@@ -235,7 +235,7 @@ export const AdvancedSecurity: React.FC = () => {
                   borderRadius: 12,
                   background: 'rgba(30, 41, 59, 0.5)',
                   border: '1px solid rgba(51, 65, 85, 0.5)',
-                  color: '#e2e8f0',
+                  color: 'var(--text-main)',
                   fontSize: 18,
                   textAlign: 'center',
                   letterSpacing: 8,

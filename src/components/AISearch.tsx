@@ -177,7 +177,7 @@ export const AISearch: React.FC<AISearchProps> = ({ onResults }) => {
             borderRadius: 12,
             background: 'rgba(30, 41, 59, 0.5)',
             border: '1px solid rgba(99, 102, 241, 0.3)',
-            color: '#e2e8f0',
+            color: 'var(--text-main)',
             fontSize: 15,
           }}
         />
@@ -228,7 +228,7 @@ export const AISearch: React.FC<AISearchProps> = ({ onResults }) => {
                   background: 'transparent',
                   border: 'none',
                   borderBottom: i < suggestions.length - 1 ? '1px solid rgba(51, 65, 85, 0.3)' : 'none',
-                  color: '#e2e8f0',
+                  color: 'var(--text-main)',
                   fontSize: 14,
                   textAlign: 'left',
                   cursor: 'pointer',
@@ -294,7 +294,7 @@ export const AISearch: React.FC<AISearchProps> = ({ onResults }) => {
                   borderRadius: 20,
                   background: 'rgba(99, 102, 241, 0.1)',
                   border: '1px solid rgba(99, 102, 241, 0.2)',
-                  color: '#a5b4fc',
+                  color: 'var(--btn-ghost-text)',
                   fontSize: 12,
                   cursor: 'pointer',
                 }}

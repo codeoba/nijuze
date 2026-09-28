@@ -1,35 +1,38 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import { User, Post, Comment, Notification, Category, TrendingTopic } from '../types';
 import { db } from '../services/database';
+import { authAPI, postsAPI, commentsAPI, usersAPI, notificationsAPI } from '../services/api';
 
 interface AppState {
   // Auth
   currentUser: User | null;
   isAuthenticated: boolean;
-  login: (email: string, password: string) => { success: boolean; error?: string };
-  register: (username: string, email: string, password: string) => { success: boolean; error?: string };
+  login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  register: (username: string, email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
 
   // Posts
   posts: Post[];
-  createPost: (title: string, content: string, tags: string[], category: string, isAnonymous: boolean) => Post | null;
-  deletePost: (postId: string) => boolean;
-  upvotePost: (postId: string) => void;
-  downvotePost: (postId: string) => void;
-  toggleBookmark: (postId: string) => void;
-  addReaction: (postId: string, emoji: string) => void;
+  createPost: (title: string, content: string, tags: string[], category: string, isAnonymous: boolean) => Promise<Post | null>;
+  deletePost: (postId: string) => Promise<boolean>;
+  upvotePost: (postId: string) => Promise<void>;
+  downvotePost: (postId: string) => Promise<void>;
+  toggleBookmark: (postId: string) => Promise<void>;
+  addReaction: (postId: string, emoji: string) => Promise<void>;
   incrementViews: (postId: string) => void;
   searchPosts: (query: string) => Post[];
 
   // Comments
   comments: Comment[];
   getCommentsByPost: (postId: string) => Comment[];
-  addComment: (postId: string, content: string) => Comment | null;
-  deleteComment: (commentId: string) => boolean;
+  addComment: (postId: string, content: string) => Promise<Comment | null>;
+  deleteComment: (commentId: string) => Promise<boolean>;
+  markBestAnswer: (commentId: string, postId: string) => Promise<void>;
+  upvoteComment: (commentId: string) => Promise<void>;
 
   // Users
   users: User[];
-  toggleFollow: (userId: string) => boolean;
+  toggleFollow: (userId: string) => Promise<boolean>;
   isFollowing: (userId: string) => boolean;
   getUserById: (userId: string) => User | undefined;
 
@@ -50,14 +53,21 @@ interface AppState {
   // Search
   searchQuery: string;
   setSearchQuery: (query: string) => void;
+
+  // Status
+  isOnlineBackend: boolean;
 }
 
 const AppContext = createContext<AppState | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(() => {
-    const saved = localStorage.getItem('nijuze_current_user');
-    return saved ? JSON.parse(saved) : null;
+    try {
+      const saved = localStorage.getItem('nijuze_user') || localStorage.getItem('nijuze_current_user');
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
   });
 
   const [posts, setPosts] = useState<Post[]>([]);
@@ -65,70 +75,180 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [comments, setComments] = useState<Comment[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isOnlineBackend, setIsOnlineBackend] = useState(false);
 
-  // Load data from database
-  const refreshData = () => {
-    setPosts(db.getPosts().map(p => ({
+  // Sync data from local storage as initial/offline baseline
+  const loadLocalBaseline = useCallback(() => {
+    const localPosts = db.getPosts().map(p => ({
       ...p,
       author: db.getUserById(p.authorId) || p.author,
       isUpvoted: currentUser ? db.getPostVote(p.id, currentUser.id) === 'upvote' : false,
       isDownvoted: currentUser ? db.getPostVote(p.id, currentUser.id) === 'downvote' : false,
       isBookmarked: currentUser ? db.isBookmarked(p.id, currentUser.id) : false,
-    })));
+    }));
+    setPosts(localPosts);
     setUsers(db.getUsers());
     setComments(db.getComments());
     if (currentUser) {
       setNotifications(db.getNotificationsByUser(currentUser.id));
     }
-  };
-
-  useEffect(() => {
-    refreshData();
   }, [currentUser]);
 
+  // Synchronize with real backend API
+  const syncWithBackend = useCallback(async () => {
+    try {
+      // 1. Fetch posts from API
+      const postsRes = await postsAPI.getAll({ limit: 50 });
+      if (postsRes && postsRes.posts && postsRes.posts.length > 0) {
+        setPosts(postsRes.posts);
+        setIsOnlineBackend(true);
+      } else {
+        loadLocalBaseline();
+      }
+
+      // 2. Fetch users
+      const usersRes = await usersAPI.getAll();
+      if (usersRes && usersRes.length > 0) {
+        setUsers(usersRes);
+      } else {
+        setUsers(db.getUsers());
+      }
+
+      // 3. If authenticated, fetch current user info & notifications
+      const token = localStorage.getItem('nijuze_token');
+      if (token) {
+        try {
+          const me = await authAPI.getCurrentUser();
+          if (me) {
+            setCurrentUser(me);
+            localStorage.setItem('nijuze_user', JSON.stringify(me));
+          }
+          const notifs = await notificationsAPI.getAll();
+          if (notifs) {
+            setNotifications(notifs);
+          }
+        } catch {
+          // Token expired or invalid
+        }
+      }
+    } catch (err) {
+      // Backend is currently offline, fall back to local baseline
+      setIsOnlineBackend(false);
+      loadLocalBaseline();
+    }
+  }, [loadLocalBaseline]);
+
+  useEffect(() => {
+    loadLocalBaseline();
+    syncWithBackend();
+  }, [loadLocalBaseline, syncWithBackend]);
+
   // Auth methods
-  const login = (email: string, password: string): { success: boolean; error?: string } => {
-    const user = db.getUserByEmail(email);
-    if (!user) {
-      return { success: false, error: 'Email haijapatikana' };
+  const login = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
+    try {
+      // 1. Try real API backend first
+      const response = await authAPI.login(email, password);
+      if (response && response.data && response.data.user) {
+        const user = response.data.user;
+        setCurrentUser(user);
+        localStorage.setItem('nijuze_user', JSON.stringify(user));
+        localStorage.setItem('nijuze_current_user', JSON.stringify(user));
+        setIsOnlineBackend(true);
+        await syncWithBackend();
+        return { success: true };
+      }
+    } catch (err: any) {
+      // If error is invalid credentials from backend, return error
+      if (err.message && (err.message.includes('Invalid') || err.message.includes('password') || err.message.includes('banned'))) {
+        return { success: false, error: err.message };
+      }
+
+      // Otherwise backend is offline, check local db fallback
+      const localUser = db.getUserByEmail(email);
+      if (localUser) {
+        if (localUser.password === password) {
+          setCurrentUser(localUser);
+          localStorage.setItem('nijuze_current_user', JSON.stringify(localUser));
+          localStorage.setItem('nijuze_user', JSON.stringify(localUser));
+          return { success: true };
+        }
+        return { success: false, error: 'Password si sahihi' };
+      }
     }
-    if (user.password !== password) {
-      return { success: false, error: 'Password si sahihi' };
-    }
-    setCurrentUser(user);
-    localStorage.setItem('nijuze_current_user', JSON.stringify(user));
-    return { success: true };
+
+    return { success: false, error: 'Email haijapatikana au nenosiri si sahihi' };
   };
 
-  const register = (username: string, email: string, password: string): { success: boolean; error?: string } => {
-    if (db.getUserByEmail(email)) {
-      return { success: false, error: 'Email hii imeshajiriwa' };
-    }
+  const register = async (username: string, email: string, password: string): Promise<{ success: boolean; error?: string }> => {
     if (password.length < 6) {
       return { success: false, error: 'Password lazima iwe na herufi 6 au zaidi' };
     }
-    const user = db.createUser({
-      username,
-      email,
-      password,
-      avatar: username.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2),
-      role: 'Mwanachama',
-      bio: '',
-    });
-    setCurrentUser(user);
-    localStorage.setItem('nijuze_current_user', JSON.stringify(user));
-    return { success: true };
+
+    try {
+      // 1. Try real API backend
+      const response = await authAPI.register(username, email, password);
+      if (response && response.data && response.data.user) {
+        const user = response.data.user;
+        setCurrentUser(user);
+        localStorage.setItem('nijuze_user', JSON.stringify(user));
+        localStorage.setItem('nijuze_current_user', JSON.stringify(user));
+        setIsOnlineBackend(true);
+        await syncWithBackend();
+        return { success: true };
+      }
+    } catch (err: any) {
+      if (err.message && err.message.includes('already registered')) {
+        return { success: false, error: 'Email hii imeshajiriwa tayari' };
+      }
+
+      // Offline fallback
+      if (db.getUserByEmail(email)) {
+        return { success: false, error: 'Email hii imeshajiriwa' };
+      }
+
+      const localUser = db.createUser({
+        username,
+        email,
+        password,
+        avatar: username.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || 'NJ',
+        role: 'Mwanachama',
+        bio: '',
+      });
+      setCurrentUser(localUser);
+      localStorage.setItem('nijuze_current_user', JSON.stringify(localUser));
+      localStorage.setItem('nijuze_user', JSON.stringify(localUser));
+      return { success: true };
+    }
+
+    return { success: false, error: 'Hitilafu wakati wa kujiandikisha' };
   };
 
   const logout = () => {
+    authAPI.logout();
     setCurrentUser(null);
     localStorage.removeItem('nijuze_current_user');
+    localStorage.removeItem('nijuze_user');
+    localStorage.removeItem('nijuze_token');
   };
 
   // Post methods
-  const createPost = (title: string, content: string, tags: string[], category: string, isAnonymous: boolean): Post | null => {
+  const createPost = async (title: string, content: string, tags: string[], category: string, isAnonymous: boolean): Promise<Post | null> => {
     if (!currentUser) return null;
-    const post = db.createPost({
+
+    let createdPost: Post | null = null;
+
+    // 1. Try API
+    try {
+      const res = await postsAPI.create({ title, content, tags, category, isAnonymous });
+      if (res && res.post) {
+        createdPost = res.post;
+      }
+    } catch {
+      // Backend offline
+    }
+
+    // 2. Also save to local database for offline resilience
+    const localPost = db.createPost({
       authorId: currentUser.id,
       author: currentUser,
       title,
@@ -137,38 +257,113 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       category,
       isAnonymous,
     });
-    refreshData();
-    return post;
+
+    const finalPost = createdPost || localPost;
+    setPosts(prev => [finalPost, ...prev]);
+    return finalPost;
   };
 
-  const deletePost = (postId: string): boolean => {
-    const result = db.deletePost(postId);
-    refreshData();
-    return result;
+  const deletePost = async (postId: string): Promise<boolean> => {
+    setPosts(prev => prev.filter(p => p.id !== postId));
+    try {
+      await postsAPI.delete(postId);
+    } catch {}
+    return db.deletePost(postId);
   };
 
-  const upvotePost = (postId: string) => {
+  const upvotePost = async (postId: string) => {
     if (!currentUser) return;
+
+    // Optimistic UI update
+    setPosts(prev => prev.map(p => {
+      if (p.id === postId) {
+        const wasUpvoted = p.isUpvoted;
+        return {
+          ...p,
+          upvotes: wasUpvoted ? Math.max(0, p.upvotes - 1) : p.upvotes + 1,
+          downvotes: p.isDownvoted ? Math.max(0, p.downvotes - 1) : p.downvotes,
+          isUpvoted: !wasUpvoted,
+          isDownvoted: false
+        };
+      }
+      return p;
+    }));
+
     db.votePost(postId, currentUser.id, 'upvote');
-    refreshData();
+
+    try {
+      await postsAPI.upvote(postId);
+    } catch {}
   };
 
-  const downvotePost = (postId: string) => {
+  const downvotePost = async (postId: string) => {
     if (!currentUser) return;
+
+    // Optimistic UI update
+    setPosts(prev => prev.map(p => {
+      if (p.id === postId) {
+        const wasDownvoted = p.isDownvoted;
+        return {
+          ...p,
+          downvotes: wasDownvoted ? Math.max(0, p.downvotes - 1) : p.downvotes + 1,
+          upvotes: p.isUpvoted ? Math.max(0, p.upvotes - 1) : p.upvotes,
+          isDownvoted: !wasDownvoted,
+          isUpvoted: false
+        };
+      }
+      return p;
+    }));
+
     db.votePost(postId, currentUser.id, 'downvote');
-    refreshData();
+
+    try {
+      await postsAPI.downvote(postId);
+    } catch {}
   };
 
-  const toggleBookmark = (postId: string) => {
+  const toggleBookmark = async (postId: string) => {
     if (!currentUser) return;
+
+    setPosts(prev => prev.map(p => {
+      if (p.id === postId) {
+        const willBookmark = !p.isBookmarked;
+        return {
+          ...p,
+          isBookmarked: willBookmark,
+          bookmarks: willBookmark ? p.bookmarks + 1 : Math.max(0, p.bookmarks - 1)
+        };
+      }
+      return p;
+    }));
+
     db.toggleBookmark(postId, currentUser.id);
-    refreshData();
+
+    try {
+      await postsAPI.bookmark(postId);
+    } catch {}
   };
 
-  const addReaction = (postId: string, emoji: string) => {
+  const addReaction = async (postId: string, emoji: string) => {
     if (!currentUser) return;
+
+    setPosts(prev => prev.map(p => {
+      if (p.id === postId) {
+        const reactions = { ...(p.reactions || {}) };
+        const userList = Array.isArray(reactions[emoji]) ? reactions[emoji] : [];
+        const hasReacted = userList.includes(currentUser.id);
+        reactions[emoji] = hasReacted
+          ? userList.filter(id => id !== currentUser.id)
+          : [...userList, currentUser.id];
+        return { ...p, reactions };
+      }
+      return p;
+    }));
+
     db.toggleReaction(postId, currentUser.id, emoji);
-    refreshData();
+
+    try {
+      await postsAPI.addReaction(postId, emoji);
+    } catch {}
   };
 
   const incrementViews = (postId: string) => {
@@ -176,41 +371,100 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   };
 
   const searchPosts = (query: string): Post[] => {
-    return db.searchPosts(query);
+    if (!query.trim()) return posts;
+    const q = query.toLowerCase();
+    return posts.filter(p =>
+      p.title.toLowerCase().includes(q) ||
+      p.content.toLowerCase().includes(q) ||
+      p.tags.some(t => t.toLowerCase().includes(q))
+    );
   };
 
   // Comment methods
   const getCommentsByPost = (postId: string): Comment[] => {
-    return db.getCommentsByPost(postId).map(c => ({
+    return comments.filter(c => c.postId === postId).map(c => ({
       ...c,
       author: db.getUserById(c.authorId) || c.author,
     }));
   };
 
-  const addComment = (postId: string, content: string): Comment | null => {
+  const addComment = async (postId: string, content: string): Promise<Comment | null> => {
     if (!currentUser) return null;
-    const comment = db.createComment({
+
+    let newComment: Comment | null = null;
+    try {
+      const res = await commentsAPI.create(postId, content);
+      if (res) newComment = res;
+    } catch {}
+
+    const localComment = db.createComment({
       postId,
       authorId: currentUser.id,
       author: currentUser,
       content,
     });
-    refreshData();
-    return comment;
+
+    const finalComment = newComment || localComment;
+    setComments(prev => [finalComment, ...prev]);
+    setPosts(prev => prev.map(p => p.id === postId ? { ...p, commentsCount: p.commentsCount + 1 } : p));
+    return finalComment;
   };
 
-  const deleteComment = (commentId: string): boolean => {
-    const result = db.deleteComment(commentId);
-    refreshData();
-    return result;
+  const deleteComment = async (commentId: string): Promise<boolean> => {
+    setComments(prev => prev.filter(c => c.id !== commentId));
+    try {
+      await commentsAPI.delete(commentId);
+    } catch {}
+    return db.deleteComment(commentId);
+  };
+
+  const markBestAnswer = async (commentId: string, postId: string): Promise<void> => {
+    setComments(prev => prev.map(c => {
+      if (c.postId === postId) {
+        return {
+          ...c,
+          isBestAnswer: c.id === commentId ? !c.isBestAnswer : false
+        };
+      }
+      return c;
+    }));
+
+    try {
+      await commentsAPI.markBest(commentId);
+    } catch {}
+  };
+
+  const upvoteComment = async (commentId: string): Promise<void> => {
+    setComments(prev => prev.map(c => {
+      if (c.id === commentId) {
+        return {
+          ...c,
+          upvotes: (c.upvotes || 0) + 1
+        };
+      }
+      return c;
+    }));
+
+    try {
+      await commentsAPI.upvote(commentId);
+    } catch {}
   };
 
   // User methods
-  const toggleFollow = (userId: string): boolean => {
+  const toggleFollow = async (userId: string): Promise<boolean> => {
     if (!currentUser) return false;
-    const result = db.toggleFollow(currentUser.id, userId);
-    refreshData();
-    return result;
+    const isNowFollowing = db.toggleFollow(currentUser.id, userId);
+
+    try {
+      if (isNowFollowing) {
+        await usersAPI.follow(userId);
+      } else {
+        await usersAPI.unfollow(userId);
+      }
+    } catch {}
+
+    setUsers(db.getUsers());
+    return isNowFollowing;
   };
 
   const isFollowing = (userId: string): boolean => {
@@ -219,19 +473,25 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   };
 
   const getUserById = (userId: string): User | undefined => {
-    return db.getUserById(userId);
+    return users.find(u => u.id === userId) || db.getUserById(userId);
   };
 
   // Notification methods
   const markNotificationRead = (notifId: string) => {
+    setNotifications(prev => prev.map(n => n.id === notifId ? { ...n, isRead: true } : n));
     db.markNotificationRead(notifId);
-    refreshData();
+    try {
+      notificationsAPI.markRead(notifId);
+    } catch {}
   };
 
   const markAllNotificationsRead = () => {
     if (!currentUser) return;
+    setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
     db.markAllNotificationsRead(currentUser.id);
-    refreshData();
+    try {
+      notificationsAPI.markAllRead();
+    } catch {}
   };
 
   const unreadCount = notifications.filter(n => !n.isRead).length;
@@ -249,19 +509,21 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   // Categories & Topics
   const categories: Category[] = [
-    { id: 'cat1', name: 'Teknolojia', icon: '💻', description: 'Programming, AI, Web Dev', postsCount: 0, followersCount: 0 },
-    { id: 'cat2', name: 'Biashara', icon: '📊', description: 'Startups, Finance, Marketing', postsCount: 0, followersCount: 0 },
-    { id: 'cat3', name: 'Sayansi', icon: '🔬', description: 'Research, Innovation', postsCount: 0, followersCount: 0 },
-    { id: 'cat4', name: 'Sanaa', icon: '🎨', description: 'Design, Music, Film', postsCount: 0, followersCount: 0 },
-    { id: 'cat5', name: 'Michezo', icon: '⚽', description: 'Football, Basketball', postsCount: 0, followersCount: 0 },
+    { id: 'cat1', name: 'Teknolojia', icon: '💻', description: 'Programming, AI, Web Dev', postsCount: 42, followersCount: 1200 },
+    { id: 'cat2', name: 'Biashara', icon: '📊', description: 'Startups, Finance, Marketing', postsCount: 28, followersCount: 890 },
+    { id: 'cat3', name: 'Sayansi', icon: '🔬', description: 'Research, Innovation', postsCount: 19, followersCount: 650 },
+    { id: 'cat4', name: 'Sanaa', icon: '🎨', description: 'Design, Music, Film', postsCount: 14, followersCount: 430 },
+    { id: 'cat5', name: 'Michezo', icon: '⚽', description: 'Football, Basketball', postsCount: 12, followersCount: 520 },
+    { id: 'cat6', name: 'Elimu', icon: '📚', description: 'Masomo, Vyuo, Scholarships', postsCount: 31, followersCount: 940 },
+    { id: 'cat7', name: 'Afya', icon: '🏥', description: 'Uzazi, Lishe, Tiba', postsCount: 22, followersCount: 710 },
   ];
 
   const trendingTopics: TrendingTopic[] = [
-    { id: 't1', name: 'AI & Machine Learning', postsCount: 0, growth: 24, category: 'Teknolojia' },
-    { id: 't2', name: 'Web3 & Blockchain', postsCount: 0, growth: 18, category: 'Teknolojia' },
-    { id: 't3', name: 'Startup Ecosystem', postsCount: 0, growth: 31, category: 'Biashara' },
-    { id: 't4', name: 'Cybersecurity', postsCount: 0, growth: 15, category: 'Teknolojia' },
-    { id: 't5', name: 'Cloud Computing', postsCount: 0, growth: 12, category: 'Teknolojia' },
+    { id: 't1', name: 'AI & Machine Learning', postsCount: 45, growth: 24, category: 'Teknolojia' },
+    { id: 't2', name: 'React 19 & Next.js', postsCount: 38, growth: 18, category: 'Teknolojia' },
+    { id: 't3', name: 'Biashara za Kidijitali', postsCount: 29, growth: 31, category: 'Biashara' },
+    { id: 't4', name: 'Cybersecurity & Privacy', postsCount: 26, growth: 15, category: 'Teknolojia' },
+    { id: 't5', name: 'Cloud Computing (AWS/GCP)', postsCount: 21, growth: 12, category: 'Teknolojia' },
   ];
 
   const value: AppState = {
@@ -283,6 +545,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     getCommentsByPost,
     addComment,
     deleteComment,
+    markBestAnswer,
+    upvoteComment,
     users,
     toggleFollow,
     isFollowing,
@@ -297,6 +561,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     trendingTopics,
     searchQuery,
     setSearchQuery,
+    isOnlineBackend,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

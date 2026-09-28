@@ -57,7 +57,7 @@ export const HeatmapAnalytics: React.FC = () => {
           <MousePointer size={32} color="#6366f1" />
           <div>
             <h2 style={{ fontSize: 28, fontWeight: 700, margin: 0 }}>Heatmap & Analytics</h2>
-            <p style={{ fontSize: 14, color: '#94a3b8', margin: 0 }}>
+            <p style={{ fontSize: 14, color: 'var(--text-muted)', margin: 0 }}>
               Chunguza tabia za watumiaji na user journey
             </p>
           </div>
@@ -96,7 +96,7 @@ export const HeatmapAnalytics: React.FC = () => {
         marginBottom: 32,
       }}>
         {[
-          { label: 'Total Clicks', value: totalClicks, icon: MousePointer, color: '#a5b4fc', change: '+18%' },
+          { label: 'Total Clicks', value: totalClicks, icon: MousePointer, color: 'var(--btn-ghost-text)', change: '+18%' },
           { label: 'Avg per Area', value: Math.round(avgClicks), icon: BarChart3, color: '#6ee7b7', change: '+12%' },
           { label: 'Peak Activity', value: maxClicks, icon: TrendingUp, color: '#fbbf24', change: '+24%' },
           { label: 'Active Users', value: 245, icon: Users, color: '#f472b6', change: '+8%' },
@@ -146,13 +146,13 @@ export const HeatmapAnalytics: React.FC = () => {
                   transition: 'all 0.3s ease',
                 }}
               >
-                <p style={{ fontSize: 14, fontWeight: 600, color: '#e2e8f0', marginBottom: 8, textTransform: 'capitalize' }}>
+                <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-main)', marginBottom: 8, textTransform: 'capitalize' }}>
                   {area}
                 </p>
                 <p style={{ fontSize: 24, fontWeight: 700, color, marginBottom: 4 }}>
                   {clicks.toLocaleString()}
                 </p>
-                <p style={{ fontSize: 12, color: '#94a3b8' }}>
+                <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>
                   {((clicks / totalClicks) * 100).toFixed(1)}%
                 </p>
               </div>
@@ -228,16 +228,16 @@ export const HeatmapAnalytics: React.FC = () => {
                     justifyContent: 'center',
                     fontSize: 14,
                     fontWeight: 700,
-                    color: '#a5b4fc',
+                    color: 'var(--btn-ghost-text)',
                   }}>
                     {i + 1}
                   </div>
-                  <span style={{ fontSize: 14, fontWeight: 500, color: '#e2e8f0' }}>
+                  <span style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-main)' }}>
                     {step.step}
                   </span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                  <span style={{ fontSize: 13, color: '#94a3b8' }}>
+                  <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>
                     {step.visits.toLocaleString()} visits
                   </span>
                   <span style={{

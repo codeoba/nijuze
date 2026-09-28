@@ -166,7 +166,7 @@ export const VirtualCurrency: React.FC = () => {
           </div>
           <div>
             <h2 style={{ fontSize: 28, fontWeight: 700, margin: 0 }}>Duka la Nijuze</h2>
-            <p style={{ fontSize: 14, color: '#94a3b8', margin: 0 }}>
+            <p style={{ fontSize: 14, color: 'var(--text-muted)', margin: 0 }}>
               Nunua badges, titles, na perks za kipekee
             </p>
           </div>
@@ -271,7 +271,7 @@ export const VirtualCurrency: React.FC = () => {
                 </h4>
               </div>
 
-              <p style={{ fontSize: 13, color: '#94a3b8', marginBottom: 16, lineHeight: 1.5 }}>
+              <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 16, lineHeight: 1.5 }}>
                 {item.description}
               </p>
 
@@ -322,7 +322,7 @@ export const VirtualCurrency: React.FC = () => {
           {shopItems.filter(item => item.owned).length === 0 ? (
             <div className="glass-card" style={{ padding: 48, textAlign: 'center', gridColumn: '1 / -1' }}>
               <Gift size={48} color="#475569" style={{ margin: '0 auto 16px' }} />
-              <p style={{ fontSize: 16, color: '#94a3b8' }}>Bado hujanutua chochote</p>
+              <p style={{ fontSize: 16, color: 'var(--text-muted)' }}>Bado hujanutua chochote</p>
             </div>
           ) : (
             shopItems.filter(item => item.owned).map((item) => (
@@ -343,7 +343,7 @@ export const VirtualCurrency: React.FC = () => {
       {/* History Tab */}
       {selectedTab === 'history' && (
         <div className="glass-card" style={{ padding: 24 }}>
-          <p style={{ textAlign: 'center', color: '#94a3b8', fontSize: 14 }}>
+          <p style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: 14 }}>
             Historia ya manunuzi itaonekana hapa
           </p>
         </div>

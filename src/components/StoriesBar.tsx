@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { X, ChevronLeft, ChevronRight, Eye, Heart, MessageCircle } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, Eye, Heart, Plus, Sparkles, Send } from 'lucide-react';
 import { useApp } from '../contexts/AppContext';
+import { storiesAPI } from '../services/api';
 
 interface Story {
   id: string;
@@ -12,8 +13,8 @@ interface Story {
   createdAt: string;
   expiresAt: string;
   views: number;
-  likes: string[];
-  isViewed: boolean;
+  likes?: string[];
+  isViewed?: boolean;
 }
 
 export const StoriesBar: React.FC = () => {
@@ -21,170 +22,206 @@ export const StoriesBar: React.FC = () => {
   const [stories, setStories] = useState<Story[]>([]);
   const [selectedStory, setSelectedStory] = useState<Story | null>(null);
   const [storyIndex, setStoryIndex] = useState(0);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [newContent, setNewContent] = useState('');
+  const [selectedGradient, setSelectedGradient] = useState('linear-gradient(135deg, #6366f1 0%, #9333ea 100%)');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  useEffect(() => {
-    // Generate sample stories
-    const sampleStories: Story[] = users.slice(0, 8).map((user, i) => ({
+  const gradients = [
+    'linear-gradient(135deg, #6366f1 0%, #9333ea 100%)',
+    'linear-gradient(135deg, #f43f5e 0%, #fb923c 100%)',
+    'linear-gradient(135deg, #10b981 0%, #06b6d4 100%)',
+    'linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%)',
+    'linear-gradient(135deg, #3b82f6 0%, #2dd4bf 100%)',
+  ];
+
+  const fetchStories = async () => {
+    try {
+      const data = await storiesAPI.getAll();
+      if (data && data.length > 0) {
+        setStories(data);
+        return;
+      }
+    } catch {}
+
+    // Fallback baseline stories
+    const sampleStories: Story[] = users.slice(0, 6).map((user, i) => ({
       id: `story-${i}`,
       userId: user.id,
       user,
       content: [
-        'Nimejifunza kitu kipya leo! 🎉',
-        'Mtu yeyote ana resources za Machine Learning?',
-        'Working on a new project 💻',
-        'Just finished reading "Clean Code" 📚',
-        'Looking for collaborators for AI project 🤖',
-        'Amazing day at the tech conference! 🚀',
-        'New blog post about React patterns 📝',
-        'Grateful for this community ❤️',
-      ][i],
-      backgroundColor: [
-        'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-        'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-        'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
-        'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
-        'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
-        'linear-gradient(135deg, #30cfd0 0%, #330867 100%)',
-        'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
-        'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)',
-      ][i],
-      createdAt: new Date(Date.now() - Math.random() * 86400000).toISOString(),
-      expiresAt: new Date(Date.now() + Math.random() * 86400000).toISOString(),
-      views: Math.floor(Math.random() * 500) + 100,
-      likes: users.slice(0, Math.floor(Math.random() * 5)).map(u => u.id),
-      isViewed: Math.random() > 0.5,
+        'Nimejifunza kitu kipya leo kuhusu React na Node.js! 🎉',
+        'Mtu yeyote mwenye uzoefu wa Machine Learning anijuze 🤖',
+        'Nashiriki kwenye mashindano ya coding wiki hii 💻',
+        'Makala mpya ya usalama wa data inakuja leo 📚',
+        'Hongera sana kwa jamii ya Nijuze kwa kufikisha wanachama 10k! 🚀',
+        'Habari za asubuhi wadau wote wa teknolojia ❤️',
+      ][i % 6],
+      backgroundColor: gradients[i % gradients.length],
+      createdAt: new Date().toISOString(),
+      expiresAt: new Date(Date.now() + 86400000).toISOString(),
+      views: Math.floor(Math.random() * 200) + 20,
+      isViewed: false,
     }));
     setStories(sampleStories);
+  };
+
+  useEffect(() => {
+    fetchStories();
   }, [users]);
 
   const handleStoryClick = (story: Story, index: number) => {
     setSelectedStory(story);
     setStoryIndex(index);
-    // Mark as viewed
-    setStories(stories.map(s => s.id === story.id ? { ...s, isViewed: true } : s));
+    setStories(prev => prev.map(s => s.id === story.id ? { ...s, isViewed: true, views: s.views + 1 } : s));
+    try {
+      storiesAPI.view(story.id);
+    } catch {}
   };
 
-  const handleNextStory = () => {
-    if (storyIndex < stories.length - 1) {
-      const nextIndex = storyIndex + 1;
-      setSelectedStory(stories[nextIndex]);
-      setStoryIndex(nextIndex);
-      setStories(stories.map(s => s.id === stories[nextIndex].id ? { ...s, isViewed: true } : s));
-    } else {
-      setSelectedStory(null);
-    }
-  };
+  const handleCreateStory = async () => {
+    if (!newContent.trim() || !currentUser) return;
+    setIsSubmitting(true);
+    try {
+      await storiesAPI.create({ content: newContent, backgroundColor: selectedGradient });
+    } catch {}
 
-  const handlePrevStory = () => {
-    if (storyIndex > 0) {
-      const prevIndex = storyIndex - 1;
-      setSelectedStory(stories[prevIndex]);
-      setStoryIndex(prevIndex);
-    }
-  };
+    // Add locally to feed
+    const myNewStory: Story = {
+      id: `story-${Date.now()}`,
+      userId: currentUser.id,
+      user: currentUser,
+      content: newContent,
+      backgroundColor: selectedGradient,
+      createdAt: new Date().toISOString(),
+      expiresAt: new Date(Date.now() + 86400000).toISOString(),
+      views: 0,
+      isViewed: false,
+    };
 
-  const handleLikeStory = () => {
-    if (!selectedStory || !currentUser) return;
-    setStories(stories.map(s => {
-      if (s.id === selectedStory.id) {
-        const isLiked = s.likes.includes(currentUser.id);
-        return {
-          ...s,
-          likes: isLiked
-            ? s.likes.filter(id => id !== currentUser.id)
-            : [...s.likes, currentUser.id],
-        };
-      }
-      return s;
-    }));
+    setStories(prev => [myNewStory, ...prev]);
+    setNewContent('');
+    setShowCreateModal(false);
+    setIsSubmitting(false);
   };
 
   return (
     <>
-      {/* Stories Bar */}
-      <div className="glass-card" style={{ padding: 16, marginBottom: 16, overflowX: 'auto' }}>
-        <div style={{ display: 'flex', gap: 16, minWidth: 'max-content' }}>
-          {/* Add Story Button */}
-          {currentUser && (
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, cursor: 'pointer' }}>
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 14,
+        padding: '12px 4px',
+        overflowX: 'auto',
+        marginBottom: 16,
+        scrollbarWidth: 'none',
+      }}>
+        {/* Current user Add Story button */}
+        {currentUser && (
+          <div
+            onClick={() => setShowCreateModal(true)}
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              cursor: 'pointer',
+              minWidth: 68,
+              textAlign: 'center',
+            }}
+          >
+            <div style={{
+              width: 58,
+              height: 58,
+              borderRadius: '50%',
+              padding: 2,
+              background: 'linear-gradient(135deg, #6366f1, #9333ea)',
+              position: 'relative',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}>
               <div style={{
-                width: 64,
-                height: 64,
+                width: '100%',
+                height: '100%',
                 borderRadius: '50%',
-                background: 'linear-gradient(135deg, #6366f1, #9333ea)',
+                background: 'var(--bg-surface)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: 24,
+                fontSize: 14,
                 fontWeight: 'bold',
-                border: '3px solid #0f0f23',
-                position: 'relative',
+                color: 'var(--text-main)',
               }}>
-                {currentUser.avatar}
-                <div style={{
-                  position: 'absolute',
-                  bottom: -2,
-                  right: -2,
-                  width: 20,
-                  height: 20,
-                  borderRadius: '50%',
-                  background: '#6366f1',
-                  border: '2px solid #0f0f23',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: 14,
-                }}>
-                  +
-                </div>
+                {currentUser.avatar || 'NJ'}
               </div>
-              <span style={{ fontSize: 11, color: '#94a3b8' }}>Ongeza</span>
-            </div>
-          )}
-
-          {/* Stories */}
-          {stories.map((story, index) => (
-            <div
-              key={story.id}
-              onClick={() => handleStoryClick(story, index)}
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: 4,
-                cursor: 'pointer',
-              }}
-            >
               <div style={{
-                width: 64,
-                height: 64,
+                position: 'absolute',
+                bottom: 0,
+                right: 0,
+                width: 20,
+                height: 20,
                 borderRadius: '50%',
-                padding: 3,
-                background: story.isViewed
-                  ? 'rgba(100, 116, 139, 0.5)'
-                  : 'linear-gradient(135deg, #6366f1, #9333ea, #ec4899)',
+                background: '#6366f1',
+                border: '2px solid var(--bg-surface)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'white',
               }}>
-                <div style={{
-                  width: '100%',
-                  height: '100%',
-                  borderRadius: '50%',
-                  background: story.backgroundColor,
-                  border: '3px solid #0f0f23',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: 20,
-                  fontWeight: 'bold',
-                }}>
-                  {story.user.avatar}
-                </div>
+                <Plus size={12} strokeWidth={3} />
               </div>
-              <span style={{ fontSize: 11, color: '#94a3b8', maxWidth: 64, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                {story.user.username.split(' ')[0]}
-              </span>
             </div>
-          ))}
-        </div>
+            <span style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4, maxWidth: 68, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              Weka Story
+            </span>
+          </div>
+        )}
+
+        {/* Stories list */}
+        {stories.map((story, index) => (
+          <div
+            key={story.id}
+            onClick={() => handleStoryClick(story, index)}
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              cursor: 'pointer',
+              minWidth: 68,
+              textAlign: 'center',
+            }}
+          >
+            <div style={{
+              width: 58,
+              height: 58,
+              borderRadius: '50%',
+              padding: 2,
+              background: story.isViewed ? 'rgba(100, 116, 139, 0.4)' : 'linear-gradient(135deg, #f43f5e, #fb923c)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transition: 'transform 0.2s',
+            }}>
+              <div style={{
+                width: '100%',
+                height: '100%',
+                borderRadius: '50%',
+                background: 'var(--bg-surface)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 13,
+                fontWeight: 'bold',
+                color: 'var(--text-main)',
+              }}>
+                {story.user?.avatar || story.user?.username?.slice(0, 2).toUpperCase() || 'NJ'}
+              </div>
+            </div>
+            <span style={{ fontSize: 11, color: 'var(--text-body)', marginTop: 4, maxWidth: 68, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {story.user?.username ? story.user.username.split(' ')[0] : 'Mwanachama'}
+            </span>
+          </div>
+        ))}
       </div>
 
       {/* Story Viewer Modal */}
@@ -192,228 +229,170 @@ export const StoriesBar: React.FC = () => {
         <div
           className="modal-overlay"
           onClick={() => setSelectedStory(null)}
-          style={{ background: 'rgba(0, 0, 0, 0.95)' }}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0,0,0,0.85)',
+            backdropFilter: 'blur(8px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 9999,
+          }}
         >
           <div
+            onClick={(e) => e.stopPropagation()}
             style={{
               width: '100%',
-              maxWidth: 480,
-              height: '90vh',
-              maxHeight: 800,
-              borderRadius: 16,
+              maxWidth: 420,
+              height: 600,
+              borderRadius: 24,
               background: selectedStory.backgroundColor,
+              padding: 24,
               position: 'relative',
-              overflow: 'hidden',
               display: 'flex',
               flexDirection: 'column',
+              justifyContent: 'space-between',
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.7)',
             }}
-            onClick={(e) => e.stopPropagation()}
           >
-            {/* Progress Bar */}
-            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, padding: 12, zIndex: 10 }}>
-              <div style={{
-                height: 3,
-                background: 'rgba(255, 255, 255, 0.3)',
-                borderRadius: 2,
-                overflow: 'hidden',
-              }}>
-                <div style={{
-                  height: '100%',
-                  background: 'white',
-                  width: '100%',
-                  animation: 'storyProgress 5s linear',
-                }} />
-              </div>
-            </div>
-
-            {/* Header */}
-            <div style={{
-              padding: '40px 16px 16px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 12,
-              zIndex: 10,
-            }}>
-              <div style={{
-                width: 40,
-                height: 40,
-                borderRadius: '50%',
-                background: 'rgba(255, 255, 255, 0.2)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: 16,
-                fontWeight: 'bold',
-              }}>
-                {selectedStory.user.avatar}
-              </div>
-              <div style={{ flex: 1 }}>
-                <h4 style={{ fontSize: 14, fontWeight: 600, color: 'white' }}>
-                  {selectedStory.user.username}
-                </h4>
-                <p style={{ fontSize: 12, color: 'rgba(255, 255, 255, 0.7)' }}>
-                  {new Date(selectedStory.createdAt).toLocaleTimeString('sw-TZ', { hour: '2-digit', minute: '2-digit' })}
-                </p>
+            {/* Top header */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
+                  {selectedStory.user?.avatar || 'NJ'}
+                </div>
+                <div>
+                  <div style={{ fontWeight: 'bold', fontSize: 14 }}>{selectedStory.user?.username || 'Mwanachama'}</div>
+                  <div style={{ fontSize: 11, opacity: 0.8 }}>Masaa 24</div>
+                </div>
               </div>
               <button
                 onClick={() => setSelectedStory(null)}
-                style={{
-                  padding: 8,
-                  borderRadius: 8,
-                  background: 'rgba(255, 255, 255, 0.2)',
-                  border: 'none',
-                  cursor: 'pointer',
-                }}
+                style={{ background: 'rgba(0,0,0,0.3)', border: 'none', borderRadius: '50%', width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', cursor: 'pointer' }}
               >
-                <X size={20} color="white" />
+                <X size={18} />
               </button>
             </div>
 
-            {/* Content */}
-            <div style={{
-              flex: 1,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: 24,
-              textAlign: 'center',
-            }}>
-              <p style={{
-                fontSize: 24,
-                fontWeight: 600,
-                color: 'white',
-                lineHeight: 1.5,
-                textShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
-              }}>
-                {selectedStory.content}
-              </p>
+            {/* Content text */}
+            <div style={{ fontSize: 22, fontWeight: 600, lineHeight: 1.4, textAlign: 'center', margin: 'auto 0', textShadow: '0 2px 4px rgba(0,0,0,0.4)' }}>
+              {selectedStory.content}
             </div>
 
-            {/* Footer */}
-            <div style={{
-              padding: 16,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              background: 'rgba(0, 0, 0, 0.2)',
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                <button
-                  onClick={handleLikeStory}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 6,
-                    padding: '8px 16px',
-                    borderRadius: 20,
-                    background: selectedStory.likes.includes(currentUser?.id || '')
-                      ? 'rgba(239, 68, 68, 0.3)'
-                      : 'rgba(255, 255, 255, 0.2)',
-                    border: 'none',
-                    color: 'white',
-                    cursor: 'pointer',
-                    fontSize: 14,
-                  }}
-                >
-                  <Heart
-                    size={18}
-                    fill={selectedStory.likes.includes(currentUser?.id || '') ? '#ef4444' : 'none'}
-                  />
-                  <span>{selectedStory.likes.length}</span>
-                </button>
-                <button style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 6,
-                  padding: '8px 16px',
-                  borderRadius: 20,
-                  background: 'rgba(255, 255, 255, 0.2)',
-                  border: 'none',
-                  color: 'white',
-                  cursor: 'pointer',
-                  fontSize: 14,
-                }}>
-                  <MessageCircle size={18} />
-                  <span>Jibu</span>
-                </button>
+            {/* Bottom info */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', opacity: 0.9, fontSize: 12 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <Eye size={15} />
+                <span>{selectedStory.views} watazamaji</span>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'rgba(255, 255, 255, 0.7)', fontSize: 13 }}>
-                <Eye size={16} />
-                <span>{selectedStory.views}</span>
-              </div>
+              <div>Nijuze Stories ✨</div>
             </div>
-
-            {/* Navigation Arrows */}
-            {storyIndex > 0 && (
-              <button
-                onClick={handlePrevStory}
-                style={{
-                  position: 'absolute',
-                  left: 8,
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  padding: 12,
-                  borderRadius: '50%',
-                  background: 'rgba(0, 0, 0, 0.3)',
-                  border: 'none',
-                  cursor: 'pointer',
-                }}
-              >
-                <ChevronLeft size={24} color="white" />
-              </button>
-            )}
-            {storyIndex < stories.length - 1 && (
-              <button
-                onClick={handleNextStory}
-                style={{
-                  position: 'absolute',
-                  right: 8,
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  padding: 12,
-                  borderRadius: '50%',
-                  background: 'rgba(0, 0, 0, 0.3)',
-                  border: 'none',
-                  cursor: 'pointer',
-                }}
-              >
-                <ChevronRight size={24} color="white" />
-              </button>
-            )}
-
-            {/* Click areas for navigation */}
-            <div
-              onClick={handlePrevStory}
-              style={{
-                position: 'absolute',
-                left: 0,
-                top: 0,
-                width: '30%',
-                height: '100%',
-                cursor: 'pointer',
-              }}
-            />
-            <div
-              onClick={handleNextStory}
-              style={{
-                position: 'absolute',
-                right: 0,
-                top: 0,
-                width: '30%',
-                height: '100%',
-                cursor: 'pointer',
-              }}
-            />
           </div>
         </div>
       )}
 
-      <style>{`
-        @keyframes storyProgress {
-          from { width: 0%; }
-          to { width: 100%; }
-        }
-      `}</style>
+      {/* Create Story Modal */}
+      {showCreateModal && (
+        <div
+          className="modal-overlay"
+          onClick={() => setShowCreateModal(false)}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0,0,0,0.8)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 9999,
+          }}
+        >
+          <div
+            className="glass-card"
+            onClick={(e) => e.stopPropagation()}
+            style={{ width: '100%', maxWidth: 460, padding: 24 }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+              <h3 style={{ fontSize: 18, fontWeight: 700 }}>Chapisha Story ya Masaa 24</h3>
+              <button onClick={() => setShowCreateModal(false)} style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* Live Preview Box */}
+            <div style={{
+              height: 200,
+              borderRadius: 16,
+              background: selectedGradient,
+              padding: 16,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              textAlign: 'center',
+              color: 'white',
+              fontSize: 18,
+              fontWeight: 600,
+              marginBottom: 16,
+              boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.2)',
+            }}>
+              {newContent || 'Andika maneno ya story yako hapa...'}
+            </div>
+
+            <textarea
+              placeholder="Unafikiria nini leo? Andika hapa..."
+              value={newContent}
+              onChange={(e) => setNewContent(e.target.value)}
+              rows={3}
+              style={{
+                width: '100%',
+                padding: 12,
+                borderRadius: 12,
+                background: 'var(--input-bg)',
+                border: '1px solid var(--input-border)',
+                color: 'var(--input-text)',
+                marginBottom: 16,
+                resize: 'none',
+              }}
+            />
+
+            {/* Gradient Selector */}
+            <div style={{ marginBottom: 20 }}>
+              <div style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 8 }}>Chagua Rangi:</div>
+              <div style={{ display: 'flex', gap: 10 }}>
+                {gradients.map((grad, i) => (
+                  <div
+                    key={i}
+                    onClick={() => setSelectedGradient(grad)}
+                    style={{
+                      width: 32,
+                      height: 32,
+                      borderRadius: '50%',
+                      background: grad,
+                      cursor: 'pointer',
+                      border: selectedGradient === grad ? '2px solid white' : 'none',
+                      transform: selectedGradient === grad ? 'scale(1.15)' : 'none',
+                      transition: 'all 0.2s',
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
+              <button onClick={() => setShowCreateModal(false)} className="btn-ghost">Ghairi</button>
+              <button
+                onClick={handleCreateStory}
+                disabled={!newContent.trim() || isSubmitting}
+                className="btn-primary"
+                style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}
+              >
+                <Send size={16} />
+                <span>{isSubmitting ? 'Inachapisha...' : 'Chapisha Sasa'}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };

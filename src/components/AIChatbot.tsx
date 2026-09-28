@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { MessageCircle, Send, X, Bot, User, Loader2 } from 'lucide-react';
 import { useApp } from '../contexts/AppContext';
+import { aiAPI } from '../services/api';
 
 interface Message {
   id: string;
@@ -28,7 +29,7 @@ export const AIChatbot: React.FC = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // Simple AI response generator
+  // Simple AI response generator (fallback)
   const generateResponse = (userMessage: string): string => {
     const message = userMessage.toLowerCase();
 
@@ -74,10 +75,9 @@ export const AIChatbot: React.FC = () => {
 
     // Default response
     const responses = [
-      'Ninaelewa. Je, unaweza kueleza zaidi?',
-      'Samahani, sikuweza kuelewa vizuri. Unaweza kuuliza tena?',
-      'Nashukuru kwa swali lako! Ninaweza kukusaidia na kutafuta posts, takwimu, au kupendekeza content. Jaribu "help" kwa msaada zaidi.',
-      'Hilo ni swali zuri! Ninapendekeza utafute posts zinazohusiana au uulize community yetu.',
+      'Ninaelewa vizuri. Je, unaweza kueleza zaidi au kuweka swali kwa kina?',
+      'Nashukuru kwa kuuliza! Ninaweza kukusaidia kutafuta posts za jamii, kupata takwimu, au kupendekeza mijadala mipya.',
+      'Swali zuri sana kuhusu jukwaa la Nijuze. Unaweza pia kuchapisha hili kama swali jipya kwenye jamii ili upate maoni mengi zaidi!',
     ];
 
     return responses[Math.floor(Math.random() * responses.length)];
@@ -86,25 +86,37 @@ export const AIChatbot: React.FC = () => {
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
 
+    const userText = input.trim();
     const userMessage: Message = {
       id: Date.now().toString(),
       role: 'user',
-      content: input,
+      content: userText,
       timestamp: new Date(),
     };
 
-    setMessages([...messages, userMessage]);
+    setMessages(prev => [...prev, userMessage]);
     setInput('');
     setIsLoading(true);
 
-    // Simulate AI thinking
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    let answer = '';
+    try {
+      // Real AI endpoint call
+      const res = await aiAPI.chat(userText);
+      if (res) {
+        answer = res.reply || res.response || (res.data && (res.data.reply || res.data.response)) || '';
+      }
+    } catch {
+      // Offline fallback
+    }
 
-    const response = generateResponse(input);
+    if (!answer) {
+      answer = generateResponse(userText);
+    }
+
     const assistantMessage: Message = {
       id: (Date.now() + 1).toString(),
       role: 'assistant',
-      content: response,
+      content: answer,
       timestamp: new Date(),
     };
 
@@ -118,8 +130,6 @@ export const AIChatbot: React.FC = () => {
       handleSend();
     }
   };
-
-  if (!currentUser) return null;
 
   return (
     <>
@@ -170,11 +180,11 @@ export const AIChatbot: React.FC = () => {
           {/* Header */}
           <div style={{
             padding: 16,
-            borderBottom: '1px solid rgba(51, 65, 85, 0.3)',
+            borderBottom: '1px solid var(--border-app)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(147, 51, 234, 0.1))',
+            background: 'var(--bg-subtle)',
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
               <div style={{
@@ -189,8 +199,8 @@ export const AIChatbot: React.FC = () => {
                 <Bot size={20} color="white" />
               </div>
               <div>
-                <h3 style={{ fontSize: 16, fontWeight: 600, margin: 0 }}>Nijuze AI</h3>
-                <p style={{ fontSize: 12, color: '#10b981', margin: 0 }}>● Online</p>
+                <h3 style={{ fontSize: 16, fontWeight: 600, margin: 0, color: 'var(--text-main)' }}>Nijuze AI</h3>
+                <p style={{ fontSize: 12, color: '#10b981', margin: 0, fontWeight: 500 }}>● Online</p>
               </div>
             </div>
             <button
@@ -201,9 +211,10 @@ export const AIChatbot: React.FC = () => {
                 background: 'transparent',
                 border: 'none',
                 cursor: 'pointer',
+                color: 'var(--text-muted)'
               }}
             >
-              <X size={20} color="#94a3b8" />
+              <X size={20} />
             </button>
           </div>
 
@@ -234,17 +245,17 @@ export const AIChatbot: React.FC = () => {
                   {msg.role === 'user' ? <User size={16} color="white" /> : <Bot size={16} color="white" />}
                 </div>
                 <div style={{
-                  maxWidth: '70%',
+                  maxWidth: '75%',
                   padding: 12,
-                  borderRadius: 12,
+                  borderRadius: 14,
                   background: msg.role === 'user'
-                    ? 'rgba(16, 185, 129, 0.1)'
-                    : 'rgba(99, 102, 241, 0.1)',
-                  border: `1px solid ${msg.role === 'user' ? 'rgba(16, 185, 129, 0.3)' : 'rgba(99, 102, 241, 0.3)'}`,
+                    ? 'var(--btn-ghost-bg)'
+                    : 'var(--bg-subtle)',
+                  border: `1px solid ${msg.role === 'user' ? 'var(--btn-ghost-border)' : 'var(--border-app)'}`,
                 }}>
                   <p style={{
                     fontSize: 14,
-                    color: '#e2e8f0',
+                    color: 'var(--text-main)',
                     margin: 0,
                     lineHeight: 1.5,
                     whiteSpace: 'pre-wrap',
@@ -253,8 +264,8 @@ export const AIChatbot: React.FC = () => {
                   </p>
                   <p style={{
                     fontSize: 11,
-                    color: '#64748b',
-                    margin: '8px 0 0 0',
+                    color: 'var(--text-muted)',
+                    margin: '6px 0 0 0',
                     textAlign: msg.role === 'user' ? 'right' : 'left',
                   }}>
                     {msg.timestamp.toLocaleTimeString('sw-TZ', { hour: '2-digit', minute: '2-digit' })}
@@ -279,10 +290,10 @@ export const AIChatbot: React.FC = () => {
                 <div style={{
                   padding: 12,
                   borderRadius: 12,
-                  background: 'rgba(99, 102, 241, 0.1)',
-                  border: '1px solid rgba(99, 102, 241, 0.3)',
+                  background: 'var(--bg-subtle)',
+                  border: '1px solid var(--border-app)',
                 }}>
-                  <Loader2 size={16} color="#a5b4fc" className="animate-spin" />
+                  <Loader2 size={16} color="var(--btn-ghost-text)" className="animate-spin" />
                 </div>
               </div>
             )}
@@ -293,9 +304,10 @@ export const AIChatbot: React.FC = () => {
           {/* Input */}
           <div style={{
             padding: 16,
-            borderTop: '1px solid rgba(51, 65, 85, 0.3)',
+            borderTop: '1px solid var(--border-app)',
             display: 'flex',
             gap: 8,
+            background: 'var(--bg-surface)'
           }}>
             <input
               type="text"
@@ -308,9 +320,9 @@ export const AIChatbot: React.FC = () => {
                 flex: 1,
                 padding: 12,
                 borderRadius: 12,
-                background: 'rgba(30, 41, 59, 0.5)',
-                border: '1px solid rgba(51, 65, 85, 0.5)',
-                color: '#e2e8f0',
+                background: 'var(--input-bg)',
+                border: '1px solid var(--input-border)',
+                color: 'var(--input-text)',
                 fontSize: 14,
               }}
             />

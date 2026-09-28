@@ -7,11 +7,15 @@ import { User, Post, Comment, Notification } from '../types';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
-// Helper function for API calls
+// Helper function for API calls with timeout
 const apiCall = async (endpoint: string, options: RequestInit = {}) => {
   const token = localStorage.getItem('nijuze_token');
   
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 3500);
+
   const config: RequestInit = {
+    signal: controller.signal,
     ...options,
     headers: {
       'Content-Type': 'application/json',
@@ -22,6 +26,7 @@ const apiCall = async (endpoint: string, options: RequestInit = {}) => {
 
   try {
     const response = await fetch(`${API_URL}${endpoint}`, config);
+    clearTimeout(timeoutId);
     const data = await response.json();
 
     if (!response.ok) {
@@ -29,8 +34,12 @@ const apiCall = async (endpoint: string, options: RequestInit = {}) => {
     }
 
     return data;
-  } catch (error) {
-    console.error('API Error:', error);
+  } catch (error: any) {
+    clearTimeout(timeoutId);
+    if (error.name === 'AbortError') {
+      throw new Error('Connection timeout - backend offline');
+    }
+    console.warn(`API call to ${endpoint} failed, falling back to local storage:`, error.message);
     throw error;
   }
 };
@@ -285,30 +294,148 @@ export const adminAPI = {
 // UPLOAD API
 // ============================================
 export const uploadAPI = {
-  image: async (file: File) => {
-    const formData = new FormData();
-    formData.append('image', file);
+  upload: async (file: File): Promise<{ url: string; filename: string; originalName: string; size: number }> => {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('image', file);
 
-    const token = localStorage.getItem('nijuze_token');
-    
-    const response = await fetch(`${API_URL}/upload`, {
-      method: 'POST',
-      headers: {
-        ...(token && { Authorization: `Bearer ${token}` }),
-      },
-      body: formData,
-    });
+      const token = localStorage.getItem('nijuze_token');
+      
+      const response = await fetch(`${API_URL}/upload`, {
+        method: 'POST',
+        headers: {
+          ...(token && { Authorization: `Bearer ${token}` }),
+        },
+        body: formData,
+      });
 
-    const data = await response.json();
+      const data = await response.json();
 
-    if (!response.ok) {
+      if (response.ok && data.success && data.data) {
+        return data.data;
+      }
       throw new Error(data.error || 'Upload failed');
+    } catch {
+      // Fallback to Base64 data URL for offline or local preview resilience
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          resolve({
+            url: reader.result as string,
+            filename: file.name,
+            originalName: file.name,
+            size: file.size,
+          });
+        };
+        reader.onerror = () => reject(new Error('Hitilafu wakati wa kusoma faili'));
+        reader.readAsDataURL(file);
+      });
     }
+  },
 
-    return data;
+  image: async (file: File) => {
+    return uploadAPI.upload(file);
+  },
+
+  file: async (file: File) => {
+    return uploadAPI.upload(file);
   },
 };
 
+// ============================================
+// STORIES API
+// ============================================
+export const storiesAPI = {
+  getAll: async () => {
+    const response = await apiCall('/stories');
+    return response.data;
+  },
+  create: async (data: { content: string; backgroundColor?: string }) => {
+    const response = await apiCall('/stories', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    return response.data;
+  },
+  view: async (id: string) => {
+    const response = await apiCall(`/stories/${id}/view`, { method: 'POST' });
+    return response;
+  },
+};
+
+// ============================================
+// MESSAGES API
+// ============================================
+export const messagesAPI = {
+  getConversations: async () => {
+    const response = await apiCall('/messages/conversations');
+    return response.data;
+  },
+  getMessages: async (userId: string) => {
+    const response = await apiCall(`/messages/${userId}`);
+    return response.data;
+  },
+  send: async (userId: string, content: string) => {
+    const response = await apiCall(`/messages/${userId}`, {
+      method: 'POST',
+      body: JSON.stringify({ content }),
+    });
+    return response.data;
+  },
+};
+
+// ============================================
+// GUILDS API
+// ============================================
+export const guildsAPI = {
+  getAll: async () => {
+    const response = await apiCall('/guilds');
+    return response.data;
+  },
+  create: async (data: { name: string; description: string; icon?: string; maxMembers?: number; isPrivate?: boolean }) => {
+    const response = await apiCall('/guilds', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    return response.data;
+  },
+  join: async (id: string) => {
+    const response = await apiCall(`/guilds/${id}/join`, { method: 'POST' });
+    return response;
+  },
+  leave: async (id: string) => {
+    const response = await apiCall(`/guilds/${id}/leave`, { method: 'POST' });
+    return response;
+  },
+};
+
+// ============================================
+// TOURNAMENTS API
+// ============================================
+export const tournamentsAPI = {
+  getAll: async () => {
+    const response = await apiCall('/tournaments');
+    return response.data;
+  },
+  join: async (id: string) => {
+    const response = await apiCall(`/tournaments/${id}/join`, { method: 'POST' });
+    return response;
+  },
+};
+
+// ============================================
+// AI API
+// ============================================
+export const aiAPI = {
+  chat: async (message: string) => {
+    const response = await apiCall('/ai/chat', {
+      method: 'POST',
+      body: JSON.stringify({ message }),
+    });
+    return response;
+  },
+};
 // ============================================
 // HEALTH CHECK
 // ============================================

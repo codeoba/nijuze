@@ -3,6 +3,7 @@ import { ThumbsUp, ThumbsDown, MessageCircle, Reply, CheckCircle2, MoreHorizonta
 import { useApp } from '../contexts/AppContext';
 import { Comment } from '../types';
 import { formatDate } from '../utils/data';
+import { CommentRichEditor, CommentContent } from './CommentRichEditor';
 
 interface CommentThreadProps {
   comment: Comment;
@@ -60,7 +61,7 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
           </div>
           <div style={{ flex: 1 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4, flexWrap: 'wrap' }}>
-              <span style={{ fontSize: 14, fontWeight: 600, color: '#e2e8f0' }}>
+              <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-main)' }}>
                 {comment.author.username}
               </span>
               {comment.isBestAnswer && (
@@ -71,7 +72,7 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
                   padding: '2px 8px',
                   borderRadius: 12,
                   background: 'rgba(99, 102, 241, 0.2)',
-                  color: '#a5b4fc',
+                  color: 'var(--btn-ghost-text)',
                   fontSize: 11,
                   fontWeight: 600,
                 }}>
@@ -95,9 +96,7 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
         </div>
 
         {/* Comment Content */}
-        <p style={{ fontSize: 14, color: '#cbd5e1', lineHeight: 1.6, marginBottom: 12 }}>
-          {comment.content}
-        </p>
+        <CommentContent content={comment.content} />
 
         {/* Comment Actions */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -127,43 +126,18 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
           )}
         </div>
 
-        {/* Reply Form */}
+        {/* Reply Form using Rich Text Editor */}
         {showReplyForm && (
-          <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid rgba(51, 65, 85, 0.3)' }}>
-            <textarea
+          <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid var(--border-app)' }}>
+            <CommentRichEditor
               value={replyText}
-              onChange={(e) => setReplyText(e.target.value)}
-              placeholder="Andika jibu lako..."
-              style={{
-                width: '100%',
-                padding: 12,
-                borderRadius: 8,
-                background: 'rgba(30, 41, 59, 0.5)',
-                border: '1px solid rgba(51, 65, 85, 0.5)',
-                color: '#e2e8f0',
-                fontSize: 14,
-                resize: 'vertical',
-                minHeight: 80,
-                marginBottom: 8,
-              }}
+              onChange={setReplyText}
+              onSubmit={handleReply}
+              onCancel={() => setShowReplyForm(false)}
+              placeholder="Andika jibu lako (tumia Bold, Italic, Code, Nukuu, n.k)..."
+              submitLabel="Tuma Jibu"
+              minHeight={70}
             />
-            <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
-              <button
-                onClick={() => setShowReplyForm(false)}
-                className="btn-ghost"
-                style={{ fontSize: 13, padding: '6px 12px' }}
-              >
-                Ghairi
-              </button>
-              <button
-                onClick={handleReply}
-                className="btn-primary"
-                style={{ fontSize: 13, padding: '6px 12px' }}
-                disabled={!replyText.trim()}
-              >
-                Tuma Jibu
-              </button>
-            </div>
           </div>
         )}
       </div>
@@ -208,7 +182,7 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
                 borderRadius: 8,
                 background: 'rgba(99, 102, 241, 0.1)',
                 border: '1px solid rgba(99, 102, 241, 0.2)',
-                color: '#a5b4fc',
+                color: 'var(--btn-ghost-text)',
                 cursor: 'pointer',
                 fontSize: 13,
                 fontWeight: 500,

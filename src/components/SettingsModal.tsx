@@ -4,6 +4,7 @@ import {
   Trash2, Shield, Eye, Moon, Sun, Monitor, Keyboard
 } from 'lucide-react';
 import { useApp } from '../contexts/AppContext';
+import { useTheme } from '../contexts/ThemeContext';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -12,13 +13,14 @@ interface SettingsModalProps {
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
   const { currentUser } = useApp();
+  const { theme, setTheme } = useTheme();
   const [activeSection, setActiveSection] = useState('account');
   const [settings, setSettings] = useState({
     emailNotifications: true,
     pushNotifications: true,
     mentionNotifications: true,
     followNotifications: true,
-    theme: 'dark' as 'light' | 'dark' | 'system',
+    theme: theme,
     language: 'sw' as 'sw' | 'en' | 'fr',
     twoFactorAuth: false,
     showOnlineStatus: true,
@@ -105,18 +107,19 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
         {/* Sidebar */}
         <div style={{
           width: 250,
-          borderRight: '1px solid rgba(51, 65, 85, 0.3)',
+          borderRight: '1px solid var(--border-app)',
+          background: 'var(--bg-subtle)',
           padding: 16,
           display: 'flex',
           flexDirection: 'column',
         }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
-            <h2 style={{ fontSize: 18, fontWeight: 700 }}>Mipangilio</h2>
+            <h2 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-main)' }}>Mipangilio</h2>
             <button
               onClick={onClose}
-              style={{ padding: 8, borderRadius: 8, background: 'transparent', border: 'none', cursor: 'pointer' }}
+              style={{ padding: 8, borderRadius: 8, background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}
             >
-              <X size={20} color="#cbd5e1" />
+              <X size={20} />
             </button>
           </div>
 
@@ -131,9 +134,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
                   gap: 12,
                   padding: '12px 16px',
                   borderRadius: 10,
-                  background: activeSection === section.id ? 'rgba(99, 102, 241, 0.15)' : 'transparent',
-                  border: 'none',
-                  color: activeSection === section.id ? '#a5b4fc' : '#94a3b8',
+                  background: activeSection === section.id ? 'var(--btn-ghost-bg)' : 'transparent',
+                  border: `1px solid ${activeSection === section.id ? 'var(--btn-ghost-border)' : 'transparent'}`,
+                  color: activeSection === section.id ? 'var(--btn-ghost-text)' : 'var(--text-muted)',
                   cursor: 'pointer',
                   fontSize: 14,
                   fontWeight: 500,
@@ -151,11 +154,11 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
         <div style={{ flex: 1, padding: 24, overflowY: 'auto' }}>
           {activeSection === 'account' && (
             <div>
-              <h3 style={{ fontSize: 20, fontWeight: 700, marginBottom: 24 }}>Mipangilio ya Akaunti</h3>
+              <h3 style={{ fontSize: 20, fontWeight: 700, marginBottom: 24, color: 'var(--text-main)' }}>Mipangilio ya Akaunti</h3>
               
               <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                 <div>
-                  <label style={{ fontSize: 14, fontWeight: 500, color: '#cbd5e1', marginBottom: 8, display: 'block' }}>
+                  <label style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-main)', marginBottom: 8, display: 'block' }}>
                     Jina
                   </label>
                   <input
@@ -165,16 +168,16 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
                       width: '100%',
                       padding: 12,
                       borderRadius: 12,
-                      background: 'rgba(30, 41, 59, 0.5)',
-                      border: '1px solid rgba(51, 65, 85, 0.5)',
-                      color: '#e2e8f0',
+                      background: 'var(--input-bg)',
+                      border: '1px solid var(--input-border)',
+                      color: 'var(--input-text)',
                       fontSize: 14,
                     }}
                   />
                 </div>
 
                 <div>
-                  <label style={{ fontSize: 14, fontWeight: 500, color: '#cbd5e1', marginBottom: 8, display: 'block' }}>
+                  <label style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-main)', marginBottom: 8, display: 'block' }}>
                     Email
                   </label>
                   <input
@@ -184,16 +187,16 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
                       width: '100%',
                       padding: 12,
                       borderRadius: 12,
-                      background: 'rgba(30, 41, 59, 0.5)',
-                      border: '1px solid rgba(51, 65, 85, 0.5)',
-                      color: '#e2e8f0',
+                      background: 'var(--input-bg)',
+                      border: '1px solid var(--input-border)',
+                      color: 'var(--input-text)',
                       fontSize: 14,
                     }}
                   />
                 </div>
 
                 <div>
-                  <label style={{ fontSize: 14, fontWeight: 500, color: '#cbd5e1', marginBottom: 8, display: 'block' }}>
+                  <label style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-main)', marginBottom: 8, display: 'block' }}>
                     Bio
                   </label>
                   <textarea
@@ -202,9 +205,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
                       width: '100%',
                       padding: 12,
                       borderRadius: 12,
-                      background: 'rgba(30, 41, 59, 0.5)',
-                      border: '1px solid rgba(51, 65, 85, 0.5)',
-                      color: '#e2e8f0',
+                      background: 'var(--input-bg)',
+                      border: '1px solid var(--input-border)',
+                      color: 'var(--input-text)',
                       fontSize: 14,
                       resize: 'vertical',
                       minHeight: 100,
@@ -244,7 +247,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
                   >
                     <div>
                       <p style={{ fontSize: 14, fontWeight: 500, marginBottom: 4 }}>{item.label}</p>
-                      <p style={{ fontSize: 13, color: '#94a3b8' }}>{item.description}</p>
+                      <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>{item.description}</p>
                     </div>
                     <label style={{ position: 'relative', display: 'inline-block', width: 48, height: 24 }}>
                       <input
@@ -281,11 +284,11 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
 
           {activeSection === 'appearance' && (
             <div>
-              <h3 style={{ fontSize: 20, fontWeight: 700, marginBottom: 24 }}>Muonekano</h3>
+              <h3 style={{ fontSize: 20, fontWeight: 700, marginBottom: 24, color: 'var(--text-main)' }}>Muonekano</h3>
               
               <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                 <div>
-                  <label style={{ fontSize: 14, fontWeight: 500, color: '#cbd5e1', marginBottom: 12, display: 'block' }}>
+                  <label style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-main)', marginBottom: 12, display: 'block' }}>
                     Theme
                   </label>
                   <div style={{ display: 'flex', gap: 12 }}>
@@ -293,26 +296,30 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
                       { value: 'light', icon: Sun, label: 'Mwanga' },
                       { value: 'dark', icon: Moon, label: 'Giza' },
                       { value: 'system', icon: Monitor, label: 'System' },
-                    ].map((theme) => (
+                    ].map((t) => (
                       <button
-                        key={theme.value}
-                        onClick={() => setSettings({ ...settings, theme: theme.value as any })}
+                        key={t.value}
+                        onClick={() => {
+                          setSettings({ ...settings, theme: t.value as any });
+                          setTheme(t.value as any);
+                        }}
                         style={{
                           flex: 1,
                           padding: 16,
                           borderRadius: 12,
-                          background: settings.theme === theme.value ? 'rgba(99, 102, 241, 0.15)' : 'rgba(30, 41, 59, 0.3)',
-                          border: `1px solid ${settings.theme === theme.value ? 'rgba(99, 102, 241, 0.5)' : 'rgba(51, 65, 85, 0.3)'}`,
-                          color: settings.theme === theme.value ? '#a5b4fc' : '#94a3b8',
+                          background: theme === t.value ? 'var(--btn-ghost-bg)' : 'var(--bg-subtle)',
+                          border: `1px solid ${theme === t.value ? 'var(--border-focus)' : 'var(--border-app)'}`,
+                          color: theme === t.value ? 'var(--border-focus)' : 'var(--text-muted)',
                           cursor: 'pointer',
                           display: 'flex',
                           flexDirection: 'column',
                           alignItems: 'center',
                           gap: 8,
+                          transition: 'all 0.2s ease',
                         }}
                       >
-                        <theme.icon size={24} />
-                        <span style={{ fontSize: 13 }}>{theme.label}</span>
+                        <t.icon size={24} />
+                        <span style={{ fontSize: 13, fontWeight: 500 }}>{t.label}</span>
                       </button>
                     ))}
                   </div>
@@ -392,7 +399,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
                       background: 'rgba(30, 41, 59, 0.3)',
                     }}
                   >
-                    <span style={{ fontSize: 14, color: '#cbd5e1' }}>{shortcut.action}</span>
+                    <span style={{ fontSize: 14, color: 'var(--text-body)' }}>{shortcut.action}</span>
                     <div style={{ display: 'flex', gap: 4 }}>
                       {shortcut.keys.map((key, j) => (
                         <kbd
@@ -404,7 +411,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
                             border: '1px solid rgba(71, 85, 105, 0.5)',
                             fontSize: 12,
                             fontFamily: 'monospace',
-                            color: '#e2e8f0',
+                            color: 'var(--text-main)',
                           }}
                         >
                           {key}

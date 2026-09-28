@@ -1,0 +1,251 @@
+{
+  "users": [
+    {
+      "id": "user-admin",
+      "username": "Msimamizi Mkuu",
+      "email": "admin@nijuze.com",
+      "password_hash": "$2a$10$mKSOfeE/tvhSUQwkQW9NFeo8uRuukjeGd3WxhVQ9m6gbn/oDOH3Ou",
+      "avatar": "MM",
+      "role": "Admin",
+      "bio": "Msimamizi Mkuu wa Nijuze Platform",
+      "reputation": 25000,
+      "is_verified": 1,
+      "followers_count": 3500,
+      "following_count": 120,
+      "posts_count": 50,
+      "answers_count": 320,
+      "is_banned": 0,
+      "created_at": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "user-amina",
+      "username": "Amina Hassan",
+      "email": "amina@example.com",
+      "password_hash": "$2a$10$IbDyk0r7rtQUVsWwpSFZiulMq7yg9S2UInEj1OzQbepSrb9aIIAUW",
+      "avatar": "AH",
+      "role": "Mtaalam wa AI",
+      "bio": "Data Scientist na ML Engineer",
+      "reputation": 12400,
+      "is_verified": 1,
+      "followers_count": 1240,
+      "following_count": 89,
+      "posts_count": 25,
+      "answers_count": 145,
+      "is_banned": 0,
+      "created_at": "2024-01-15T00:00:00.000Z"
+    },
+    {
+      "id": "user-juma",
+      "username": "Juma Bakari",
+      "email": "juma@example.com",
+      "password_hash": "$2a$10$IbDyk0r7rtQUVsWwpSFZiulMq7yg9S2UInEj1OzQbepSrb9aIIAUW",
+      "avatar": "JB",
+      "role": "Software Engineer",
+      "bio": "Full-stack developer, React & Node.js expert",
+      "reputation": 9800,
+      "is_verified": 1,
+      "followers_count": 980,
+      "following_count": 156,
+      "posts_count": 18,
+      "answers_count": 89,
+      "is_banned": 0,
+      "created_at": "2024-02-01T00:00:00.000Z"
+    },
+    {
+      "id": "user-fatma",
+      "username": "Fatma Omar",
+      "email": "fatma@example.com",
+      "password_hash": "$2a$10$IbDyk0r7rtQUVsWwpSFZiulMq7yg9S2UInEj1OzQbepSrb9aIIAUW",
+      "avatar": "FO",
+      "role": "Data Scientist",
+      "bio": "Blockchain enthusiast na researcher",
+      "reputation": 8200,
+      "is_verified": 1,
+      "followers_count": 820,
+      "following_count": 67,
+      "posts_count": 15,
+      "answers_count": 64,
+      "is_banned": 0,
+      "created_at": "2024-03-10T00:00:00.000Z"
+    }
+  ],
+  "posts": [
+    {
+      "id": "d2401122-7827-4363-9a71-7beed04b6b1b",
+      "author_id": "user-amina",
+      "title": "Jaribio la Chapisho Jipya",
+      "content": "Hili ni chapisho lililojaribiwa moja kwa moja kupitia API.",
+      "tags": "[\"Jaribio\",\"Nijuze\"]",
+      "category": "Teknolojia",
+      "is_anonymous": 0,
+      "image_url": null,
+      "upvotes": 0,
+      "downvotes": 0,
+      "comments_count": 0,
+      "views": 0,
+      "shares": 0,
+      "bookmarks_count": 0,
+      "reactions": "{}",
+      "is_pinned": 0,
+      "is_approved": 1,
+      "created_at": "2026-09-28T12:43:36.936Z"
+    },
+    {
+      "id": "post-1",
+      "author_id": "user-amina",
+      "title": "Je, ni njia bora zipi za kujifunza Machine Learning mwaka 2026?",
+      "content": "Nimekuwa nikijifunza ML kwa miezi 3 na nataka kujua njia bora za kuendelea. Je, ni resources gani mnazopendekeza? Nimeanza na Python basics na sasa niko kwenye pandas na numpy.",
+      "tags": "[\"Machine Learning\",\"AI\",\"Teknolojia\",\"Kujifunza\"]",
+      "category": "Teknolojia",
+      "upvotes": 342,
+      "downvotes": 12,
+      "comments_count": 47,
+      "views": 2840,
+      "shares": 89,
+      "bookmarks_count": 156,
+      "reactions": "{\"🔥\":[\"user-juma\",\"user-fatma\"],\"💡\":[\"user-admin\"]}",
+      "is_pinned": 1,
+      "is_anonymous": 0,
+      "is_approved": 1,
+      "created_at": "2026-09-28T10:33:58.907Z"
+    },
+    {
+      "id": "post-2",
+      "author_id": "user-juma",
+      "title": "Tofauti kati ya React na Vue.js ni zipi? Nipi ni bora kwa project kubwa?",
+      "content": "Nina project kubwa ya enterprise na nataka kuchagua framework sahihi. React ina ecosystem kubwa lakini Vue ni rahisi. Je, mtaalamu yeyote anaweza kunitoa ushauri?",
+      "tags": "[\"React\",\"Vue.js\",\"Web Development\",\"Frontend\"]",
+      "category": "Teknolojia",
+      "upvotes": 218,
+      "downvotes": 8,
+      "comments_count": 34,
+      "views": 1920,
+      "shares": 56,
+      "bookmarks_count": 98,
+      "reactions": "{\"🔥\":[\"user-amina\"],\"💡\":[\"user-fatma\"]}",
+      "is_pinned": 0,
+      "is_anonymous": 0,
+      "is_approved": 1,
+      "created_at": "2026-09-28T07:33:58.907Z"
+    },
+    {
+      "id": "post-3",
+      "author_id": "user-fatma",
+      "title": "Je, blockchain inaweza kutumikaje katika sekta ya afya Tanzania?",
+      "content": "Ninafanya research kuhusu blockchain na nataka kujua applications zake katika healthcare. Je, kuna mfano wowote wa matumizi ya blockchain katika sekta ya afya Afrika?",
+      "tags": "[\"Blockchain\",\"Afya\",\"Innovation\",\"Tanzania\"]",
+      "category": "Afya",
+      "upvotes": 187,
+      "downvotes": 5,
+      "comments_count": 28,
+      "views": 1540,
+      "shares": 43,
+      "bookmarks_count": 72,
+      "reactions": "{\"💡\":[\"user-amina\",\"user-juma\"]}",
+      "is_pinned": 0,
+      "is_anonymous": 0,
+      "is_approved": 1,
+      "created_at": "2026-09-28T04:33:58.907Z"
+    }
+  ],
+  "comments": [
+    {
+      "id": "comment-1",
+      "post_id": "post-1",
+      "author_id": "user-juma",
+      "content": "Ninapendekeza kozi ya Andrew Ng ya Deep Learning kwenye Coursera, kisha fanya miradi ya Kaggle mara kwa mara!",
+      "upvotes": 45,
+      "downvotes": 2,
+      "is_best_answer": 1,
+      "created_at": "2026-09-28T11:33:58.907Z"
+    },
+    {
+      "id": "comment-2",
+      "post_id": "post-1",
+      "author_id": "user-fatma",
+      "content": "Pia jifunze Scikit-learn vizuri kabla ya kuingia kwenye PyTorch au TensorFlow.",
+      "upvotes": 28,
+      "downvotes": 1,
+      "is_best_answer": 0,
+      "created_at": "2026-09-28T12:03:58.907Z"
+    }
+  ],
+  "guilds": [
+    {
+      "id": "guild-1",
+      "name": "Tech Wizards Africa",
+      "description": "Kikundi cha wataalam wa teknolojia, AI na Web Development",
+      "icon": "💻",
+      "leader_id": "user-amina",
+      "member_ids": "[\"user-amina\",\"user-juma\",\"user-fatma\"]",
+      "max_members": 50,
+      "is_private": 0,
+      "created_at": "2026-09-28T12:33:58.908Z"
+    },
+    {
+      "id": "guild-2",
+      "name": "Business Leaders",
+      "description": "Wafanyabiashara na entrepreneurs wa Afrika Mashariki",
+      "icon": "💼",
+      "leader_id": "user-juma",
+      "member_ids": "[\"user-juma\"]",
+      "max_members": 30,
+      "is_private": 0,
+      "created_at": "2026-09-28T12:33:58.908Z"
+    }
+  ],
+  "tournaments": [
+    {
+      "id": "tourn-1",
+      "title": "Weekly Coding Challenge",
+      "description": "Shindano la wiki la programming na utatuzi wa matatizo ya code",
+      "icon": "💻",
+      "start_date": "2026-09-29",
+      "end_date": "2026-10-06",
+      "status": "upcoming",
+      "reward": "500 Pts + Nishani ya Dhahabu",
+      "participant_ids": "[\"user-amina\",\"user-juma\"]",
+      "max_participants": 100,
+      "created_at": "2026-09-28T12:33:58.908Z"
+    },
+    {
+      "id": "tourn-2",
+      "title": "Best Post Competition",
+      "description": "Shindano la post na swali bora la mwezi huu",
+      "icon": "📝",
+      "start_date": "2026-09-22",
+      "end_date": "2026-09-29",
+      "status": "ongoing",
+      "reward": "1000 Pts + Hadhi ya Mshindi",
+      "participant_ids": "[\"user-amina\",\"user-fatma\",\"user-juma\"]",
+      "max_participants": 50,
+      "created_at": "2026-09-28T12:33:58.908Z"
+    }
+  ],
+  "badges": [
+    {
+      "id": "b-1",
+      "user_id": "user-amina",
+      "name": "Mtaalam wa AI",
+      "icon": "🤖",
+      "description": "Ameweka majibu zaidi ya 50 kwenye AI"
+    },
+    {
+      "id": "b-2",
+      "user_id": "user-juma",
+      "name": "React Guru",
+      "icon": "⚛️",
+      "description": "Mtaalam mwenye mchango mkubwa wa React"
+    },
+    {
+      "id": "b-3",
+      "user_id": "user-fatma",
+      "name": "Blockchain Pioneer",
+      "icon": "⛓️",
+      "description": "Utafiti bora wa Web3"
+    }
+  ],
+  "notifications": [],
+  "post_votes": [],
+  "bookmarks": []
+}

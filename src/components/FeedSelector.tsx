@@ -42,23 +42,25 @@ export const FeedSelector: React.FC<FeedSelectorProps> = ({ activeFeed, onFeedCh
               gap: 8,
               padding: '10px 16px',
               borderRadius: 12,
-              background: isActive ? 'rgba(99, 102, 241, 0.2)' : 'rgba(30, 41, 59, 0.3)',
-              border: `1px solid ${isActive ? 'rgba(99, 102, 241, 0.5)' : 'rgba(51, 65, 85, 0.3)'}`,
-              color: isActive ? '#a5b4fc' : '#94a3b8',
+              background: isActive ? 'var(--btn-ghost-bg)' : 'var(--bg-subtle)',
+              border: `1px solid ${isActive ? 'var(--btn-ghost-border)' : 'var(--border-app)'}`,
+              color: isActive ? 'var(--btn-ghost-text)' : 'var(--text-muted)',
               cursor: 'pointer',
               fontSize: 14,
-              fontWeight: 500,
+              fontWeight: isActive ? 600 : 500,
               whiteSpace: 'nowrap',
               transition: 'all 0.2s ease',
             }}
             onMouseEnter={(e) => {
               if (!isActive) {
-                e.currentTarget.style.background = 'rgba(30, 41, 59, 0.5)';
+                e.currentTarget.style.background = 'var(--bg-subtle-hover)';
+                e.currentTarget.style.color = 'var(--text-main)';
               }
             }}
             onMouseLeave={(e) => {
               if (!isActive) {
-                e.currentTarget.style.background = 'rgba(30, 41, 59, 0.3)';
+                e.currentTarget.style.background = 'var(--bg-subtle)';
+                e.currentTarget.style.color = 'var(--text-muted)';
               }
             }}
             title={feed.description}

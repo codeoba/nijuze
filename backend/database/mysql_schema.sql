@@ -344,6 +344,65 @@ CREATE TABLE IF NOT EXISTS settings (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================
+-- GUILDS TABLE (Vikundi vya Jamii)
+-- ============================================
+CREATE TABLE IF NOT EXISTS guilds (
+  id VARCHAR(36) PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  description TEXT,
+  icon VARCHAR(50) DEFAULT '🏰',
+  leader_id VARCHAR(36) NOT NULL,
+  max_members INT DEFAULT 50,
+  is_private BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (leader_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================
+-- GUILD MEMBERS TABLE
+-- ============================================
+CREATE TABLE IF NOT EXISTS guild_members (
+  id VARCHAR(36) PRIMARY KEY,
+  guild_id VARCHAR(36) NOT NULL,
+  user_id VARCHAR(36) NOT NULL,
+  role ENUM('leader', 'moderator', 'member') DEFAULT 'member',
+  joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (guild_id) REFERENCES guilds(id) ON DELETE CASCADE,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  UNIQUE KEY unique_guild_member (guild_id, user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================
+-- TOURNAMENTS TABLE (Mashindano)
+-- ============================================
+CREATE TABLE IF NOT EXISTS tournaments (
+  id VARCHAR(36) PRIMARY KEY,
+  name VARCHAR(150) NOT NULL,
+  description TEXT,
+  icon VARCHAR(50) DEFAULT '🏆',
+  start_date TIMESTAMP NOT NULL,
+  end_date TIMESTAMP NOT NULL,
+  max_participants INT DEFAULT 100,
+  prize VARCHAR(100) DEFAULT '1000 Pts',
+  status ENUM('upcoming', 'ongoing', 'completed') DEFAULT 'upcoming',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================
+-- TOURNAMENT PARTICIPANTS TABLE
+-- ============================================
+CREATE TABLE IF NOT EXISTS tournament_participants (
+  id VARCHAR(36) PRIMARY KEY,
+  tournament_id VARCHAR(36) NOT NULL,
+  user_id VARCHAR(36) NOT NULL,
+  score INT DEFAULT 0,
+  joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (tournament_id) REFERENCES tournaments(id) ON DELETE CASCADE,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  UNIQUE KEY unique_participant (tournament_id, user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================
 -- INSERT DEFAULT SETTINGS
 -- ============================================
 INSERT INTO settings (id, key_name, value) VALUES

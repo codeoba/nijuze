@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Users, Crown, Shield, MessageCircle, Plus, Settings, X } from 'lucide-react';
 import { useApp } from '../contexts/AppContext';
+import { guildsAPI } from '../services/api';
 
 interface Guild {
   id: string;
@@ -12,6 +13,7 @@ interface Guild {
   maxMembers: number;
   isPrivate: boolean;
   createdAt: string;
+  isMember?: boolean;
 }
 
 export const GuildSystem: React.FC = () => {
@@ -27,18 +29,27 @@ export const GuildSystem: React.FC = () => {
     isPrivate: false,
   });
 
-  useEffect(() => {
-    // Load guilds from localStorage
+  const loadGuilds = async () => {
+    try {
+      const data = await guildsAPI.getAll();
+      if (data && data.length > 0) {
+        setGuilds(data.map((g: any) => ({
+          ...g,
+          memberIds: g.isMember && currentUser ? [currentUser.id] : [],
+        })));
+        return;
+      }
+    } catch {}
+
     const saved = localStorage.getItem('guilds');
     if (saved) {
       setGuilds(JSON.parse(saved));
     } else {
-      // Create sample guilds
       const sampleGuilds: Guild[] = [
         {
           id: 'guild-1',
-          name: 'Tech Wizards',
-          description: 'Kikundi cha wataalam wa teknolojia',
+          name: 'Tech Wizards Africa',
+          description: 'Kikundi cha wataalam wa teknolojia, AI na Web Development',
           icon: '💻',
           leaderId: 'user1',
           memberIds: ['user1', 'user2', 'user3'],
@@ -61,32 +72,46 @@ export const GuildSystem: React.FC = () => {
       setGuilds(sampleGuilds);
       localStorage.setItem('guilds', JSON.stringify(sampleGuilds));
     }
-  }, []);
+  };
 
-  const handleCreateGuild = () => {
+  useEffect(() => {
+    loadGuilds();
+  }, [currentUser]);
+
+  const handleCreateGuild = async () => {
     if (!currentUser || !newGuild.name) return;
+
+    try {
+      await guildsAPI.create(newGuild);
+    } catch {}
 
     const guild: Guild = {
       id: `guild-${Date.now()}`,
       ...newGuild,
       leaderId: currentUser.id,
       memberIds: [currentUser.id],
+      isMember: true,
       createdAt: new Date().toISOString(),
     };
 
-    const updated = [...guilds, guild];
+    const updated = [guild, ...guilds];
     setGuilds(updated);
     localStorage.setItem('guilds', JSON.stringify(updated));
     setShowCreateModal(false);
     setNewGuild({ name: '', description: '', icon: '🏰', maxMembers: 50, isPrivate: false });
   };
 
-  const handleJoinGuild = (guildId: string) => {
+  const handleJoinGuild = async (guildId: string) => {
     if (!currentUser) return;
 
+    try {
+      await guildsAPI.join(guildId);
+    } catch {}
+
     const updated = guilds.map(g => {
-      if (g.id === guildId && !g.memberIds.includes(currentUser.id) && g.memberIds.length < g.maxMembers) {
-        return { ...g, memberIds: [...g.memberIds, currentUser.id] };
+      if (g.id === guildId) {
+        const members = g.memberIds || [];
+        return { ...g, isMember: true, memberIds: members.includes(currentUser.id) ? members : [...members, currentUser.id] };
       }
       return g;
     });
@@ -95,12 +120,16 @@ export const GuildSystem: React.FC = () => {
     localStorage.setItem('guilds', JSON.stringify(updated));
   };
 
-  const handleLeaveGuild = (guildId: string) => {
+  const handleLeaveGuild = async (guildId: string) => {
     if (!currentUser) return;
+
+    try {
+      await guildsAPI.leave(guildId);
+    } catch {}
 
     const updated = guilds.map(g => {
       if (g.id === guildId) {
-        return { ...g, memberIds: g.memberIds.filter(id => id !== currentUser.id) };
+        return { ...g, isMember: false, memberIds: (g.memberIds || []).filter(id => id !== currentUser.id) };
       }
       return g;
     });
@@ -111,14 +140,12 @@ export const GuildSystem: React.FC = () => {
 
   const getUserGuilds = () => {
     if (!currentUser) return [];
-    return guilds.filter(g => g.memberIds.includes(currentUser.id));
+    return guilds.filter(g => (g.memberIds || []).includes(currentUser.id));
   };
 
   const userGuilds = getUserGuilds();
 
   const icons = ['🏰', '💻', '💼', '🎨', '⚽', '📚', '🏥', '🎮', '🎵', '🌍'];
-
-  if (!currentUser) return null;
 
   return (
     <div style={{ maxWidth: 1000, margin: '0 auto', padding: 24 }}>
@@ -127,16 +154,16 @@ export const GuildSystem: React.FC = () => {
         <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
           <Users size={32} color="#6366f1" />
           <div>
-            <h2 style={{ fontSize: 28, fontWeight: 700, margin: 0 }}>Guilds & Groups</h2>
-            <p style={{ fontSize: 14, color: '#94a3b8', margin: 0 }}>
+            <h2 style={{ fontSize: 28, fontWeight: 700, margin: 0, color: 'var(--text-main)' }}>Guilds & Vikundi</h2>
+            <p style={{ fontSize: 14, color: 'var(--text-muted)', margin: 0 }}>
               Jiunge na vikundi na ushirikiane na watumiaji wengine
             </p>
           </div>
         </div>
         <button
-          onClick={() => setShowCreateModal(true)}
+          onClick={() => currentUser ? setShowCreateModal(true) : alert('Tafadhali ingia kwenye akaunti ili kuunda kikundi!')}
           className="btn-primary"
-          style={{ display: 'flex', alignItems: 'center', gap: 8 }}
+          style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}
         >
           <Plus size={16} />
           Unda Guild Mpya
@@ -170,15 +197,15 @@ export const GuildSystem: React.FC = () => {
                   </div>
                   <div style={{ flex: 1 }}>
                     <h4 style={{ fontSize: 16, fontWeight: 600, margin: 0 }}>{guild.name}</h4>
-                    <p style={{ fontSize: 12, color: '#94a3b8', margin: 0 }}>
+                    <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: 0 }}>
                       {guild.memberIds.length}/{guild.maxMembers} members
                     </p>
                   </div>
-                  {guild.leaderId === currentUser.id && (
+                  {currentUser && guild.leaderId === currentUser.id && (
                     <Crown size={20} color="#fbbf24" />
                   )}
                 </div>
-                <p style={{ fontSize: 13, color: '#94a3b8', marginBottom: 12 }}>
+                <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 12 }}>
                   {guild.description}
                 </p>
                 <button
@@ -201,7 +228,7 @@ export const GuildSystem: React.FC = () => {
       <div>
         <h3 style={{ fontSize: 18, fontWeight: 600, marginBottom: 16 }}>Guilds Zinazopatikana</h3>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>
-          {guilds.filter(g => !g.memberIds.includes(currentUser.id)).map((guild) => (
+          {guilds.filter(g => !currentUser || !g.memberIds.includes(currentUser.id)).map((guild) => (
             <div
               key={guild.id}
               className="glass-card"
@@ -222,7 +249,7 @@ export const GuildSystem: React.FC = () => {
                 </div>
                 <div style={{ flex: 1 }}>
                   <h4 style={{ fontSize: 16, fontWeight: 600, margin: 0 }}>{guild.name}</h4>
-                  <p style={{ fontSize: 12, color: '#94a3b8', margin: 0 }}>
+                  <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: 0 }}>
                     {guild.memberIds.length}/{guild.maxMembers} members
                   </p>
                 </div>
@@ -230,7 +257,7 @@ export const GuildSystem: React.FC = () => {
                   <Shield size={20} color="#94a3b8" />
                 )}
               </div>
-              <p style={{ fontSize: 13, color: '#94a3b8', marginBottom: 12 }}>
+              <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 12 }}>
                 {guild.description}
               </p>
               <button
@@ -266,7 +293,7 @@ export const GuildSystem: React.FC = () => {
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               <div>
-                <label style={{ fontSize: 14, fontWeight: 500, color: '#cbd5e1', marginBottom: 8, display: 'block' }}>
+                <label style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-main)', marginBottom: 8, display: 'block' }}>
                   Jina la Guild
                 </label>
                 <input
@@ -278,16 +305,16 @@ export const GuildSystem: React.FC = () => {
                     width: '100%',
                     padding: 12,
                     borderRadius: 12,
-                    background: 'rgba(30, 41, 59, 0.5)',
-                    border: '1px solid rgba(51, 65, 85, 0.5)',
-                    color: '#e2e8f0',
+                    background: 'var(--input-bg)',
+                    border: '1px solid var(--input-border)',
+                    color: 'var(--input-text)',
                     fontSize: 14,
                   }}
                 />
               </div>
 
               <div>
-                <label style={{ fontSize: 14, fontWeight: 500, color: '#cbd5e1', marginBottom: 8, display: 'block' }}>
+                <label style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-main)', marginBottom: 8, display: 'block' }}>
                   Maelezo
                 </label>
                 <textarea
@@ -298,9 +325,9 @@ export const GuildSystem: React.FC = () => {
                     width: '100%',
                     padding: 12,
                     borderRadius: 12,
-                    background: 'rgba(30, 41, 59, 0.5)',
-                    border: '1px solid rgba(51, 65, 85, 0.5)',
-                    color: '#e2e8f0',
+                    background: 'var(--input-bg)',
+                    border: '1px solid var(--input-border)',
+                    color: 'var(--input-text)',
                     fontSize: 14,
                     resize: 'vertical',
                     minHeight: 80,
@@ -309,7 +336,7 @@ export const GuildSystem: React.FC = () => {
               </div>
 
               <div>
-                <label style={{ fontSize: 14, fontWeight: 500, color: '#cbd5e1', marginBottom: 8, display: 'block' }}>
+                <label style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-main)', marginBottom: 8, display: 'block' }}>
                   Icon
                 </label>
                 <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
@@ -321,8 +348,8 @@ export const GuildSystem: React.FC = () => {
                         width: 48,
                         height: 48,
                         borderRadius: 12,
-                        background: newGuild.icon === icon ? 'rgba(99, 102, 241, 0.2)' : 'rgba(30, 41, 59, 0.3)',
-                        border: `2px solid ${newGuild.icon === icon ? '#6366f1' : 'transparent'}`,
+                        background: newGuild.icon === icon ? 'var(--btn-ghost-bg)' : 'var(--bg-subtle)',
+                        border: `2px solid ${newGuild.icon === icon ? 'var(--border-focus)' : 'var(--border-app)'}`,
                         cursor: 'pointer',
                         fontSize: 24,
                         display: 'flex',
@@ -337,7 +364,7 @@ export const GuildSystem: React.FC = () => {
               </div>
 
               <div>
-                <label style={{ fontSize: 14, fontWeight: 500, color: '#cbd5e1', marginBottom: 8, display: 'block' }}>
+                <label style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-body)', marginBottom: 8, display: 'block' }}>
                   Max Members: {newGuild.maxMembers}
                 </label>
                 <input
@@ -358,7 +385,7 @@ export const GuildSystem: React.FC = () => {
                   onChange={(e) => setNewGuild({ ...newGuild, isPrivate: e.target.checked })}
                   style={{ width: 18, height: 18 }}
                 />
-                <span style={{ fontSize: 14, color: '#cbd5e1' }}>Guild ya Faragha (Private)</span>
+                <span style={{ fontSize: 14, color: 'var(--text-body)' }}>Guild ya Faragha (Private)</span>
               </label>
 
               <button
@@ -397,7 +424,7 @@ export const GuildSystem: React.FC = () => {
                 </div>
                 <div>
                   <h3 style={{ fontSize: 20, fontWeight: 700, margin: 0 }}>{selectedGuild.name}</h3>
-                  <p style={{ fontSize: 13, color: '#94a3b8', margin: 0 }}>
+                  <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>
                     {selectedGuild.memberIds.length}/{selectedGuild.maxMembers} members
                   </p>
                 </div>
@@ -410,7 +437,7 @@ export const GuildSystem: React.FC = () => {
               </button>
             </div>
 
-            <p style={{ fontSize: 14, color: '#cbd5e1', marginBottom: 24 }}>
+            <p style={{ fontSize: 14, color: 'var(--text-body)', marginBottom: 24 }}>
               {selectedGuild.description}
             </p>
 
@@ -428,7 +455,8 @@ export const GuildSystem: React.FC = () => {
                       gap: 12,
                       padding: 12,
                       borderRadius: 10,
-                      background: 'rgba(30, 41, 59, 0.3)',
+                      background: 'var(--bg-subtle)',
+                      border: '1px solid var(--border-app)',
                     }}
                   >
                     <div style={{
@@ -441,12 +469,13 @@ export const GuildSystem: React.FC = () => {
                       justifyContent: 'center',
                       fontSize: 14,
                       fontWeight: 'bold',
+                      color: 'white',
                     }}>
                       {member.avatar}
                     </div>
                     <div style={{ flex: 1 }}>
-                      <p style={{ fontSize: 14, fontWeight: 500, margin: 0 }}>{member.username}</p>
-                      <p style={{ fontSize: 12, color: '#94a3b8', margin: 0 }}>{member.role}</p>
+                      <p style={{ fontSize: 14, fontWeight: 500, margin: 0, color: 'var(--text-main)' }}>{member.username}</p>
+                      <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: 0 }}>{member.role}</p>
                     </div>
                     {selectedGuild.leaderId === memberId && (
                       <Crown size={16} color="#fbbf24" />

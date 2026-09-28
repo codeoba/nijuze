@@ -1,14 +1,18 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { X, Send, Search, MessageCircle, User, Users } from 'lucide-react';
 import { useApp } from '../contexts/AppContext';
+import { messagesAPI } from '../services/api';
 
 interface Message {
   id: string;
-  senderId: string;
-  receiverId: string;
+  senderId?: string;
+  sender_id?: string;
+  receiverId?: string;
+  receiver_id?: string;
   content: string;
-  timestamp: string;
-  isRead: boolean;
+  timestamp?: string;
+  created_at?: string;
+  isRead?: boolean;
 }
 
 interface Conversation {
@@ -28,22 +32,68 @@ export const ChatModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ 
   const [searchQuery, setSearchQuery] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  // Load conversations
+  const loadConversations = useCallback(async () => {
+    if (!currentUser) return;
+    try {
+      const data = await messagesAPI.getConversations();
+      if (data && data.length > 0) {
+        setConversations(data);
+        return;
+      }
+    } catch {}
+
+    // Fallback: list of actual users to message
+    const sampleConversations: Conversation[] = users
+      .filter(u => u.id !== currentUser.id)
+      .slice(0, 8)
+      .map(user => ({
+        userId: user.id,
+        user,
+        lastMessage: 'Habari! Ninaweza kukusaidia?',
+        lastMessageTime: new Date().toISOString(),
+        unreadCount: 0,
+      }));
+    setConversations(sampleConversations);
+  }, [currentUser, users]);
+
+  // Load messages for selected conversation
+  const loadMessages = useCallback(async (userId: string) => {
+    try {
+      const msgs = await messagesAPI.getMessages(userId);
+      if (msgs && msgs.length > 0) {
+        setMessages(msgs);
+        return;
+      }
+    } catch {}
+
+    // Initial greeting if empty
+    setMessages([
+      {
+        id: 'msg-init',
+        senderId: userId,
+        content: `Habari! Mimi ni ${selectedConversation?.user?.username || 'mwanachama mwenzako'}. Karibu tuzungumze hapa Nijuze!`,
+        timestamp: new Date().toISOString(),
+      }
+    ]);
+  }, [selectedConversation]);
+
   useEffect(() => {
     if (isOpen && currentUser) {
-      // Initialize conversations with sample data
-      const sampleConversations: Conversation[] = users
-        .filter(u => u.id !== currentUser.id)
-        .slice(0, 5)
-        .map(user => ({
-          userId: user.id,
-          user,
-          lastMessage: 'Habari! Unaendeleaje?',
-          lastMessageTime: new Date(Date.now() - Math.random() * 86400000).toISOString(),
-          unreadCount: Math.floor(Math.random() * 3),
-        }));
-      setConversations(sampleConversations);
+      loadConversations();
     }
-  }, [isOpen, currentUser, users]);
+  }, [isOpen, currentUser, loadConversations]);
+
+  useEffect(() => {
+    if (selectedConversation) {
+      loadMessages(selectedConversation.userId);
+      // Poll every 4 seconds for new incoming messages
+      const interval = setInterval(() => {
+        loadMessages(selectedConversation.userId);
+      }, 4000);
+      return () => clearInterval(interval);
+    }
+  }, [selectedConversation, loadMessages]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -51,322 +101,234 @@ export const ChatModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ 
 
   const handleSelectConversation = (conv: Conversation) => {
     setSelectedConversation(conv);
-    // Load sample messages
-    const sampleMessages: Message[] = [
-      {
-        id: '1',
-        senderId: conv.userId,
-        receiverId: currentUser?.id || '',
-        content: 'Habari! Unaendeleaje?',
-        timestamp: new Date(Date.now() - 3600000).toISOString(),
-        isRead: true,
-      },
-      {
-        id: '2',
-        senderId: currentUser?.id || '',
-        receiverId: conv.userId,
-        content: 'Nzuri sana! Wewe?',
-        timestamp: new Date(Date.now() - 3500000).toISOString(),
-        isRead: true,
-      },
-      {
-        id: '3',
-        senderId: conv.userId,
-        receiverId: currentUser?.id || '',
-        content: 'Niko sawa. Nimeona post yako kuhusu Machine Learning. Ni nzuri sana!',
-        timestamp: new Date(Date.now() - 3400000).toISOString(),
-        isRead: true,
-      },
-    ];
-    setMessages(sampleMessages);
+    loadMessages(conv.userId);
   };
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async (e: React.FormEvent) => {
+    e.preventDefault();
     if (!newMessage.trim() || !selectedConversation || !currentUser) return;
 
-    const message: Message = {
-      id: Date.now().toString(),
+    const messageText = newMessage;
+    setNewMessage('');
+
+    // Optimistic UI update
+    const optimisticMsg: Message = {
+      id: `msg-${Date.now()}`,
       senderId: currentUser.id,
       receiverId: selectedConversation.userId,
-      content: newMessage,
+      content: messageText,
       timestamp: new Date().toISOString(),
       isRead: false,
     };
+    setMessages(prev => [...prev, optimisticMsg]);
 
-    setMessages([...messages, message]);
-    setNewMessage('');
-
-    // Update conversation
-    setConversations(conversations.map(conv =>
-      conv.userId === selectedConversation.userId
-        ? { ...conv, lastMessage: newMessage, lastMessageTime: message.timestamp }
-        : conv
-    ));
+    try {
+      await messagesAPI.send(selectedConversation.userId, messageText);
+    } catch {}
   };
-
-  const filteredConversations = conversations.filter(conv =>
-    conv.user.username.toLowerCase().includes(searchQuery.toLowerCase())
-  );
 
   if (!isOpen) return null;
 
+  const filteredConversations = conversations.filter(c =>
+    c.user?.username?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    c.lastMessage?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div className="modal-overlay" onClick={onClose} style={{ zIndex: 100 }}>
       <div
         className="glass-card"
         style={{
           width: '100%',
           maxWidth: 900,
-          height: '80vh',
+          height: 600,
           margin: '0 16px',
           display: 'flex',
           overflow: 'hidden',
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Conversations List */}
+        {/* Left: Conversations list */}
         <div style={{
-          width: selectedConversation ? 300 : '100%',
-          borderRight: selectedConversation ? '1px solid rgba(51, 65, 85, 0.3)' : 'none',
+          width: 320,
+          borderRight: '1px solid var(--border-app)',
           display: 'flex',
           flexDirection: 'column',
+          background: 'var(--bg-subtle)',
         }}>
           {/* Header */}
-          <div style={{
-            padding: 16,
-            borderBottom: '1px solid rgba(51, 65, 85, 0.3)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}>
-            <h3 style={{ fontSize: 18, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8 }}>
-              <MessageCircle size={20} color="#818cf8" />
-              Ujumbe
-            </h3>
-            <button
-              onClick={onClose}
-              style={{ padding: 8, borderRadius: 8, background: 'transparent', border: 'none', cursor: 'pointer' }}
-            >
-              <X size={20} color="#cbd5e1" />
-            </button>
-          </div>
-
-          {/* Search */}
-          <div style={{ padding: 12, borderBottom: '1px solid rgba(51, 65, 85, 0.3)' }}>
+          <div style={{ padding: 16, borderBottom: '1px solid var(--border-app)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <MessageCircle size={20} color="#6366f1" />
+                <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-main)' }}>Ujumbe wa Moja kwa Moja</h3>
+              </div>
+            </div>
             <div style={{ position: 'relative' }}>
-              <Search size={16} color="#94a3b8" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)' }} />
+              <Search size={14} color="var(--text-muted)" style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)' }} />
               <input
                 type="text"
-                placeholder="Tafuta..."
+                placeholder="Tafuta mazungumzo..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 style={{
                   width: '100%',
-                  padding: '8px 12px 8px 36px',
+                  padding: '8px 12px 8px 32px',
                   borderRadius: 8,
-                  background: 'rgba(30, 41, 59, 0.5)',
-                  border: '1px solid rgba(51, 65, 85, 0.5)',
-                  color: '#e2e8f0',
-                  fontSize: 14,
+                  background: 'var(--input-bg)',
+                  border: '1px solid var(--input-border)',
+                  color: 'var(--input-text)',
+                  fontSize: 12,
                 }}
               />
             </div>
           </div>
 
-          {/* Conversations */}
+          {/* Conversation items */}
           <div style={{ flex: 1, overflowY: 'auto' }}>
-            {filteredConversations.map((conv) => (
-              <div
-                key={conv.userId}
-                onClick={() => handleSelectConversation(conv)}
-                style={{
-                  padding: 12,
-                  cursor: 'pointer',
-                  background: selectedConversation?.userId === conv.userId ? 'rgba(99, 102, 241, 0.1)' : 'transparent',
-                  borderBottom: '1px solid rgba(51, 65, 85, 0.2)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 12,
-                }}
-              >
-                <div style={{ position: 'relative' }}>
+            {filteredConversations.map((conv) => {
+              const isSelected = selectedConversation?.userId === conv.userId;
+              return (
+                <div
+                  key={conv.userId}
+                  onClick={() => handleSelectConversation(conv)}
+                  style={{
+                    padding: '12px 16px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 12,
+                    cursor: 'pointer',
+                    background: isSelected ? 'rgba(99, 102, 241, 0.15)' : 'transparent',
+                    borderLeft: isSelected ? '3px solid #6366f1' : '3px solid transparent',
+                    transition: 'all 0.2s',
+                  }}
+                >
                   <div style={{
-                    width: 48,
-                    height: 48,
+                    width: 40,
+                    height: 40,
                     borderRadius: '50%',
                     background: 'linear-gradient(135deg, #6366f1, #9333ea)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    fontSize: 16,
                     fontWeight: 'bold',
-                  }}>
-                    {conv.user.avatar}
-                  </div>
-                  <div style={{
-                    position: 'absolute',
-                    bottom: 0,
-                    right: 0,
-                    width: 12,
-                    height: 12,
-                    borderRadius: '50%',
-                    background: '#10b981',
-                    border: '2px solid #0f0f23',
-                  }} />
-                </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-                    <h4 style={{ fontSize: 14, fontWeight: 600 }}>{conv.user.username}</h4>
-                    {conv.unreadCount > 0 && (
-                      <span style={{
-                        background: '#6366f1',
-                        color: 'white',
-                        fontSize: 11,
-                        padding: '2px 6px',
-                        borderRadius: 10,
-                        fontWeight: 600,
-                      }}>
-                        {conv.unreadCount}
-                      </span>
-                    )}
-                  </div>
-                  <p style={{
                     fontSize: 13,
-                    color: '#94a3b8',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
+                    color: 'white',
                   }}>
-                    {conv.lastMessage}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Chat Window */}
-        {selectedConversation && (
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-            {/* Chat Header */}
-            <div style={{
-              padding: 16,
-              borderBottom: '1px solid rgba(51, 65, 85, 0.3)',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 12,
-            }}>
-              <button
-                onClick={() => setSelectedConversation(null)}
-                style={{ padding: 8, borderRadius: 8, background: 'transparent', border: 'none', cursor: 'pointer', display: 'none' }}
-              >
-                <X size={20} color="#cbd5e1" />
-              </button>
-              <div style={{
-                width: 40,
-                height: 40,
-                borderRadius: '50%',
-                background: 'linear-gradient(135deg, #6366f1, #9333ea)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: 14,
-                fontWeight: 'bold',
-              }}>
-                {selectedConversation.user.avatar}
-              </div>
-              <div>
-                <h4 style={{ fontSize: 15, fontWeight: 600 }}>{selectedConversation.user.username}</h4>
-                <p style={{ fontSize: 12, color: '#10b981' }}>Online</p>
-              </div>
-            </div>
-
-            {/* Messages */}
-            <div style={{ flex: 1, overflowY: 'auto', padding: 16 }}>
-              {messages.map((msg) => (
-                <div
-                  key={msg.id}
-                  style={{
-                    display: 'flex',
-                    justifyContent: msg.senderId === currentUser?.id ? 'flex-end' : 'flex-start',
-                    marginBottom: 12,
-                  }}
-                >
-                  <div style={{
-                    maxWidth: '70%',
-                    padding: '10px 14px',
-                    borderRadius: 16,
-                    background: msg.senderId === currentUser?.id
-                      ? 'linear-gradient(135deg, #6366f1, #9333ea)'
-                      : 'rgba(30, 41, 59, 0.5)',
-                    color: msg.senderId === currentUser?.id ? 'white' : '#e2e8f0',
-                    fontSize: 14,
-                    lineHeight: 1.5,
-                  }}>
-                    {msg.content}
-                    <div style={{
-                      fontSize: 11,
-                      color: msg.senderId === currentUser?.id ? 'rgba(255,255,255,0.7)' : '#64748b',
-                      marginTop: 4,
-                      textAlign: 'right',
-                    }}>
-                      {new Date(msg.timestamp).toLocaleTimeString('sw-TZ', { hour: '2-digit', minute: '2-digit' })}
+                    {conv.user?.avatar || conv.user?.username?.slice(0, 2).toUpperCase() || 'NJ'}
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2 }}>
+                      <span style={{ fontWeight: 600, fontSize: 13 }}>{conv.user?.username || 'Mwanachama'}</span>
+                    </div>
+                    <div style={{ fontSize: 11, color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {conv.lastMessage}
                     </div>
                   </div>
                 </div>
-              ))}
-              <div ref={messagesEndRef} />
-            </div>
-
-            {/* Message Input */}
-            <div style={{
-              padding: 16,
-              borderTop: '1px solid rgba(51, 65, 85, 0.3)',
-              display: 'flex',
-              gap: 12,
-            }}>
-              <input
-                type="text"
-                value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                placeholder="Andika ujumbe..."
-                style={{
-                  flex: 1,
-                  padding: '10px 14px',
-                  borderRadius: 20,
-                  background: 'rgba(30, 41, 59, 0.5)',
-                  border: '1px solid rgba(51, 65, 85, 0.5)',
-                  color: '#e2e8f0',
-                  fontSize: 14,
-                }}
-              />
-              <button
-                onClick={handleSendMessage}
-                className="btn-primary"
-                style={{ padding: '10px 20px', display: 'flex', alignItems: 'center', gap: 8 }}
-              >
-                <Send size={16} />
-              </button>
-            </div>
+              );
+            })}
           </div>
-        )}
+        </div>
 
-        {/* Empty State */}
-        {!selectedConversation && (
-          <div style={{
-            flex: 1,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: '#64748b',
-          }}>
-            <Users size={64} style={{ marginBottom: 16, opacity: 0.3 }} />
-            <p style={{ fontSize: 16, fontWeight: 500 }}>Chagua mazungumzo</p>
-            <p style={{ fontSize: 14 }}>Anza mazungumzo na watumiaji wengine</p>
-          </div>
-        )}
+        {/* Right: Message Window */}
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+          {selectedConversation ? (
+            <>
+              {/* Header */}
+              <div style={{
+                padding: '12px 20px',
+                borderBottom: '1px solid var(--border-app)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <div style={{
+                    width: 36,
+                    height: 36,
+                    borderRadius: '50%',
+                    background: 'linear-gradient(135deg, #6366f1, #9333ea)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontWeight: 'bold',
+                    fontSize: 12,
+                    color: 'white',
+                  }}>
+                    {selectedConversation.user?.avatar || 'NJ'}
+                  </div>
+                  <div>
+                    <h4 style={{ fontSize: 14, fontWeight: 600, margin: 0, color: 'var(--text-main)' }}>{selectedConversation.user?.username}</h4>
+                    <span style={{ fontSize: 11, color: '#22c55e' }}>Mtandaoni</span>
+                  </div>
+                </div>
+                <button onClick={onClose} style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>
+                  <X size={20} />
+                </button>
+              </div>
+
+              {/* Message history */}
+              <div style={{ flex: 1, overflowY: 'auto', padding: 20, display: 'flex', flexDirection: 'column', gap: 12 }}>
+                {messages.map((msg, i) => {
+                  const isMine = (msg.senderId || msg.sender_id) === currentUser?.id;
+                  return (
+                    <div
+                      key={msg.id || i}
+                      style={{
+                        alignSelf: isMine ? 'flex-end' : 'flex-start',
+                        maxWidth: '70%',
+                        padding: '10px 16px',
+                        borderRadius: 16,
+                        background: isMine ? 'linear-gradient(135deg, #6366f1, #8b5cf6)' : 'var(--bg-subtle)',
+                        color: isMine ? 'white' : 'var(--text-main)',
+                        border: isMine ? 'none' : '1px solid var(--border-app)',
+                        fontSize: 13,
+                        lineHeight: 1.4,
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.06)',
+                      }}
+                    >
+                      {msg.content}
+                    </div>
+                  );
+                })}
+                <div ref={messagesEndRef} />
+              </div>
+
+              {/* Message Input form */}
+              <form onSubmit={handleSendMessage} style={{ padding: 16, borderTop: '1px solid var(--border-app)', display: 'flex', gap: 10 }}>
+                <input
+                  type="text"
+                  placeholder="Andika ujumbe wako hapa..."
+                  value={newMessage}
+                  onChange={(e) => setNewMessage(e.target.value)}
+                  style={{
+                    flex: 1,
+                    padding: '10px 16px',
+                    borderRadius: 12,
+                    background: 'var(--input-bg)',
+                    border: '1px solid var(--input-border)',
+                    color: 'var(--input-text)',
+                    fontSize: 13,
+                  }}
+                />
+                <button
+                  type="submit"
+                  disabled={!newMessage.trim()}
+                  className="btn-primary"
+                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 18px', cursor: 'pointer' }}
+                >
+                  <Send size={16} />
+                </button>
+              </form>
+            </>
+          ) : (
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)' }}>
+              <MessageCircle size={48} style={{ opacity: 0.3, marginBottom: 12 }} />
+              <p style={{ fontSize: 14 }}>Chagua mtumiaji kuanza mazungumzo</p>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

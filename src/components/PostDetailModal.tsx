@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { X, MessageCircle, ThumbsUp, ThumbsDown, Share2, Bold, Italic, Code, Image, Send, CheckCircle2, Users, BookOpen, ChevronDown } from 'lucide-react';
+import { X, MessageCircle, ThumbsUp, ThumbsDown, Bookmark, Share2, Send, CheckCircle2, Award, Trash2 } from 'lucide-react';
 import { Post, Comment } from '../types';
 import { useApp } from '../contexts/AppContext';
 import { formatDate } from '../utils/data';
+import { CommentRichEditor, CommentContent } from './CommentRichEditor';
 
 interface PostDetailModalProps {
   post: Post | null;
@@ -10,27 +11,61 @@ interface PostDetailModalProps {
 }
 
 export const PostDetailModal: React.FC<PostDetailModalProps> = ({ post, onClose }) => {
-  const { getCommentsByPost, addComment, isAuthenticated, currentUser, incrementViews } = useApp();
+  const {
+    getCommentsByPost,
+    addComment,
+    deleteComment,
+    markBestAnswer,
+    upvoteComment,
+    upvotePost,
+    downvotePost,
+    toggleBookmark,
+    isAuthenticated,
+    currentUser,
+    incrementViews,
+    posts
+  } = useApp();
+
   const [commentText, setCommentText] = useState('');
   const [comments, setComments] = useState<Comment[]>([]);
+  const [copied, setCopied] = useState(false);
+
+  // Sync active post data from state for real-time votes/bookmarks
+  const currentPost = posts.find(p => p.id === post?.id) || post;
 
   useEffect(() => {
     if (post) {
       setComments(getCommentsByPost(post.id));
       incrementViews(post.id);
     }
-  }, [post?.id]);
+  }, [post?.id, getCommentsByPost]);
 
-  if (!post) return null;
+  if (!currentPost) return null;
 
-  const handleSubmitComment = () => {
+  const handleSubmitComment = async () => {
     if (!commentText.trim() || !isAuthenticated) return;
-    const newComment = addComment(post.id, commentText);
+    const newComment = await addComment(currentPost.id, commentText.trim());
     if (newComment) {
-      setComments([...comments, newComment]);
+      setComments(prev => [newComment, ...prev]);
       setCommentText('');
     }
   };
+
+  const handleShare = () => {
+    if (navigator.share) {
+      navigator.share({
+        title: currentPost.title,
+        text: currentPost.content.slice(0, 100),
+        url: window.location.href,
+      }).catch(() => {});
+    } else {
+      navigator.clipboard.writeText(window.location.href);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  const isAuthor = currentUser?.id === currentPost.authorId;
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -43,22 +78,23 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({ post, onClose 
         onClick={(e) => e.stopPropagation()}
       >
         <div style={{
-          position: 'sticky', top: 0, background: 'rgba(15, 23, 42, 0.95)',
+          position: 'sticky', top: 0, background: 'var(--header-bg)',
           backdropFilter: 'blur(12px)', padding: 16,
-          borderBottom: '1px solid rgba(51, 65, 85, 0.3)',
+          borderBottom: '1px solid var(--border-app)',
           display: 'flex', alignItems: 'center', justifyContent: 'space-between', zIndex: 10
         }}>
-          <h3 style={{ fontSize: 14, fontWeight: 600 }}>Mazungumzo</h3>
+          <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-main)' }}>Mazungumzo</h3>
           <button
             onClick={onClose}
             style={{ padding: 8, borderRadius: 8, background: 'transparent', border: 'none', cursor: 'pointer' }}
           >
-            <X size={20} color="#cbd5e1" />
+            <X size={20} color="var(--text-muted)" />
           </button>
         </div>
 
         <div style={{ padding: 24 }}>
-          <div style={{ marginBottom: 24 }}>
+          {/* Post Header */}
+          <div style={{ marginBottom: 20 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
               <div className="avatar-ring">
                 <div style={{
@@ -67,25 +103,95 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({ post, onClose 
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   fontSize: 14, fontWeight: 'bold'
                 }}>
-                  {post.author.avatar}
+                  {currentPost.author.avatar}
                 </div>
               </div>
               <div>
-                <h4 style={{ fontSize: 14, fontWeight: 600 }}>{post.author.username}</h4>
-                <p style={{ fontSize: 12, color: '#94a3b8' }}>{post.author.role} • {formatDate(post.createdAt)}</p>
+                <h4 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-main)' }}>{currentPost.author.username}</h4>
+                <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>{currentPost.author.role} • {formatDate(currentPost.createdAt)}</p>
               </div>
             </div>
-            <h2 style={{ fontSize: 20, fontWeight: 'bold', marginBottom: 16 }}>{post.title}</h2>
-            <p style={{ color: '#cbd5e1', lineHeight: 1.7, marginBottom: 16, whiteSpace: 'pre-wrap' }}>
-              {post.content}
+
+            <h2 style={{ fontSize: 20, fontWeight: 'bold', marginBottom: 16, color: 'var(--text-main)' }}>
+              {currentPost.title}
+            </h2>
+
+            <p style={{ color: 'var(--text-body)', lineHeight: 1.7, marginBottom: 16, whiteSpace: 'pre-wrap' }}>
+              {currentPost.content}
             </p>
+
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 16 }}>
-              {post.tags.map((tag) => <span key={tag} className="tag">#{tag}</span>)}
+              {currentPost.tags.map((tag) => <span key={tag} className="tag">#{tag}</span>)}
+            </div>
+
+            {/* Interaction Bar */}
+            <div style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              padding: '12px 16px', borderRadius: 12,
+              background: 'var(--bg-subtle)', border: '1px solid var(--border-app)'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <button
+                  onClick={() => upvotePost(currentPost.id)}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 6,
+                    padding: '6px 12px', borderRadius: 8, border: 'none', cursor: 'pointer',
+                    background: currentPost.isUpvoted ? 'rgba(99, 102, 241, 0.2)' : 'transparent',
+                    color: currentPost.isUpvoted ? '#818cf8' : 'var(--text-muted)',
+                    fontWeight: 500, fontSize: 13
+                  }}
+                >
+                  <ThumbsUp size={16} />
+                  <span>{currentPost.upvotes}</span>
+                </button>
+
+                <button
+                  onClick={() => downvotePost(currentPost.id)}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 6,
+                    padding: '6px 12px', borderRadius: 8, border: 'none', cursor: 'pointer',
+                    background: currentPost.isDownvoted ? 'rgba(239, 68, 68, 0.2)' : 'transparent',
+                    color: currentPost.isDownvoted ? '#f87171' : '#94a3b8',
+                    fontWeight: 500, fontSize: 13
+                  }}
+                >
+                  <ThumbsDown size={16} />
+                  <span>{currentPost.downvotes}</span>
+                </button>
+
+                <button
+                  onClick={() => toggleBookmark(currentPost.id)}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 6,
+                    padding: '6px 12px', borderRadius: 8, border: 'none', cursor: 'pointer',
+                    background: currentPost.isBookmarked ? 'rgba(234, 179, 8, 0.2)' : 'transparent',
+                    color: currentPost.isBookmarked ? '#facc15' : '#94a3b8',
+                    fontWeight: 500, fontSize: 13
+                  }}
+                >
+                  <Bookmark size={16} />
+                  <span>{currentPost.bookmarks || 0}</span>
+                </button>
+              </div>
+
+              <button
+                onClick={handleShare}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 6,
+                  padding: '6px 12px', borderRadius: 8, border: 'none', cursor: 'pointer',
+                  background: 'transparent', color: copied ? '#34d399' : '#94a3b8',
+                  fontSize: 13
+                }}
+              >
+                <Share2 size={16} />
+                <span>{copied ? 'Imenakiliwa!' : 'Shiriki'}</span>
+              </button>
             </div>
           </div>
 
-          <div style={{ borderTop: '1px solid rgba(51, 65, 85, 0.3)', paddingTop: 16 }}>
-            <h4 style={{ fontSize: 14, fontWeight: 600, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
+          {/* Comments Section */}
+          <div style={{ borderTop: '1px solid var(--border-app)', paddingTop: 16 }}>
+            <h4 style={{ fontSize: 14, fontWeight: 600, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8, color: 'var(--text-main)' }}>
               <MessageCircle size={16} color="#818cf8" />
               Majibu ({comments.length})
             </h4>
@@ -94,10 +200,10 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({ post, onClose 
               <div
                 key={comment.id}
                 style={{
-                  display: 'flex', gap: 12, marginBottom: 16, padding: 12,
+                  display: 'flex', gap: 12, marginBottom: 16, padding: 14,
                   borderRadius: 12,
-                  background: comment.isBestAnswer ? 'rgba(99, 102, 241, 0.1)' : 'rgba(30, 41, 59, 0.2)',
-                  border: comment.isBestAnswer ? '1px solid rgba(99, 102, 241, 0.3)' : 'none'
+                  background: comment.isBestAnswer ? 'rgba(99, 102, 241, 0.12)' : 'var(--bg-subtle)',
+                  border: comment.isBestAnswer ? '1px solid rgba(99, 102, 241, 0.4)' : '1px solid var(--border-app)'
                 }}
               >
                 <div style={{
@@ -109,62 +215,106 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({ post, onClose 
                   {comment.author.avatar}
                 </div>
                 <div style={{ flex: 1 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4, flexWrap: 'wrap' }}>
-                    <span style={{ fontSize: 14, fontWeight: 500 }}>{comment.author.username}</span>
-                    {comment.isBestAnswer && (
-                      <span style={{
-                        display: 'flex', alignItems: 'center', gap: 4, fontSize: 11,
-                        background: 'rgba(99, 102, 241, 0.2)', color: '#a5b4fc',
-                        padding: '2px 8px', borderRadius: 12
-                      }}>
-                        <CheckCircle2 size={10} /> Jibu Bora
-                      </span>
-                    )}
-                    <span style={{ fontSize: 12, color: '#64748b' }}>{formatDate(comment.createdAt)}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4, flexWrap: 'wrap', gap: 8 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <span style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-main)' }}>{comment.author.username}</span>
+                      {comment.isBestAnswer && (
+                        <span style={{
+                          display: 'flex', alignItems: 'center', gap: 4, fontSize: 11,
+                          background: 'var(--btn-ghost-bg)', color: 'var(--btn-ghost-text)',
+                          padding: '2px 8px', borderRadius: 12, fontWeight: 600
+                        }}>
+                          <CheckCircle2 size={12} /> Jibu Bora
+                        </span>
+                      )}
+                      <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{formatDate(comment.createdAt)}</span>
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      {/* Best Answer Toggle (if post author or admin) */}
+                      {(isAuthor || currentUser?.role === 'Admin') && (
+                        <button
+                          onClick={() => markBestAnswer(comment.id, currentPost.id)}
+                          title={comment.isBestAnswer ? 'Ondoa Jibu Bora' : 'Weka kama Jibu Bora'}
+                          style={{
+                            display: 'flex', alignItems: 'center', gap: 4,
+                            padding: '3px 8px', borderRadius: 6, fontSize: 11, cursor: 'pointer',
+                            background: comment.isBestAnswer ? 'var(--btn-ghost-bg)' : 'var(--bg-subtle)',
+                            color: comment.isBestAnswer ? 'var(--btn-ghost-text)' : 'var(--text-muted)',
+                            border: '1px solid var(--border-app)'
+                          }}
+                        >
+                          <Award size={12} />
+                          {comment.isBestAnswer ? 'Chaguo lako' : 'Weka Jibu Bora'}
+                        </button>
+                      )}
+
+                      {/* Delete comment if author */}
+                      {(currentUser?.id === comment.authorId || currentUser?.role === 'Admin') && (
+                        <button
+                          onClick={() => {
+                            deleteComment(comment.id);
+                            setComments(prev => prev.filter(c => c.id !== comment.id));
+                          }}
+                          style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: 2, color: 'var(--text-muted)' }}
+                          title="Futa jibu"
+                        >
+                          <Trash2 size={13} />
+                        </button>
+                      )}
+                    </div>
                   </div>
-                  <p style={{ fontSize: 14, color: '#cbd5e1', lineHeight: 1.5 }}>{comment.content}</p>
+
+                  <CommentContent content={comment.content} />
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <button
+                      onClick={() => upvoteComment(comment.id)}
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: 4,
+                        background: 'transparent', border: 'none', cursor: 'pointer',
+                        color: 'var(--text-muted)', fontSize: 12
+                      }}
+                    >
+                      <ThumbsUp size={12} />
+                      <span>{comment.upvotes || 0}</span>
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}
 
             {comments.length === 0 && (
-              <div style={{ textAlign: 'center', padding: 32, color: '#64748b' }}>
+              <div style={{ textAlign: 'center', padding: 32, color: 'var(--text-muted)' }}>
                 <MessageCircle size={32} style={{ margin: '0 auto 12px', opacity: 0.5 }} />
                 <p style={{ fontSize: 14 }}>Bado hakuna majibu. Kuwa wa kwanza kujibu!</p>
               </div>
             )}
 
+            {/* Answer Input using Rich Text Editor */}
             {isAuthenticated ? (
-              <div style={{ display: 'flex', gap: 12, marginTop: 16 }}>
-                <div style={{
-                  width: 32, height: 32, borderRadius: '50%',
-                  background: 'linear-gradient(135deg, #6366f1, #9333ea)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 12, fontWeight: 'bold', flexShrink: 0
-                }}>
-                  {currentUser?.avatar}
-                </div>
-                <div style={{ flex: 1 }}>
-                  <textarea
-                    value={commentText}
-                    onChange={(e) => setCommentText(e.target.value)}
-                    placeholder="Andika jibu lako..."
-                    style={{
-                      width: '100%', padding: 12, borderRadius: 12,
-                      background: 'rgba(30, 41, 59, 0.5)',
-                      border: '1px solid rgba(51, 65, 85, 0.5)',
-                      color: '#e2e8f0', fontSize: 14, resize: 'none', height: 80
-                    }}
-                  />
-                  <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 8 }}>
-                    <button
-                      className="btn-primary"
-                      style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, padding: '8px 16px' }}
-                      onClick={handleSubmitComment}
-                      disabled={!commentText.trim()}
-                    >
-                      <Send size={14} /> Tuma
-                    </button>
+              <div style={{ marginTop: 24, paddingTop: 16, borderTop: '1px solid var(--border-app)' }}>
+                <h4 style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)', marginBottom: 12 }}>
+                  Weka Jibu au Maoni Yako:
+                </h4>
+                <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+                  <div style={{
+                    width: 36, height: 36, borderRadius: '50%',
+                    background: 'linear-gradient(135deg, #6366f1, #9333ea)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: 12, fontWeight: 'bold', color: 'white', flexShrink: 0
+                  }}>
+                    {currentUser?.avatar || 'NJ'}
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <CommentRichEditor
+                      value={commentText}
+                      onChange={setCommentText}
+                      onSubmit={handleSubmitComment}
+                      placeholder="Andika jibu lako (tumia Bold, Italic, Code, Nukuu, Orodha, n.k)..."
+                      submitLabel="Tuma Jibu"
+                      minHeight={85}
+                    />
                   </div>
                 </div>
               </div>
@@ -175,7 +325,7 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({ post, onClose 
                 border: '1px solid rgba(99, 102, 241, 0.2)',
                 textAlign: 'center'
               }}>
-                <p style={{ fontSize: 14, color: '#94a3b8' }}>
+                <p style={{ fontSize: 14, color: 'var(--text-muted)' }}>
                   Ingia ili uweze kujibu maswali
                 </p>
               </div>

@@ -26,7 +26,7 @@ export const ForgotPasswordPage: React.FC = () => {
       alignItems: 'center',
       justifyContent: 'center',
       padding: 16,
-      background: 'linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%)',
+      background: 'var(--bg-app)',
     }}>
       <div style={{ width: '100%', maxWidth: 480 }}>
         {/* Logo */}
@@ -47,7 +47,7 @@ export const ForgotPasswordPage: React.FC = () => {
           <h1 className="gradient-text" style={{ fontSize: 32, fontWeight: 700 }}>
             Umesahau Password?
           </h1>
-          <p style={{ fontSize: 16, color: '#94a3b8', marginTop: 8 }}>
+          <p style={{ fontSize: 16, color: 'var(--text-muted)', marginTop: 8 }}>
             Hakuna shida, tutakusaidia kuipata tena
           </p>
         </div>
@@ -56,19 +56,19 @@ export const ForgotPasswordPage: React.FC = () => {
         <div className="glass-card" style={{ padding: 32 }}>
           {!isSubmitted ? (
             <>
-              <p style={{ fontSize: 14, color: '#94a3b8', marginBottom: 24, lineHeight: 1.6 }}>
+              <p style={{ fontSize: 14, color: 'var(--text-muted)', marginBottom: 24, lineHeight: 1.6 }}>
                 Ingiza email yako na tutakutumia link ya kureset password yako.
               </p>
 
               <form onSubmit={handleSubmit}>
                 <div style={{ marginBottom: 24 }}>
-                  <label style={{ fontSize: 14, fontWeight: 500, color: '#cbd5e1', marginBottom: 8, display: 'block' }}>
+                  <label style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-main)', marginBottom: 8, display: 'block' }}>
                     Email
                   </label>
                   <div style={{ position: 'relative' }}>
                     <Mail
                       size={18}
-                      color="#64748b"
+                      color="var(--text-muted)"
                       style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)' }}
                     />
                     <input
@@ -81,9 +81,9 @@ export const ForgotPasswordPage: React.FC = () => {
                         width: '100%',
                         padding: '12px 12px 12px 40px',
                         borderRadius: 12,
-                        background: 'rgba(30, 41, 59, 0.5)',
-                        border: '1px solid rgba(51, 65, 85, 0.5)',
-                        color: '#e2e8f0',
+                        background: 'var(--input-bg)',
+                        border: '1px solid var(--input-border)',
+                        color: 'var(--input-text)',
                         fontSize: 14,
                       }}
                     />
@@ -115,8 +115,8 @@ export const ForgotPasswordPage: React.FC = () => {
                     alignItems: 'center',
                     gap: 8,
                     fontSize: 14,
-                    color: '#818cf8',
-                    fontWeight: 500,
+                    color: 'var(--border-focus)',
+                    fontWeight: 600,
                     background: 'transparent',
                     border: 'none',
                     cursor: 'pointer',
@@ -143,23 +143,23 @@ export const ForgotPasswordPage: React.FC = () => {
                 <CheckCircle2 size={48} color="#10b981" />
               </div>
 
-              <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 12 }}>
+              <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 12, color: 'var(--text-main)' }}>
                 Email Imetumwa!
               </h2>
-              <p style={{ fontSize: 14, color: '#94a3b8', marginBottom: 24, lineHeight: 1.6 }}>
-                Tumetuma email yenye link ya kureset password kwa <strong style={{ color: '#e2e8f0' }}>{email}</strong>. 
+              <p style={{ fontSize: 14, color: 'var(--text-muted)', marginBottom: 24, lineHeight: 1.6 }}>
+                Tumetuma email yenye link ya kureset password kwa <strong style={{ color: 'var(--text-main)' }}>{email}</strong>. 
                 Tafadhali angalia inbox yako na ufuatiliae maagizo.
               </p>
 
               <div style={{
                 padding: 16,
                 borderRadius: 12,
-                background: 'rgba(99, 102, 241, 0.05)',
-                border: '1px solid rgba(99, 102, 241, 0.2)',
+                background: 'var(--bg-subtle)',
+                border: '1px solid var(--border-app)',
                 marginBottom: 24,
               }}>
-                <p style={{ fontSize: 13, color: '#94a3b8' }}>
-                  <strong style={{ color: '#a5b4fc' }}>Kidokezo:</strong> Kama huoni email, angalia spam folder yako
+                <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>
+                  <strong style={{ color: 'var(--border-focus)' }}>Kidokezo:</strong> Kama huoni email, angalia spam folder yako
                 </p>
               </div>
 

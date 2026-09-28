@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Trophy, Calendar, Users, Clock, Medal, Crown, X } from 'lucide-react';
 import { useApp } from '../contexts/AppContext';
+import { tournamentsAPI } from '../services/api';
 
 interface Tournament {
   id: string;
@@ -14,6 +15,7 @@ interface Tournament {
   prize: string;
   status: 'upcoming' | 'ongoing' | 'completed';
   winners?: { userId: string; position: number; prize: string }[];
+  isJoined?: boolean;
 }
 
 export const TournamentsSystem: React.FC = () => {
@@ -31,60 +33,56 @@ export const TournamentsSystem: React.FC = () => {
     prize: '',
   });
 
-  useEffect(() => {
-    // Load tournaments from localStorage
+  const loadTournaments = async () => {
+    try {
+      const data = await tournamentsAPI.getAll();
+      if (data && data.length > 0) {
+        setTournaments(data.map((t: any) => ({
+          ...t,
+          participantIds: t.isJoined && currentUser ? [currentUser.id] : [],
+        })));
+        return;
+      }
+    } catch {}
+
     const saved = localStorage.getItem('tournaments');
     if (saved) {
       setTournaments(JSON.parse(saved));
     } else {
-      // Create sample tournaments
       const sampleTournaments: Tournament[] = [
         {
           id: 'tournament-1',
           name: 'Weekly Coding Challenge',
-          description: 'Shindano la wiki la programming',
+          description: 'Shindano la wiki la programming na utatuzi wa matatizo ya code',
           icon: '💻',
           startDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(),
           endDate: new Date(Date.now() + 9 * 24 * 60 * 60 * 1000).toISOString(),
           maxParticipants: 100,
           participantIds: ['user1', 'user2'],
-          prize: '500 coins + Badge ya Dhahabu',
+          prize: '500 Pts + Nishani ya Dhahabu',
           status: 'upcoming',
         },
         {
           id: 'tournament-2',
           name: 'Best Post Competition',
-          description: 'Shindano la post bora ya mwezi',
+          description: 'Shindano la post na swali bora la mwezi huu',
           icon: '📝',
           startDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
           endDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(),
           maxParticipants: 50,
           participantIds: ['user1', 'user3', 'user4'],
-          prize: '1000 coins + Title ya Mshindi',
+          prize: '1000 Pts + Hadhi ya Mshindi',
           status: 'ongoing',
-        },
-        {
-          id: 'tournament-3',
-          name: 'Monthly Champion',
-          description: 'Shindano la mwezi - mshindi bora',
-          icon: '👑',
-          startDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
-          endDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-          maxParticipants: 100,
-          participantIds: ['user1', 'user2', 'user3', 'user4'],
-          prize: '2000 coins + Crown Badge',
-          status: 'completed',
-          winners: [
-            { userId: 'user1', position: 1, prize: '2000 coins' },
-            { userId: 'user2', position: 2, prize: '1000 coins' },
-            { userId: 'user3', position: 3, prize: '500 coins' },
-          ],
         },
       ];
       setTournaments(sampleTournaments);
       localStorage.setItem('tournaments', JSON.stringify(sampleTournaments));
     }
-  }, []);
+  };
+
+  useEffect(() => {
+    loadTournaments();
+  }, [currentUser]);
 
   const handleCreateTournament = () => {
     if (!currentUser || !newTournament.name || !newTournament.startDate || !newTournament.endDate) return;
@@ -94,9 +92,10 @@ export const TournamentsSystem: React.FC = () => {
       ...newTournament,
       participantIds: [currentUser.id],
       status: 'upcoming',
+      isJoined: true,
     };
 
-    const updated = [...tournaments, tournament];
+    const updated = [tournament, ...tournaments];
     setTournaments(updated);
     localStorage.setItem('tournaments', JSON.stringify(updated));
     setShowCreateModal(false);
@@ -111,12 +110,21 @@ export const TournamentsSystem: React.FC = () => {
     });
   };
 
-  const handleJoinTournament = (tournamentId: string) => {
+  const handleJoinTournament = async (tournamentId: string) => {
     if (!currentUser) return;
 
+    try {
+      await tournamentsAPI.join(tournamentId);
+    } catch {}
+
     const updated = tournaments.map(t => {
-      if (t.id === tournamentId && !t.participantIds.includes(currentUser.id) && t.participantIds.length < t.maxParticipants) {
-        return { ...t, participantIds: [...t.participantIds, currentUser.id] };
+      if (t.id === tournamentId) {
+        const pIds = t.participantIds || [];
+        return {
+          ...t,
+          isJoined: true,
+          participantIds: pIds.includes(currentUser.id) ? pIds : [...pIds, currentUser.id]
+        };
       }
       return t;
     });
@@ -130,7 +138,11 @@ export const TournamentsSystem: React.FC = () => {
 
     const updated = tournaments.map(t => {
       if (t.id === tournamentId) {
-        return { ...t, participantIds: t.participantIds.filter(id => id !== currentUser.id) };
+        return {
+          ...t,
+          isJoined: false,
+          participantIds: (t.participantIds || []).filter(id => id !== currentUser.id)
+        };
       }
       return t;
     });
@@ -159,8 +171,6 @@ export const TournamentsSystem: React.FC = () => {
 
   const icons = ['🏆', '💻', '📝', '👑', '🎮', '🎨', '⚽', '📚', '🎵', '🌍'];
 
-  if (!currentUser) return null;
-
   return (
     <div style={{ maxWidth: 1200, margin: '0 auto', padding: 24 }}>
       {/* Header */}
@@ -168,16 +178,16 @@ export const TournamentsSystem: React.FC = () => {
         <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
           <Trophy size={32} color="#fbbf24" />
           <div>
-            <h2 style={{ fontSize: 28, fontWeight: 700, margin: 0 }}>Mashindano</h2>
-            <p style={{ fontSize: 14, color: '#94a3b8', margin: 0 }}>
+            <h2 style={{ fontSize: 28, fontWeight: 700, margin: 0, color: 'var(--text-main)' }}>Mashindano</h2>
+            <p style={{ fontSize: 14, color: 'var(--text-muted)', margin: 0 }}>
               Shiriki katika mashindano na ushinde zawadi
             </p>
           </div>
         </div>
         <button
-          onClick={() => setShowCreateModal(true)}
+          onClick={() => currentUser ? setShowCreateModal(true) : alert('Tafadhali ingia kwenye akaunti ili kuunda shindano!')}
           className="btn-primary"
-          style={{ display: 'flex', alignItems: 'center', gap: 8 }}
+          style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}
         >
           <Trophy size={16} />
           Unda Shindano
@@ -194,8 +204,8 @@ export const TournamentsSystem: React.FC = () => {
         {[
           { label: 'Mashindano Yote', value: tournaments.length, icon: Trophy, color: '#fbbf24' },
           { label: 'Inaendelea', value: tournaments.filter(t => t.status === 'ongoing').length, icon: Clock, color: '#10b981' },
-          { label: 'Ninashiriki', value: tournaments.filter(t => t.participantIds.includes(currentUser.id)).length, icon: Users, color: '#a5b4fc' },
-          { label: 'Nimeshinda', value: tournaments.filter(t => t.winners?.some(w => w.userId === currentUser.id)).length, icon: Medal, color: '#f472b6' },
+          { label: 'Ninashiriki', value: tournaments.filter(t => currentUser ? t.participantIds.includes(currentUser.id) : false).length, icon: Users, color: 'var(--btn-ghost-text)' },
+          { label: 'Nimeshinda', value: tournaments.filter(t => currentUser ? t.winners?.some(w => w.userId === currentUser.id) : false).length, icon: Medal, color: '#f472b6' },
         ].map((stat, i) => (
           <div key={i} className="glass-card" style={{ padding: 20 }}>
             <stat.icon size={24} color={stat.color} style={{ marginBottom: 12 }} />
@@ -210,7 +220,7 @@ export const TournamentsSystem: React.FC = () => {
       {/* Tournaments Grid */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 16 }}>
         {tournaments.map((tournament) => {
-          const isJoined = tournament.participantIds.includes(currentUser.id);
+          const isJoined = currentUser ? tournament.participantIds.includes(currentUser.id) : false;
           const isFull = tournament.participantIds.length >= tournament.maxParticipants;
 
           return (
@@ -250,18 +260,18 @@ export const TournamentsSystem: React.FC = () => {
                 </div>
               </div>
 
-              <p style={{ fontSize: 13, color: '#94a3b8', marginBottom: 16, lineHeight: 1.5 }}>
+              <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 16, lineHeight: 1.5 }}>
                 {tournament.description}
               </p>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 16 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: '#cbd5e1' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: 'var(--text-body)' }}>
                   <Calendar size={14} color="#64748b" />
                   <span>
                     {new Date(tournament.startDate).toLocaleDateString('sw-TZ')} - {new Date(tournament.endDate).toLocaleDateString('sw-TZ')}
                   </span>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: '#cbd5e1' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: 'var(--text-body)' }}>
                   <Users size={14} color="#64748b" />
                   <span>{tournament.participantIds.length}/{tournament.maxParticipants} washiriki</span>
                 </div>
@@ -320,7 +330,7 @@ export const TournamentsSystem: React.FC = () => {
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               <div>
-                <label style={{ fontSize: 14, fontWeight: 500, color: '#cbd5e1', marginBottom: 8, display: 'block' }}>
+                <label style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-body)', marginBottom: 8, display: 'block' }}>
                   Jina la Shindano
                 </label>
                 <input
@@ -332,16 +342,16 @@ export const TournamentsSystem: React.FC = () => {
                     width: '100%',
                     padding: 12,
                     borderRadius: 12,
-                    background: 'rgba(30, 41, 59, 0.5)',
-                    border: '1px solid rgba(51, 65, 85, 0.5)',
-                    color: '#e2e8f0',
+                    background: 'var(--input-bg)',
+                    border: '1px solid var(--input-border)',
+                    color: 'var(--input-text)',
                     fontSize: 14,
                   }}
                 />
               </div>
 
               <div>
-                <label style={{ fontSize: 14, fontWeight: 500, color: '#cbd5e1', marginBottom: 8, display: 'block' }}>
+                <label style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-main)', marginBottom: 8, display: 'block' }}>
                   Maelezo
                 </label>
                 <textarea
@@ -352,9 +362,9 @@ export const TournamentsSystem: React.FC = () => {
                     width: '100%',
                     padding: 12,
                     borderRadius: 12,
-                    background: 'rgba(30, 41, 59, 0.5)',
-                    border: '1px solid rgba(51, 65, 85, 0.5)',
-                    color: '#e2e8f0',
+                    background: 'var(--input-bg)',
+                    border: '1px solid var(--input-border)',
+                    color: 'var(--input-text)',
                     fontSize: 14,
                     resize: 'vertical',
                     minHeight: 80,
@@ -363,7 +373,7 @@ export const TournamentsSystem: React.FC = () => {
               </div>
 
               <div>
-                <label style={{ fontSize: 14, fontWeight: 500, color: '#cbd5e1', marginBottom: 8, display: 'block' }}>
+                <label style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-main)', marginBottom: 8, display: 'block' }}>
                   Icon
                 </label>
                 <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
@@ -375,8 +385,8 @@ export const TournamentsSystem: React.FC = () => {
                         width: 48,
                         height: 48,
                         borderRadius: 12,
-                        background: newTournament.icon === icon ? 'rgba(251, 191, 36, 0.2)' : 'rgba(30, 41, 59, 0.3)',
-                        border: `2px solid ${newTournament.icon === icon ? '#fbbf24' : 'transparent'}`,
+                        background: newTournament.icon === icon ? 'var(--btn-ghost-bg)' : 'var(--bg-subtle)',
+                        border: `2px solid ${newTournament.icon === icon ? 'var(--border-focus)' : 'var(--border-app)'}`,
                         cursor: 'pointer',
                         fontSize: 24,
                         display: 'flex',
@@ -392,7 +402,7 @@ export const TournamentsSystem: React.FC = () => {
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                 <div>
-                  <label style={{ fontSize: 14, fontWeight: 500, color: '#cbd5e1', marginBottom: 8, display: 'block' }}>
+                  <label style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-main)', marginBottom: 8, display: 'block' }}>
                     Tarehe ya Kuanza
                   </label>
                   <input
@@ -403,15 +413,15 @@ export const TournamentsSystem: React.FC = () => {
                       width: '100%',
                       padding: 12,
                       borderRadius: 12,
-                      background: 'rgba(30, 41, 59, 0.5)',
-                      border: '1px solid rgba(51, 65, 85, 0.5)',
-                      color: '#e2e8f0',
+                      background: 'var(--input-bg)',
+                      border: '1px solid var(--input-border)',
+                      color: 'var(--input-text)',
                       fontSize: 14,
                     }}
                   />
                 </div>
                 <div>
-                  <label style={{ fontSize: 14, fontWeight: 500, color: '#cbd5e1', marginBottom: 8, display: 'block' }}>
+                  <label style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-main)', marginBottom: 8, display: 'block' }}>
                     Tarehe ya Kuisha
                   </label>
                   <input
@@ -422,9 +432,9 @@ export const TournamentsSystem: React.FC = () => {
                       width: '100%',
                       padding: 12,
                       borderRadius: 12,
-                      background: 'rgba(30, 41, 59, 0.5)',
-                      border: '1px solid rgba(51, 65, 85, 0.5)',
-                      color: '#e2e8f0',
+                      background: 'var(--input-bg)',
+                      border: '1px solid var(--input-border)',
+                      color: 'var(--input-text)',
                       fontSize: 14,
                     }}
                   />
@@ -432,7 +442,7 @@ export const TournamentsSystem: React.FC = () => {
               </div>
 
               <div>
-                <label style={{ fontSize: 14, fontWeight: 500, color: '#cbd5e1', marginBottom: 8, display: 'block' }}>
+                <label style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-main)', marginBottom: 8, display: 'block' }}>
                   Max Participants: {newTournament.maxParticipants}
                 </label>
                 <input
@@ -447,7 +457,7 @@ export const TournamentsSystem: React.FC = () => {
               </div>
 
               <div>
-                <label style={{ fontSize: 14, fontWeight: 500, color: '#cbd5e1', marginBottom: 8, display: 'block' }}>
+                <label style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-main)', marginBottom: 8, display: 'block' }}>
                   Zawadi
                 </label>
                 <input
@@ -459,9 +469,9 @@ export const TournamentsSystem: React.FC = () => {
                     width: '100%',
                     padding: 12,
                     borderRadius: 12,
-                    background: 'rgba(30, 41, 59, 0.5)',
-                    border: '1px solid rgba(51, 65, 85, 0.5)',
-                    color: '#e2e8f0',
+                    background: 'var(--input-bg)',
+                    border: '1px solid var(--input-border)',
+                    color: 'var(--input-text)',
                     fontSize: 14,
                   }}
                 />
@@ -523,7 +533,7 @@ export const TournamentsSystem: React.FC = () => {
               </button>
             </div>
 
-            <p style={{ fontSize: 15, color: '#cbd5e1', marginBottom: 24, lineHeight: 1.6 }}>
+            <p style={{ fontSize: 15, color: 'var(--text-body)', marginBottom: 24, lineHeight: 1.6 }}>
               {selectedTournament.description}
             </p>
 
@@ -547,29 +557,31 @@ export const TournamentsSystem: React.FC = () => {
               <div style={{
                 padding: 16,
                 borderRadius: 12,
-                background: 'rgba(30, 41, 59, 0.3)',
+                background: 'var(--bg-subtle)',
+                border: '1px solid var(--border-app)',
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-                  <Calendar size={16} color="#a5b4fc" />
-                  <span style={{ fontSize: 13, color: '#94a3b8' }}>Tarehe</span>
+                  <Calendar size={16} color="var(--border-focus)" />
+                  <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>Tarehe</span>
                 </div>
-                <p style={{ fontSize: 14, color: '#e2e8f0', margin: 0 }}>
+                <p style={{ fontSize: 14, color: 'var(--text-main)', margin: 0, fontWeight: 500 }}>
                   {new Date(selectedTournament.startDate).toLocaleDateString('sw-TZ')}
                 </p>
-                <p style={{ fontSize: 12, color: '#64748b', margin: '4px 0 0 0' }}>
+                <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: '4px 0 0 0' }}>
                   hadi {new Date(selectedTournament.endDate).toLocaleDateString('sw-TZ')}
                 </p>
               </div>
               <div style={{
                 padding: 16,
                 borderRadius: 12,
-                background: 'rgba(30, 41, 59, 0.3)',
+                background: 'var(--bg-subtle)',
+                border: '1px solid var(--border-app)',
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-                  <Users size={16} color="#a5b4fc" />
-                  <span style={{ fontSize: 13, color: '#94a3b8' }}>Washiriki</span>
+                  <Users size={16} color="var(--border-focus)" />
+                  <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>Washiriki</span>
                 </div>
-                <p style={{ fontSize: 20, fontWeight: 700, color: '#e2e8f0', margin: 0 }}>
+                <p style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>
                   {selectedTournament.participantIds.length} / {selectedTournament.maxParticipants}
                 </p>
               </div>
@@ -578,7 +590,7 @@ export const TournamentsSystem: React.FC = () => {
             {/* Winners (if completed) */}
             {selectedTournament.status === 'completed' && selectedTournament.winners && (
               <div style={{ marginBottom: 24 }}>
-                <h4 style={{ fontSize: 16, fontWeight: 600, marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
+                <h4 style={{ fontSize: 16, fontWeight: 600, marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8, color: 'var(--text-main)' }}>
                   <Medal size={18} color="#fbbf24" />
                   Washindi
                 </h4>
@@ -595,8 +607,8 @@ export const TournamentsSystem: React.FC = () => {
                           gap: 12,
                           padding: 12,
                           borderRadius: 10,
-                          background: i === 0 ? 'rgba(251, 191, 36, 0.1)' : 'rgba(30, 41, 59, 0.3)',
-                          border: `1px solid ${i === 0 ? 'rgba(251, 191, 36, 0.3)' : 'rgba(51, 65, 85, 0.3)'}`,
+                          background: i === 0 ? 'rgba(251, 191, 36, 0.12)' : 'var(--bg-subtle)',
+                          border: `1px solid ${i === 0 ? 'rgba(251, 191, 36, 0.3)' : 'var(--border-app)'}`,
                         }}
                       >
                         <div style={{
@@ -609,12 +621,13 @@ export const TournamentsSystem: React.FC = () => {
                           justifyContent: 'center',
                           fontSize: 16,
                           fontWeight: 'bold',
+                          color: 'white',
                         }}>
                           {user.avatar}
                         </div>
                         <div style={{ flex: 1 }}>
-                          <p style={{ fontSize: 14, fontWeight: 600, margin: 0 }}>{user.username}</p>
-                          <p style={{ fontSize: 12, color: '#94a3b8', margin: 0 }}>Nafasi #{winner.position}</p>
+                          <p style={{ fontSize: 14, fontWeight: 600, margin: 0, color: 'var(--text-main)' }}>{user.username}</p>
+                          <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: 0 }}>Nafasi #{winner.position}</p>
                         </div>
                         {i === 0 && <Crown size={20} color="#fbbf24" />}
                         <span style={{ fontSize: 13, fontWeight: 600, color: '#fbbf24' }}>
@@ -629,8 +642,8 @@ export const TournamentsSystem: React.FC = () => {
 
             {/* Participants */}
             <div>
-              <h4 style={{ fontSize: 16, fontWeight: 600, marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
-                <Users size={18} color="#a5b4fc" />
+              <h4 style={{ fontSize: 16, fontWeight: 600, marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8, color: 'var(--text-main)' }}>
+                <Users size={18} color="var(--border-focus)" />
                 Washiriki ({selectedTournament.participantIds.length})
               </h4>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
@@ -646,8 +659,8 @@ export const TournamentsSystem: React.FC = () => {
                         gap: 8,
                         padding: '8px 12px',
                         borderRadius: 20,
-                        background: 'rgba(30, 41, 59, 0.3)',
-                        border: '1px solid rgba(51, 65, 85, 0.3)',
+                        background: 'var(--bg-subtle)',
+                        border: '1px solid var(--border-app)',
                       }}
                     >
                       <div style={{
@@ -660,10 +673,11 @@ export const TournamentsSystem: React.FC = () => {
                         justifyContent: 'center',
                         fontSize: 11,
                         fontWeight: 'bold',
+                        color: 'white',
                       }}>
                         {participant.avatar}
                       </div>
-                      <span style={{ fontSize: 13, color: '#e2e8f0' }}>{participant.username}</span>
+                      <span style={{ fontSize: 13, color: 'var(--text-main)', fontWeight: 500 }}>{participant.username}</span>
                     </div>
                   );
                 })}

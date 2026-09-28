@@ -55,8 +55,9 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onExpand }) => {
         <div style={{ position: 'absolute', top: -8, left: 16 }}>
           <span style={{
             display: 'flex', alignItems: 'center', gap: 4, fontSize: 12,
-            background: 'rgba(245, 158, 11, 0.2)', color: '#fcd34d',
-            padding: '4px 8px', borderRadius: 20, border: '1px solid rgba(245, 158, 11, 0.3)'
+            background: 'rgba(245, 158, 11, 0.15)', color: '#d97706',
+            padding: '4px 8px', borderRadius: 20, border: '1px solid rgba(245, 158, 11, 0.3)',
+            fontWeight: 600
           }}>
             <Pin size={12} /> Pinned
           </span>
@@ -78,7 +79,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onExpand }) => {
           </div>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <h4 style={{ fontSize: 14, fontWeight: 600 }}>
+              <h4 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-main)' }}>
                 {post.isAnonymous ? 'Anonymous' : post.author.username}
               </h4>
               {post.author.isVerified && (
@@ -87,7 +88,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onExpand }) => {
                 </span>
               )}
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: '#94a3b8' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: 'var(--text-muted)' }}>
               <span>{post.author.role}</span>
               <span>•</span>
               <span>{formatDate(post.createdAt)}</span>
@@ -126,7 +127,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onExpand }) => {
                     display: 'flex', alignItems: 'center', gap: 8,
                     padding: '8px 12px', borderRadius: 8, width: '100%',
                     background: 'transparent', border: 'none',
-                    color: '#cbd5e1', cursor: 'pointer', fontSize: 14
+                    color: 'var(--text-body)', cursor: 'pointer', fontSize: 14
                   }}
                 >
                   <item.icon size={16} />
@@ -140,7 +141,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onExpand }) => {
 
       {/* Title */}
       <h2
-        style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 12, cursor: 'pointer', lineHeight: 1.5 }}
+        style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 12, cursor: 'pointer', lineHeight: 1.5, color: 'var(--text-main)' }}
         onClick={() => onExpand(post)}
       >
         {post.title}
@@ -150,10 +151,10 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onExpand }) => {
       {post.content && (
         <div style={{
           marginBottom: 16, padding: 16, borderRadius: 12,
-          background: 'rgba(30, 41, 59, 0.3)', border: '1px solid rgba(51, 65, 85, 0.3)'
+          background: 'var(--bg-subtle)', border: '1px solid var(--border-app)'
         }}>
           <p style={{
-            fontSize: 14, color: '#cbd5e1', lineHeight: 1.6,
+            fontSize: 14, color: 'var(--text-body)', lineHeight: 1.6,
             display: '-webkit-box', WebkitLineClamp: 3,
             WebkitBoxOrient: 'vertical', overflow: 'hidden'
           }}>
@@ -162,9 +163,9 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onExpand }) => {
           <button
             onClick={() => onExpand(post)}
             style={{
-              fontSize: 12, color: '#818cf8', marginTop: 8,
+              fontSize: 12, color: 'var(--border-focus)', marginTop: 8,
               background: 'transparent', border: 'none',
-              cursor: 'pointer', fontWeight: 500
+              cursor: 'pointer', fontWeight: 600
             }}
           >
             Soma zaidi →
@@ -182,8 +183,8 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onExpand }) => {
       {/* Stats */}
       <div style={{
         display: 'flex', alignItems: 'center', gap: 16, fontSize: 12,
-        color: '#94a3b8', marginBottom: 16, paddingBottom: 12,
-        borderBottom: '1px solid rgba(51, 65, 85, 0.3)'
+        color: 'var(--text-muted)', marginBottom: 16, paddingBottom: 12,
+        borderBottom: '1px solid var(--border-app)'
       }}>
         <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
           <Eye size={14} />{post.views.toLocaleString()} views
@@ -204,8 +205,9 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onExpand }) => {
             className="reaction-btn"
             onClick={() => handleReaction(emoji)}
             style={{
-              background: userIds.includes('currentUser') ? 'rgba(99, 102, 241, 0.2)' : undefined,
-              borderColor: userIds.includes('currentUser') ? '#6366f1' : undefined,
+              background: userIds.includes('currentUser') ? 'var(--btn-ghost-bg)' : undefined,
+              borderColor: userIds.includes('currentUser') ? 'var(--btn-ghost-border)' : undefined,
+              color: userIds.includes('currentUser') ? 'var(--btn-ghost-text)' : undefined,
             }}
           >
             <span>{emoji}</span>

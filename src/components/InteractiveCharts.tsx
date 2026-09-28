@@ -56,7 +56,7 @@ export const InteractiveBarChart: React.FC<InteractiveBarChartProps> = ({ data, 
                   background: 'rgba(15, 23, 42, 0.95)',
                   border: '1px solid rgba(99, 102, 241, 0.3)',
                   fontSize: 12,
-                  color: '#e2e8f0',
+                  color: 'var(--text-main)',
                   whiteSpace: 'nowrap',
                   marginBottom: 8,
                   zIndex: 10,
@@ -67,7 +67,7 @@ export const InteractiveBarChart: React.FC<InteractiveBarChartProps> = ({ data, 
               )}
 
               {/* Value Label */}
-              <span style={{ fontSize: 11, color: '#94a3b8', fontWeight: 500 }}>
+              <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 500 }}>
                 {item.value.toLocaleString()}
               </span>
 
@@ -333,8 +333,8 @@ export const InteractiveDonutChart: React.FC<DonutChartProps> = ({ data, title, 
                 borderRadius: 3,
                 background: item.color,
               }} />
-              <span style={{ fontSize: 13, color: '#cbd5e1', flex: 1 }}>{item.label}</span>
-              <span style={{ fontSize: 13, fontWeight: 600, color: '#e2e8f0' }}>
+              <span style={{ fontSize: 13, color: 'var(--text-body)', flex: 1 }}>{item.label}</span>
+              <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-main)' }}>
                 {item.value}
               </span>
             </div>

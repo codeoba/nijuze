@@ -158,7 +158,7 @@ export const ReadingList: React.FC<{ isOpen: boolean; onClose: () => void }> = (
                   {/* Post Content Preview */}
                   <p style={{
                     fontSize: 13,
-                    color: '#94a3b8',
+                    color: 'var(--text-muted)',
                     lineHeight: 1.5,
                     marginBottom: 12,
                     display: '-webkit-box',
@@ -178,7 +178,7 @@ export const ReadingList: React.FC<{ isOpen: boolean; onClose: () => void }> = (
                         background: 'rgba(99, 102, 241, 0.1)',
                         border: '1px solid rgba(99, 102, 241, 0.2)',
                         fontSize: 11,
-                        color: '#a5b4fc',
+                        color: 'var(--btn-ghost-text)',
                       }}>
                         #{tag}
                       </span>
@@ -251,7 +251,7 @@ export const ReadingList: React.FC<{ isOpen: boolean; onClose: () => void }> = (
             justifyContent: 'space-around',
           }}>
             <div style={{ textAlign: 'center' }}>
-              <p style={{ fontSize: 18, fontWeight: 700, color: '#a5b4fc' }}>{filteredList.length}</p>
+              <p style={{ fontSize: 18, fontWeight: 700, color: 'var(--btn-ghost-text)' }}>{filteredList.length}</p>
               <p style={{ fontSize: 12, color: '#64748b' }}>Posts</p>
             </div>
             <div style={{ textAlign: 'center' }}>

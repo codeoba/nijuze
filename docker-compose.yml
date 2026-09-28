@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  # Frontend (React App)
+  # Frontend (React + Vite + Nginx)
   frontend:
     build:
       context: .
@@ -10,13 +10,13 @@ services:
       - "3000:80"
     environment:
       - VITE_API_URL=http://localhost:5000/api
-      - VITE_WS_URL=ws://localhost:5000
     depends_on:
       - backend
     networks:
       - nijuze-network
+    restart: unless-stopped
 
-  # Backend (Node.js API)
+  # Backend (Node.js + Express API)
   backend:
     build:
       context: ./backend
@@ -26,84 +26,45 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=5000
-      - DATABASE_URL=postgresql://nijuze:nijuze_password@postgres:5432/nijuze
-      - REDIS_URL=redis://redis:6379
-      - JWT_SECRET=${JWT_SECRET:-your-super-secret-jwt-key-change-in-production}
+      - DB_HOST=mysql
+      - DB_USER=nijuze_user
+      - DB_PASSWORD=nijuze_password
+      - DB_NAME=nijuze
+      - JWT_SECRET=${JWT_SECRET:-nijuze_super_secret_production_jwt_key_2026}
       - JWT_EXPIRES_IN=7d
-      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-      - AWS_S3_BUCKET=${AWS_S3_BUCKET:-nijuze-uploads}
-      - AWS_REGION=${AWS_REGION:-us-east-1}
-      - SENDGRID_API_KEY=${SENDGRID_API_KEY}
-      - FROM_EMAIL=${FROM_EMAIL:-noreply@nijuze.com}
+      - FRONTEND_URL=http://localhost:3000
     depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
+      mysql:
         condition: service_healthy
     networks:
       - nijuze-network
     restart: unless-stopped
 
-  # PostgreSQL Database
-  postgres:
-    image: postgres:15-alpine
+  # MySQL 8.0 Database
+  mysql:
+    image: mysql:8.0
+    command: --default-authentication-plugin=mysql_native_password
     ports:
-      - "5432:5432"
+      - "3306:3306"
     environment:
-      - POSTGRES_USER=nijuze
-      - POSTGRES_PASSWORD=nijuze_password
-      - POSTGRES_DB=nijuze
+      - MYSQL_ROOT_PASSWORD=root_password
+      - MYSQL_DATABASE=nijuze
+      - MYSQL_USER=nijuze_user
+      - MYSQL_PASSWORD=nijuze_password
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./backend/database/schema.sql:/docker-entrypoint-initdb.d/init.sql
+      - mysql_data:/var/lib/mysql
+      - ./backend/database/mysql_schema.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U nijuze"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot_password"]
       interval: 10s
       timeout: 5s
       retries: 5
     networks:
       - nijuze-network
     restart: unless-stopped
-
-  # Redis Cache
-  redis:
-    image: redis:7-alpine
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis_data:/data
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    command: redis-server --appendonly yes
-    networks:
-      - nijuze-network
-    restart: unless-stopped
-
-  # Nginx Reverse Proxy (Optional - for production)
-  nginx:
-    image: nginx:alpine
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./ssl:/etc/nginx/ssl:ro
-    depends_on:
-      - frontend
-      - backend
-    networks:
-      - nijuze-network
-    restart: unless-stopped
-    profiles:
-      - production
 
 volumes:
-  postgres_data:
-  redis_data:
+  mysql_data:
 
 networks:
   nijuze-network:

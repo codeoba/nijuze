@@ -106,7 +106,7 @@ export const CreatePollModal: React.FC<CreatePollModalProps> = ({ isOpen, onClos
 
         {/* Question */}
         <div style={{ marginBottom: 20 }}>
-          <label style={{ fontSize: 14, fontWeight: 500, color: '#cbd5e1', marginBottom: 8, display: 'block' }}>
+          <label style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-body)', marginBottom: 8, display: 'block' }}>
             Swali la Kura *
           </label>
           <input
@@ -118,9 +118,9 @@ export const CreatePollModal: React.FC<CreatePollModalProps> = ({ isOpen, onClos
               width: '100%',
               padding: 12,
               borderRadius: 12,
-              background: 'rgba(30, 41, 59, 0.5)',
-              border: '1px solid rgba(51, 65, 85, 0.5)',
-              color: '#e2e8f0',
+              background: 'var(--input-bg)',
+              border: '1px solid var(--border-app)',
+              color: 'var(--text-main)',
               fontSize: 14,
             }}
           />
@@ -128,7 +128,7 @@ export const CreatePollModal: React.FC<CreatePollModalProps> = ({ isOpen, onClos
 
         {/* Options */}
         <div style={{ marginBottom: 20 }}>
-          <label style={{ fontSize: 14, fontWeight: 500, color: '#cbd5e1', marginBottom: 8, display: 'block' }}>
+          <label style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-body)', marginBottom: 8, display: 'block' }}>
             Chaguzi * (2-6)
           </label>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -143,9 +143,9 @@ export const CreatePollModal: React.FC<CreatePollModalProps> = ({ isOpen, onClos
                     flex: 1,
                     padding: 12,
                     borderRadius: 12,
-                    background: 'rgba(30, 41, 59, 0.5)',
-                    border: '1px solid rgba(51, 65, 85, 0.5)',
-                    color: '#e2e8f0',
+                    background: 'var(--input-bg)',
+                    border: '1px solid var(--border-app)',
+                    color: 'var(--text-main)',
                     fontSize: 14,
                   }}
                 />
@@ -173,7 +173,7 @@ export const CreatePollModal: React.FC<CreatePollModalProps> = ({ isOpen, onClos
                   borderRadius: 12,
                   background: 'rgba(99, 102, 241, 0.1)',
                   border: '1px solid rgba(99, 102, 241, 0.3)',
-                  color: '#a5b4fc',
+                  color: 'var(--btn-ghost-text)',
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
@@ -191,7 +191,7 @@ export const CreatePollModal: React.FC<CreatePollModalProps> = ({ isOpen, onClos
 
         {/* Duration */}
         <div style={{ marginBottom: 20 }}>
-          <label style={{ fontSize: 14, fontWeight: 500, color: '#cbd5e1', marginBottom: 8, display: 'block' }}>
+          <label style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-body)', marginBottom: 8, display: 'block' }}>
             Muda wa Kura (masaa)
           </label>
           <select
@@ -201,9 +201,9 @@ export const CreatePollModal: React.FC<CreatePollModalProps> = ({ isOpen, onClos
               width: '100%',
               padding: 12,
               borderRadius: 12,
-              background: 'rgba(30, 41, 59, 0.5)',
-              border: '1px solid rgba(51, 65, 85, 0.5)',
-              color: '#e2e8f0',
+              background: 'var(--input-bg)',
+              border: '1px solid var(--border-app)',
+              color: 'var(--text-main)',
               fontSize: 14,
             }}
           >
@@ -226,7 +226,7 @@ export const CreatePollModal: React.FC<CreatePollModalProps> = ({ isOpen, onClos
               onChange={(e) => setIsAnonymous(e.target.checked)}
               style={{ width: 16, height: 16, borderRadius: 4 }}
             />
-            <span style={{ fontSize: 14, color: '#cbd5e1' }}>Kura ya siri (watu hawaoni nani alipiga kura)</span>
+            <span style={{ fontSize: 14, color: 'var(--text-body)' }}>Kura ya siri (watu hawaoni nani alipiga kura)</span>
           </label>
           <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
             <input
@@ -235,7 +235,7 @@ export const CreatePollModal: React.FC<CreatePollModalProps> = ({ isOpen, onClos
               onChange={(e) => setAllowMultiple(e.target.checked)}
               style={{ width: 16, height: 16, borderRadius: 4 }}
             />
-            <span style={{ fontSize: 14, color: '#cbd5e1' }}>Ruhusu kura nyingi (mtu anaweza kuchagua zaidi ya moja)</span>
+            <span style={{ fontSize: 14, color: 'var(--text-body)' }}>Ruhusu kura nyingi (mtu anaweza kuchagua zaidi ya moja)</span>
           </label>
         </div>
 
@@ -307,8 +307,8 @@ export const PollCard: React.FC<PollCardProps> = ({ poll, hasVoted, onVote }) =>
                   gap: 12,
                   padding: 12,
                   borderRadius: 12,
-                  background: selectedOption === option.id ? 'rgba(99, 102, 241, 0.1)' : 'rgba(30, 41, 59, 0.3)',
-                  border: `1px solid ${selectedOption === option.id ? 'rgba(99, 102, 241, 0.5)' : 'rgba(51, 65, 85, 0.3)'}`,
+                  background: selectedOption === option.id ? 'rgba(99, 102, 241, 0.1)' : 'var(--bg-subtle)',
+                  border: `1px solid ${selectedOption === option.id ? 'rgba(99, 102, 241, 0.5)' : 'var(--border-app)'}`,
                   cursor: 'pointer',
                 }}
               >
@@ -319,7 +319,7 @@ export const PollCard: React.FC<PollCardProps> = ({ poll, hasVoted, onVote }) =>
                   onChange={() => setSelectedOption(option.id)}
                   style={{ width: 16, height: 16 }}
                 />
-                <span style={{ fontSize: 14, color: '#e2e8f0' }}>{option.text}</span>
+                <span style={{ fontSize: 14, color: 'var(--text-main)' }}>{option.text}</span>
               </label>
             ))}
           </div>
@@ -339,15 +339,15 @@ export const PollCard: React.FC<PollCardProps> = ({ poll, hasVoted, onVote }) =>
             return (
               <div key={option.id}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                  <span style={{ fontSize: 14, color: '#e2e8f0' }}>{option.text}</span>
-                  <span style={{ fontSize: 14, fontWeight: 600, color: '#a5b4fc' }}>
+                  <span style={{ fontSize: 14, color: 'var(--text-main)' }}>{option.text}</span>
+                  <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--btn-ghost-text)' }}>
                     {percentage.toFixed(1)}%
                   </span>
                 </div>
                 <div style={{
                   height: 8,
                   borderRadius: 4,
-                  background: 'rgba(30, 41, 59, 0.5)',
+                  background: 'var(--input-bg)',
                   overflow: 'hidden',
                 }}>
                   <div style={{
@@ -370,7 +370,7 @@ export const PollCard: React.FC<PollCardProps> = ({ poll, hasVoted, onVote }) =>
       <div style={{
         marginTop: 16,
         paddingTop: 16,
-        borderTop: '1px solid rgba(51, 65, 85, 0.3)',
+        borderTop: '1px solid var(--border-app)',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',

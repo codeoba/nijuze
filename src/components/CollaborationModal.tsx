@@ -121,7 +121,7 @@ export const CollaborationModal: React.FC<CollaborationModalProps> = ({ isOpen, 
               <Users size={24} color="#818cf8" />
               Ushirikiano
             </h2>
-            <p style={{ fontSize: 13, color: '#94a3b8' }}>{postTitle}</p>
+            <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>{postTitle}</p>
           </div>
           <button
             onClick={onClose}
@@ -172,7 +172,7 @@ export const CollaborationModal: React.FC<CollaborationModalProps> = ({ isOpen, 
                 borderRadius: 8,
                 background: 'rgba(15, 23, 42, 0.5)',
                 border: '1px solid rgba(51, 65, 85, 0.5)',
-                color: '#e2e8f0',
+                color: 'var(--text-main)',
                 fontSize: 14,
               }}
             />
@@ -184,7 +184,7 @@ export const CollaborationModal: React.FC<CollaborationModalProps> = ({ isOpen, 
                 borderRadius: 8,
                 background: 'rgba(15, 23, 42, 0.5)',
                 border: '1px solid rgba(51, 65, 85, 0.5)',
-                color: '#e2e8f0',
+                color: 'var(--text-main)',
                 fontSize: 14,
               }}
             >
@@ -252,7 +252,7 @@ export const CollaborationModal: React.FC<CollaborationModalProps> = ({ isOpen, 
                         borderRadius: 6,
                         background: 'rgba(15, 23, 42, 0.5)',
                         border: '1px solid rgba(51, 65, 85, 0.5)',
-                        color: '#e2e8f0',
+                        color: 'var(--text-main)',
                         fontSize: 12,
                       }}
                     >
@@ -291,17 +291,17 @@ export const CollaborationModal: React.FC<CollaborationModalProps> = ({ isOpen, 
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12 }}>
               <span style={{ fontSize: 16 }}>👑</span>
               <span style={{ color: '#fbbf24', fontWeight: 500 }}>Mmiliki:</span>
-              <span style={{ color: '#94a3b8' }}>Ruhusa kamili (hariri, futa, ongeza washirikiani)</span>
+              <span style={{ color: 'var(--text-muted)' }}>Ruhusa kamili (hariri, futa, ongeza washirikiani)</span>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12 }}>
               <Edit size={16} color="#60a5fa" />
               <span style={{ color: '#60a5fa', fontWeight: 500 }}>Mhariri:</span>
-              <span style={{ color: '#94a3b8' }}>Anaweza kuhariri content</span>
+              <span style={{ color: 'var(--text-muted)' }}>Anaweza kuhariri content</span>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12 }}>
               <Eye size={16} color="#94a3b8" />
-              <span style={{ color: '#94a3b8', fontWeight: 500 }}>Mtazamaji:</span>
-              <span style={{ color: '#94a3b8' }}>Anaweza kutazama tu</span>
+              <span style={{ color: 'var(--text-muted)', fontWeight: 500 }}>Mtazamaji:</span>
+              <span style={{ color: 'var(--text-muted)' }}>Anaweza kutazama tu</span>
             </div>
           </div>
         </div>

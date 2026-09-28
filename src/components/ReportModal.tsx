@@ -81,7 +81,7 @@ export const ReportModal: React.FC<ReportModalProps> = ({ isOpen, onClose, conte
             <h3 style={{ fontSize: 18, fontWeight: 600, marginBottom: 8 }}>
               Ripoti Imetumwa
             </h3>
-            <p style={{ fontSize: 14, color: '#94a3b8' }}>
+            <p style={{ fontSize: 14, color: 'var(--text-muted)' }}>
               Asante kwa kuripoti. Tutachunguza suala hili haraka iwezekanavyo.
             </p>
           </div>
@@ -113,14 +113,14 @@ export const ReportModal: React.FC<ReportModalProps> = ({ isOpen, onClose, conte
                   Kwa nini unaripoti hii {contentType === 'post' ? 'post' : contentType === 'comment' ? 'comment' : 'akaunti'}?
                 </span>
               </div>
-              <p style={{ fontSize: 12, color: '#94a3b8' }}>
+              <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>
                 Ripoti yako itachunguzwa na timu yetu ya moderation.
               </p>
             </div>
 
             {/* Reasons */}
             <div style={{ marginBottom: 20 }}>
-              <label style={{ fontSize: 14, fontWeight: 500, color: '#cbd5e1', marginBottom: 12, display: 'block' }}>
+              <label style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-body)', marginBottom: 12, display: 'block' }}>
                 Chagua sababu *
               </label>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -148,7 +148,7 @@ export const ReportModal: React.FC<ReportModalProps> = ({ isOpen, onClose, conte
                       style={{ width: 16, height: 16 }}
                     />
                     <span style={{ fontSize: 20 }}>{r.icon}</span>
-                    <span style={{ fontSize: 14, color: '#e2e8f0' }}>{r.label}</span>
+                    <span style={{ fontSize: 14, color: 'var(--text-main)' }}>{r.label}</span>
                   </label>
                 ))}
               </div>
@@ -156,7 +156,7 @@ export const ReportModal: React.FC<ReportModalProps> = ({ isOpen, onClose, conte
 
             {/* Details */}
             <div style={{ marginBottom: 24 }}>
-              <label style={{ fontSize: 14, fontWeight: 500, color: '#cbd5e1', marginBottom: 8, display: 'block' }}>
+              <label style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-body)', marginBottom: 8, display: 'block' }}>
                 Maelezo ya ziada (Hiari)
               </label>
               <textarea
@@ -169,7 +169,7 @@ export const ReportModal: React.FC<ReportModalProps> = ({ isOpen, onClose, conte
                   borderRadius: 12,
                   background: 'rgba(30, 41, 59, 0.5)',
                   border: '1px solid rgba(51, 65, 85, 0.5)',
-                  color: '#e2e8f0',
+                  color: 'var(--text-main)',
                   fontSize: 14,
                   resize: 'vertical',
                   minHeight: 100,

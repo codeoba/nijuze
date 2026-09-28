@@ -137,7 +137,7 @@ export const VoiceChatRooms: React.FC = () => {
           <Mic size={32} color="#6366f1" />
           <div>
             <h2 style={{ fontSize: 28, fontWeight: 700, margin: 0 }}>Voice Chat Rooms</h2>
-            <p style={{ fontSize: 14, color: '#94a3b8', margin: 0 }}>
+            <p style={{ fontSize: 14, color: 'var(--text-muted)', margin: 0 }}>
               Ongea na watumiaji wengine kwa sauti
             </p>
           </div>
@@ -158,7 +158,7 @@ export const VoiceChatRooms: React.FC = () => {
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
             <div>
               <h3 style={{ fontSize: 20, fontWeight: 600, margin: 0 }}>{currentRoom.name}</h3>
-              <p style={{ fontSize: 13, color: '#94a3b8', margin: 0 }}>{currentRoom.description}</p>
+              <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>{currentRoom.description}</p>
             </div>
             <button
               onClick={handleLeaveRoom}
@@ -242,7 +242,7 @@ export const VoiceChatRooms: React.FC = () => {
                         </div>
                       )}
                     </div>
-                    <span style={{ fontSize: 13, fontWeight: 500, color: '#e2e8f0' }}>
+                    <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-main)' }}>
                       {isCurrentUser ? 'Wewe' : participant.username}
                     </span>
                     {isCurrentUser && (isMuted || isDeafened) && (
@@ -322,7 +322,7 @@ export const VoiceChatRooms: React.FC = () => {
                     </button>
                   )}
                 </div>
-                <p style={{ fontSize: 13, color: '#94a3b8', marginBottom: 12 }}>
+                <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 12 }}>
                   {room.description}
                 </p>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16, fontSize: 13, color: '#64748b' }}>
@@ -355,7 +355,7 @@ export const VoiceChatRooms: React.FC = () => {
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               <div>
-                <label style={{ fontSize: 14, fontWeight: 500, color: '#cbd5e1', marginBottom: 8, display: 'block' }}>
+                <label style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-body)', marginBottom: 8, display: 'block' }}>
                   Jina la Room
                 </label>
                 <input
@@ -369,14 +369,14 @@ export const VoiceChatRooms: React.FC = () => {
                     borderRadius: 12,
                     background: 'rgba(30, 41, 59, 0.5)',
                     border: '1px solid rgba(51, 65, 85, 0.5)',
-                    color: '#e2e8f0',
+                    color: 'var(--text-main)',
                     fontSize: 14,
                   }}
                 />
               </div>
 
               <div>
-                <label style={{ fontSize: 14, fontWeight: 500, color: '#cbd5e1', marginBottom: 8, display: 'block' }}>
+                <label style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-body)', marginBottom: 8, display: 'block' }}>
                   Maelezo
                 </label>
                 <textarea
@@ -389,7 +389,7 @@ export const VoiceChatRooms: React.FC = () => {
                     borderRadius: 12,
                     background: 'rgba(30, 41, 59, 0.5)',
                     border: '1px solid rgba(51, 65, 85, 0.5)',
-                    color: '#e2e8f0',
+                    color: 'var(--text-main)',
                     fontSize: 14,
                     resize: 'vertical',
                     minHeight: 80,
@@ -398,7 +398,7 @@ export const VoiceChatRooms: React.FC = () => {
               </div>
 
               <div>
-                <label style={{ fontSize: 14, fontWeight: 500, color: '#cbd5e1', marginBottom: 8, display: 'block' }}>
+                <label style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-body)', marginBottom: 8, display: 'block' }}>
                   Max Participants: {newRoom.maxParticipants}
                 </label>
                 <input
@@ -418,7 +418,7 @@ export const VoiceChatRooms: React.FC = () => {
                   onChange={(e) => setNewRoom({ ...newRoom, isPrivate: e.target.checked })}
                   style={{ width: 18, height: 18 }}
                 />
-                <span style={{ fontSize: 14, color: '#cbd5e1' }}>Room ya Faragha (Private)</span>
+                <span style={{ fontSize: 14, color: 'var(--text-body)' }}>Room ya Faragha (Private)</span>
               </label>
 
               <div style={{ display: 'flex', gap: 12 }}>

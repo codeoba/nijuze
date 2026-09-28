@@ -46,7 +46,7 @@ export const MapIntegration: React.FC = () => {
         <Globe size={24} color="#a5b4fc" />
         <div>
           <h3 style={{ fontSize: 18, fontWeight: 600, margin: 0 }}>Ramani ya Watumiaji</h3>
-          <p style={{ fontSize: 13, color: '#94a3b8', margin: 0 }}>
+          <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>
             Ona watumiaji wako duniani kote
           </p>
         </div>
@@ -132,7 +132,7 @@ export const MapIntegration: React.FC = () => {
           gap: 8,
         }}>
           <MapPin size={16} color="#a5b4fc" />
-          <span style={{ fontSize: 13, color: '#e2e8f0' }}>
+          <span style={{ fontSize: 13, color: 'var(--text-main)' }}>
             Afrika Mashariki
           </span>
         </div>
@@ -163,16 +163,16 @@ export const MapIntegration: React.FC = () => {
               {selectedUser.avatar}
             </div>
             <div style={{ flex: 1 }}>
-              <h4 style={{ fontSize: 16, fontWeight: 600, margin: 0, color: '#e2e8f0' }}>
+              <h4 style={{ fontSize: 16, fontWeight: 600, margin: 0, color: 'var(--text-main)' }}>
                 {selectedUser.username}
               </h4>
-              <p style={{ fontSize: 13, color: '#94a3b8', margin: 0 }}>
+              <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>
                 {selectedUser.city}, {selectedUser.country}
               </p>
             </div>
             <div style={{ textAlign: 'right' }}>
               <p style={{ fontSize: 12, color: '#64748b', margin: 0 }}>Coordinates</p>
-              <p style={{ fontSize: 13, color: '#a5b4fc', margin: 0, fontFamily: 'monospace' }}>
+              <p style={{ fontSize: 13, color: 'var(--btn-ghost-text)', margin: 0, fontFamily: 'monospace' }}>
                 {selectedUser.lat.toFixed(4)}, {selectedUser.lng.toFixed(4)}
               </p>
             </div>
@@ -195,7 +195,7 @@ export const MapIntegration: React.FC = () => {
           textAlign: 'center',
         }}>
           <Users size={24} color="#a5b4fc" style={{ margin: '0 auto 8px' }} />
-          <p style={{ fontSize: 20, fontWeight: 700, color: '#a5b4fc', margin: 0 }}>
+          <p style={{ fontSize: 20, fontWeight: 700, color: 'var(--btn-ghost-text)', margin: 0 }}>
             {userLocations.length}
           </p>
           <p style={{ fontSize: 12, color: '#64748b', margin: 0 }}>Watumiaji</p>

@@ -152,7 +152,7 @@ export const PrintView: React.FC<PrintViewProps> = ({ post, onClose }) => {
               borderTop: '1px solid #e2e8f0',
               textAlign: 'center',
               fontSize: 12,
-              color: '#94a3b8',
+              color: 'var(--text-muted)',
             }}>
               <p>Chapishwa kutoka Nijuze - {new Date().toLocaleDateString('sw-TZ')}</p>
               <p>https://nijuze.com/post/{post.id}</p>

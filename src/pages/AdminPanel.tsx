@@ -21,7 +21,7 @@ export const AdminPanel: React.FC = () => {
       <div style={{ padding: 48, textAlign: 'center' }}>
         <Shield size={64} color="#ef4444" style={{ margin: '0 auto 24px' }} />
         <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 12 }}>Access Denied</h2>
-        <p style={{ color: '#94a3b8', marginBottom: 24 }}>
+        <p style={{ color: 'var(--text-muted)', marginBottom: 24 }}>
           Huna ruhusa ya kufikia admin panel
         </p>
         <button onClick={() => navigate('/')} className="btn-primary">
@@ -61,7 +61,7 @@ export const AdminPanel: React.FC = () => {
           <Shield size={32} color="#6366f1" />
           <h1 style={{ fontSize: 32, fontWeight: 700 }}>Admin Panel</h1>
         </div>
-        <p style={{ color: '#94a3b8' }}>Dhibiti na uratibu mfumo wote wa Nijuze</p>
+        <p style={{ color: 'var(--text-muted)' }}>Dhibiti na uratibu mfumo wote wa Nijuze</p>
       </div>
 
       {/* Stats Overview */}
@@ -72,7 +72,7 @@ export const AdminPanel: React.FC = () => {
         marginBottom: 32,
       }}>
         {[
-          { label: 'Watumiaji', value: stats.totalUsers, icon: Users, color: '#a5b4fc', change: '+12%' },
+          { label: 'Watumiaji', value: stats.totalUsers, icon: Users, color: 'var(--btn-ghost-text)', change: '+12%' },
           { label: 'Posts', value: stats.totalPosts, icon: FileText, color: '#6ee7b7', change: '+8%' },
           { label: 'Comments', value: stats.totalComments, icon: MessageCircle, color: '#fbbf24', change: '+15%' },
           { label: 'Views', value: stats.totalViews, icon: Eye, color: '#f472b6', change: '+24%' },
@@ -125,8 +125,8 @@ export const AdminPanel: React.FC = () => {
                 gap: 8,
                 padding: '10px 16px',
                 borderRadius: 12,
-                background: activeTab === tab.id ? 'rgba(99, 102, 241, 0.2)' : 'rgba(30, 41, 59, 0.3)',
-                border: `1px solid ${activeTab === tab.id ? 'rgba(99, 102, 241, 0.5)' : 'rgba(51, 65, 85, 0.3)'}`,
+                background: activeTab === tab.id ? 'rgba(99, 102, 241, 0.2)' : 'var(--bg-subtle)',
+                border: `1px solid ${activeTab === tab.id ? 'rgba(99, 102, 241, 0.5)' : 'var(--border-app)'}`,
                 color: activeTab === tab.id ? '#a5b4fc' : '#94a3b8',
                 cursor: 'pointer',
                 fontSize: 14,
@@ -197,15 +197,15 @@ const AdminDashboard: React.FC<{ stats: any }> = ({ stats }) => {
                 gap: 12,
                 padding: 16,
                 borderRadius: 12,
-                background: 'rgba(30, 41, 59, 0.3)',
-                border: '1px solid rgba(51, 65, 85, 0.3)',
+                background: 'var(--bg-subtle)',
+                border: '1px solid var(--border-app)',
                 cursor: 'pointer',
                 textAlign: 'left',
               }}
             >
               <action.icon size={20} color={action.color} />
               <div style={{ flex: 1 }}>
-                <p style={{ fontSize: 14, fontWeight: 500, color: '#e2e8f0' }}>{action.label}</p>
+                <p style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-main)' }}>{action.label}</p>
                 <p style={{ fontSize: 12, color: '#64748b' }}>{action.count} pending</p>
               </div>
               <span style={{
@@ -250,9 +250,9 @@ const AdminUsers: React.FC<{ users: any[]; searchQuery: string; setSearchQuery: 
               width: '100%',
               padding: '10px 12px 10px 40px',
               borderRadius: 12,
-              background: 'rgba(30, 41, 59, 0.5)',
-              border: '1px solid rgba(51, 65, 85, 0.5)',
-              color: '#e2e8f0',
+              background: 'var(--input-bg)',
+              border: '1px solid var(--border-app)',
+              color: 'var(--text-main)',
               fontSize: 14,
             }}
           />
@@ -271,21 +271,21 @@ const AdminUsers: React.FC<{ users: any[]; searchQuery: string; setSearchQuery: 
       <div className="glass-card" style={{ overflow: 'hidden' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
-            <tr style={{ background: 'rgba(30, 41, 59, 0.5)' }}>
-              <th style={{ padding: 16, textAlign: 'left', fontSize: 13, fontWeight: 600, color: '#94a3b8' }}>
+            <tr style={{ background: 'var(--input-bg)' }}>
+              <th style={{ padding: 16, textAlign: 'left', fontSize: 13, fontWeight: 600, color: 'var(--text-muted)' }}>
                 <input type="checkbox" />
               </th>
-              <th style={{ padding: 16, textAlign: 'left', fontSize: 13, fontWeight: 600, color: '#94a3b8' }}>Mtumiaji</th>
-              <th style={{ padding: 16, textAlign: 'left', fontSize: 13, fontWeight: 600, color: '#94a3b8' }}>Email</th>
-              <th style={{ padding: 16, textAlign: 'left', fontSize: 13, fontWeight: 600, color: '#94a3b8' }}>Role</th>
-              <th style={{ padding: 16, textAlign: 'left', fontSize: 13, fontWeight: 600, color: '#94a3b8' }}>Posts</th>
-              <th style={{ padding: 16, textAlign: 'left', fontSize: 13, fontWeight: 600, color: '#94a3b8' }}>Status</th>
-              <th style={{ padding: 16, textAlign: 'left', fontSize: 13, fontWeight: 600, color: '#94a3b8' }}>Actions</th>
+              <th style={{ padding: 16, textAlign: 'left', fontSize: 13, fontWeight: 600, color: 'var(--text-muted)' }}>Mtumiaji</th>
+              <th style={{ padding: 16, textAlign: 'left', fontSize: 13, fontWeight: 600, color: 'var(--text-muted)' }}>Email</th>
+              <th style={{ padding: 16, textAlign: 'left', fontSize: 13, fontWeight: 600, color: 'var(--text-muted)' }}>Role</th>
+              <th style={{ padding: 16, textAlign: 'left', fontSize: 13, fontWeight: 600, color: 'var(--text-muted)' }}>Posts</th>
+              <th style={{ padding: 16, textAlign: 'left', fontSize: 13, fontWeight: 600, color: 'var(--text-muted)' }}>Status</th>
+              <th style={{ padding: 16, textAlign: 'left', fontSize: 13, fontWeight: 600, color: 'var(--text-muted)' }}>Actions</th>
             </tr>
           </thead>
           <tbody>
             {filteredUsers.map((user) => (
-              <tr key={user.id} style={{ borderBottom: '1px solid rgba(51, 65, 85, 0.3)' }}>
+              <tr key={user.id} style={{ borderBottom: '1px solid var(--border-app)' }}>
                 <td style={{ padding: 16 }}>
                   <input type="checkbox" />
                 </td>
@@ -305,12 +305,12 @@ const AdminUsers: React.FC<{ users: any[]; searchQuery: string; setSearchQuery: 
                       {user.avatar}
                     </div>
                     <div>
-                      <p style={{ fontSize: 14, fontWeight: 500, color: '#e2e8f0' }}>{user.username}</p>
+                      <p style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-main)' }}>{user.username}</p>
                       <p style={{ fontSize: 12, color: '#64748b' }}>Joined {new Date(user.joinedAt).toLocaleDateString()}</p>
                     </div>
                   </div>
                 </td>
-                <td style={{ padding: 16, fontSize: 14, color: '#cbd5e1' }}>{user.email}</td>
+                <td style={{ padding: 16, fontSize: 14, color: 'var(--text-body)' }}>{user.email}</td>
                 <td style={{ padding: 16 }}>
                   <span style={{
                     padding: '4px 12px',
@@ -323,7 +323,7 @@ const AdminUsers: React.FC<{ users: any[]; searchQuery: string; setSearchQuery: 
                     {user.role}
                   </span>
                 </td>
-                <td style={{ padding: 16, fontSize: 14, color: '#cbd5e1' }}>{user.postsCount}</td>
+                <td style={{ padding: 16, fontSize: 14, color: 'var(--text-body)' }}>{user.postsCount}</td>
                 <td style={{ padding: 16 }}>
                   <span style={{
                     padding: '4px 12px',
@@ -374,9 +374,9 @@ const AdminPosts: React.FC<{ posts: any[]; searchQuery: string; setSearchQuery: 
               width: '100%',
               padding: '10px 12px 10px 40px',
               borderRadius: 12,
-              background: 'rgba(30, 41, 59, 0.5)',
-              border: '1px solid rgba(51, 65, 85, 0.5)',
-              color: '#e2e8f0',
+              background: 'var(--input-bg)',
+              border: '1px solid var(--border-app)',
+              color: 'var(--text-main)',
               fontSize: 14,
             }}
           />
@@ -390,7 +390,7 @@ const AdminPosts: React.FC<{ posts: any[]; searchQuery: string; setSearchQuery: 
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
               <div>
                 <h4 style={{ fontSize: 16, fontWeight: 600, marginBottom: 4 }}>{post.title}</h4>
-                <p style={{ fontSize: 13, color: '#94a3b8' }}>by {post.author.username} • {new Date(post.createdAt).toLocaleDateString()}</p>
+                <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>by {post.author.username} • {new Date(post.createdAt).toLocaleDateString()}</p>
               </div>
               <div style={{ display: 'flex', gap: 8 }}>
                 <button style={{ padding: 8, borderRadius: 8, background: 'rgba(16, 185, 129, 0.1)', border: 'none', cursor: 'pointer' }}>
@@ -422,7 +422,7 @@ const AdminComments: React.FC<{ comments: any[] }> = ({ comments }) => {
         {comments.slice(0, 10).map((comment) => (
           <div key={comment.id} className="glass-card" style={{ padding: 16 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-              <p style={{ fontSize: 14, color: '#cbd5e1' }}>{comment.content}</p>
+              <p style={{ fontSize: 14, color: 'var(--text-body)' }}>{comment.content}</p>
               <div style={{ display: 'flex', gap: 8 }}>
                 <button style={{ padding: 6, borderRadius: 6, background: 'rgba(239, 68, 68, 0.1)', border: 'none', cursor: 'pointer' }}>
                   <Trash2 size={14} color="#fca5a5" />
@@ -468,12 +468,12 @@ const AdminCategories: React.FC = () => {
               <span style={{ fontSize: 32 }}>{cat.icon}</span>
               <div>
                 <h4 style={{ fontSize: 16, fontWeight: 600 }}>{cat.name}</h4>
-                <p style={{ fontSize: 12, color: '#94a3b8' }}>{cat.posts.toLocaleString()} posts</p>
+                <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>{cat.posts.toLocaleString()} posts</p>
               </div>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#64748b' }}>
               <span>{cat.followers.toLocaleString()} followers</span>
-              <button style={{ color: '#a5b4fc', background: 'transparent', border: 'none', cursor: 'pointer', fontSize: 13 }}>
+              <button style={{ color: 'var(--btn-ghost-text)', background: 'transparent', border: 'none', cursor: 'pointer', fontSize: 13 }}>
                 Edit
               </button>
             </div>
@@ -490,7 +490,7 @@ const AdminActivities: React.FC = () => {
     { type: 'post', user: 'Amina Hassan', action: 'created a post', time: '2 minutes ago', icon: FileText, color: '#6ee7b7' },
     { type: 'comment', user: 'Juma Bakari', action: 'commented on a post', time: '5 minutes ago', icon: MessageCircle, color: '#60a5fa' },
     { type: 'upvote', user: 'Fatma Omar', action: 'upvoted a post', time: '10 minutes ago', icon: ThumbsUp, color: '#fbbf24' },
-    { type: 'follow', user: 'David Mwangi', action: 'followed Amina Hassan', time: '15 minutes ago', icon: Users, color: '#a5b4fc' },
+    { type: 'follow', user: 'David Mwangi', action: 'followed Amina Hassan', time: '15 minutes ago', icon: Users, color: 'var(--btn-ghost-text)' },
     { type: 'badge', user: 'Amina Hassan', action: 'earned a badge', time: '1 hour ago', icon: Award, color: '#f472b6' },
   ];
 
@@ -512,7 +512,7 @@ const AdminActivities: React.FC = () => {
               <activity.icon size={20} color={activity.color} />
             </div>
             <div style={{ flex: 1 }}>
-              <p style={{ fontSize: 14, color: '#e2e8f0' }}>
+              <p style={{ fontSize: 14, color: 'var(--text-main)' }}>
                 <strong>{activity.user}</strong> {activity.action}
               </p>
               <p style={{ fontSize: 12, color: '#64748b' }}>{activity.time}</p>
@@ -539,7 +539,7 @@ const AdminSettings: React.FC = () => {
           { label: 'Require Email Verification', value: 'true', type: 'select' },
         ].map((setting, i) => (
           <div key={i} className="glass-card" style={{ padding: 20 }}>
-            <label style={{ fontSize: 14, fontWeight: 500, color: '#cbd5e1', marginBottom: 8, display: 'block' }}>
+            <label style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-body)', marginBottom: 8, display: 'block' }}>
               {setting.label}
             </label>
             <input
@@ -549,9 +549,9 @@ const AdminSettings: React.FC = () => {
                 width: '100%',
                 padding: 10,
                 borderRadius: 8,
-                background: 'rgba(30, 41, 59, 0.5)',
-                border: '1px solid rgba(51, 65, 85, 0.5)',
-                color: '#e2e8f0',
+                background: 'var(--input-bg)',
+                border: '1px solid var(--border-app)',
+                color: 'var(--text-main)',
                 fontSize: 14,
               }}
             />

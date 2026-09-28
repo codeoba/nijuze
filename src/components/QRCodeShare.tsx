@@ -113,7 +113,7 @@ export const QRCodeShare: React.FC<QRCodeShareProps> = ({ url, title = 'Nijuze P
         )}
       </div>
 
-      <p style={{ fontSize: 14, color: '#94a3b8', marginBottom: 20 }}>
+      <p style={{ fontSize: 14, color: 'var(--text-muted)', marginBottom: 20 }}>
         Skani QR code hii kufungua post hii
       </p>
 

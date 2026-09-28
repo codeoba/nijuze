@@ -377,7 +377,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
                 borderRadius: 4,
                 background: 'rgba(15, 23, 42, 0.5)',
                 border: '1px solid rgba(51, 65, 85, 0.5)',
-                color: '#e2e8f0',
+                color: 'var(--text-main)',
                 fontSize: 12,
                 cursor: 'pointer',
               }}
@@ -396,7 +396,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
                 borderRadius: 4,
                 background: 'rgba(15, 23, 42, 0.5)',
                 border: '1px solid rgba(51, 65, 85, 0.5)',
-                color: '#e2e8f0',
+                color: 'var(--text-main)',
                 fontSize: 12,
                 cursor: 'pointer',
               }}
@@ -580,7 +580,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
           minHeight,
           padding: 16,
           background: isPreview ? 'rgba(30, 41, 59, 0.2)' : 'transparent',
-          color: '#e2e8f0',
+          color: 'var(--text-main)',
           fontSize: 14,
           lineHeight: 1.6,
           outline: 'none',
@@ -692,7 +692,7 @@ const ToolButton: React.FC<{ icon: any; onClick: () => void; title: string }> = 
       background: 'transparent',
       border: 'none',
       cursor: 'pointer',
-      color: '#94a3b8',
+      color: 'var(--text-muted)',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
@@ -830,7 +830,7 @@ const TableMenu: React.FC<{ onInsert: (rows: number, cols: number) => void; onCl
       }}
     >
       <div style={{ marginBottom: 12 }}>
-        <label style={{ fontSize: 12, color: '#94a3b8', marginBottom: 4, display: 'block' }}>Rows</label>
+        <label style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 4, display: 'block' }}>Rows</label>
         <input
           type="number"
           min="1"
@@ -843,13 +843,13 @@ const TableMenu: React.FC<{ onInsert: (rows: number, cols: number) => void; onCl
             borderRadius: 6,
             background: 'rgba(15, 23, 42, 0.5)',
             border: '1px solid rgba(51, 65, 85, 0.5)',
-            color: '#e2e8f0',
+            color: 'var(--text-main)',
             fontSize: 13,
           }}
         />
       </div>
       <div style={{ marginBottom: 12 }}>
-        <label style={{ fontSize: 12, color: '#94a3b8', marginBottom: 4, display: 'block' }}>Columns</label>
+        <label style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 4, display: 'block' }}>Columns</label>
         <input
           type="number"
           min="1"
@@ -862,7 +862,7 @@ const TableMenu: React.FC<{ onInsert: (rows: number, cols: number) => void; onCl
             borderRadius: 6,
             background: 'rgba(15, 23, 42, 0.5)',
             border: '1px solid rgba(51, 65, 85, 0.5)',
-            color: '#e2e8f0',
+            color: 'var(--text-main)',
             fontSize: 13,
           }}
         />
@@ -909,7 +909,7 @@ const InsertInput: React.FC<{
         borderRadius: 6,
         background: 'rgba(15, 23, 42, 0.5)',
         border: '1px solid rgba(51, 65, 85, 0.5)',
-        color: '#e2e8f0',
+        color: 'var(--text-main)',
         fontSize: 13,
       }}
     />
@@ -925,7 +925,7 @@ const InsertInput: React.FC<{
           borderRadius: 6,
           background: 'rgba(15, 23, 42, 0.5)',
           border: '1px solid rgba(51, 65, 85, 0.5)',
-          color: '#e2e8f0',
+          color: 'var(--text-main)',
           fontSize: 13,
         }}
       />

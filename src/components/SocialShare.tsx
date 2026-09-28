@@ -98,7 +98,7 @@ export const SocialShare: React.FC<SocialShareProps> = ({ url, title, descriptio
               }}
             >
               <Icon size={24} color={link.color} />
-              <span style={{ fontSize: 12, color: '#cbd5e1', fontWeight: 500 }}>{link.name}</span>
+              <span style={{ fontSize: 12, color: 'var(--text-body)', fontWeight: 500 }}>{link.name}</span>
             </button>
           );
         })}
@@ -123,7 +123,7 @@ export const SocialShare: React.FC<SocialShareProps> = ({ url, title, descriptio
             borderRadius: 8,
             background: 'rgba(15, 23, 42, 0.5)',
             border: '1px solid rgba(51, 65, 85, 0.5)',
-            color: '#e2e8f0',
+            color: 'var(--text-main)',
             fontSize: 13,
           }}
         />

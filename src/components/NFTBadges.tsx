@@ -142,8 +142,6 @@ export const NFTBadges: React.FC = () => {
 
   const images = ['🏆', '⭐', '👑', '💎', '🎨', '🎭', '🌟', '🔥', '💫', '🎯'];
 
-  if (!currentUser) return null;
-
   return (
     <div style={{ maxWidth: 1200, margin: '0 auto', padding: 24 }}>
       {/* Header */}
@@ -151,16 +149,16 @@ export const NFTBadges: React.FC = () => {
         <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
           <Gem size={32} color="#c084fc" />
           <div>
-            <h2 style={{ fontSize: 28, fontWeight: 700, margin: 0 }}>NFT Badges</h2>
-            <p style={{ fontSize: 14, color: '#94a3b8', margin: 0 }}>
+            <h2 style={{ fontSize: 28, fontWeight: 700, margin: 0, color: 'var(--text-main)' }}>NFT Badges</h2>
+            <p style={{ fontSize: 14, color: 'var(--text-muted)', margin: 0 }}>
               Badges za blockchain - unique na za kudumu
             </p>
           </div>
         </div>
         <button
-          onClick={() => setShowMintModal(true)}
+          onClick={() => currentUser ? setShowMintModal(true) : alert('Tafadhali ingia kwenye akaunti kutengeneza badge!')}
           className="btn-primary"
-          style={{ display: 'flex', alignItems: 'center', gap: 8 }}
+          style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}
         >
           <Sparkles size={16} />
           Tengeneza Badge
@@ -178,7 +176,7 @@ export const NFTBadges: React.FC = () => {
           <Shield size={24} color="#c084fc" />
           <h3 style={{ fontSize: 18, fontWeight: 600, margin: 0 }}>Nini ni NFT Badges?</h3>
         </div>
-        <p style={{ fontSize: 14, color: '#cbd5e1', lineHeight: 1.6, margin: 0 }}>
+        <p style={{ fontSize: 14, color: 'var(--text-body)', lineHeight: 1.6, margin: 0 }}>
           NFT Badges ni badges za kipekee zinazotumia blockchain technology. Kila badge ni unique na haiwezi kuigwa.
           Unaweza kuonyesha badges zako kwenye profile yako na kuzishare na watumiaji wengine.
         </p>
@@ -233,7 +231,7 @@ export const NFTBadges: React.FC = () => {
                 </div>
 
                 <h4 style={{ fontSize: 16, fontWeight: 600, marginBottom: 8 }}>{badge.name}</h4>
-                <p style={{ fontSize: 13, color: '#94a3b8', marginBottom: 12, lineHeight: 1.5 }}>
+                <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 12, lineHeight: 1.5 }}>
                   {badge.description}
                 </p>
 
@@ -307,7 +305,7 @@ export const NFTBadges: React.FC = () => {
                 </div>
 
                 <h4 style={{ fontSize: 16, fontWeight: 600, marginBottom: 8 }}>{badge.name}</h4>
-                <p style={{ fontSize: 13, color: '#94a3b8', marginBottom: 12, lineHeight: 1.5 }}>
+                <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 12, lineHeight: 1.5 }}>
                   {badge.description}
                 </p>
 
@@ -369,7 +367,7 @@ export const NFTBadges: React.FC = () => {
             </div>
 
             <h3 style={{ fontSize: 24, fontWeight: 700, marginBottom: 8 }}>{selectedBadge.name}</h3>
-            <p style={{ fontSize: 14, color: '#94a3b8', marginBottom: 24, lineHeight: 1.6 }}>
+            <p style={{ fontSize: 14, color: 'var(--text-muted)', marginBottom: 24, lineHeight: 1.6 }}>
               {selectedBadge.description}
             </p>
 
@@ -377,25 +375,27 @@ export const NFTBadges: React.FC = () => {
               <div style={{
                 padding: 12,
                 borderRadius: 10,
-                background: 'rgba(30, 41, 59, 0.3)',
+                background: 'var(--bg-subtle)',
+                border: '1px solid var(--border-app)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
               }}>
-                <span style={{ fontSize: 13, color: '#94a3b8' }}>Token ID</span>
-                <span style={{ fontSize: 13, fontFamily: 'monospace', color: '#e2e8f0' }}>
+                <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>Token ID</span>
+                <span style={{ fontSize: 13, fontFamily: 'monospace', color: 'var(--text-main)', fontWeight: 600 }}>
                   {selectedBadge.tokenId}
                 </span>
               </div>
               <div style={{
                 padding: 12,
                 borderRadius: 10,
-                background: 'rgba(30, 41, 59, 0.3)',
+                background: 'var(--bg-subtle)',
+                border: '1px solid var(--border-app)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
               }}>
-                <span style={{ fontSize: 13, color: '#94a3b8' }}>Blockchain</span>
+                <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>Blockchain</span>
                 <span style={{
                   padding: '4px 12px',
                   borderRadius: 8,
@@ -410,13 +410,14 @@ export const NFTBadges: React.FC = () => {
               <div style={{
                 padding: 12,
                 borderRadius: 10,
-                background: 'rgba(30, 41, 59, 0.3)',
+                background: 'var(--bg-subtle)',
+                border: '1px solid var(--border-app)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
               }}>
-                <span style={{ fontSize: 13, color: '#94a3b8' }}>Minted</span>
-                <span style={{ fontSize: 13, color: '#e2e8f0' }}>
+                <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>Minted</span>
+                <span style={{ fontSize: 13, color: 'var(--text-main)', fontWeight: 500 }}>
                   {new Date(selectedBadge.mintedAt).toLocaleDateString('sw-TZ')}
                 </span>
               </div>
@@ -454,7 +455,7 @@ export const NFTBadges: React.FC = () => {
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               <div>
-                <label style={{ fontSize: 14, fontWeight: 500, color: '#cbd5e1', marginBottom: 8, display: 'block' }}>
+                <label style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-body)', marginBottom: 8, display: 'block' }}>
                   Jina la Badge
                 </label>
                 <input
@@ -466,16 +467,16 @@ export const NFTBadges: React.FC = () => {
                     width: '100%',
                     padding: 12,
                     borderRadius: 12,
-                    background: 'rgba(30, 41, 59, 0.5)',
-                    border: '1px solid rgba(51, 65, 85, 0.5)',
-                    color: '#e2e8f0',
+                    background: 'var(--input-bg)',
+                    border: '1px solid var(--input-border)',
+                    color: 'var(--input-text)',
                     fontSize: 14,
                   }}
                 />
               </div>
 
               <div>
-                <label style={{ fontSize: 14, fontWeight: 500, color: '#cbd5e1', marginBottom: 8, display: 'block' }}>
+                <label style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-main)', marginBottom: 8, display: 'block' }}>
                   Maelezo
                 </label>
                 <textarea
@@ -486,9 +487,9 @@ export const NFTBadges: React.FC = () => {
                     width: '100%',
                     padding: 12,
                     borderRadius: 12,
-                    background: 'rgba(30, 41, 59, 0.5)',
-                    border: '1px solid rgba(51, 65, 85, 0.5)',
-                    color: '#e2e8f0',
+                    background: 'var(--input-bg)',
+                    border: '1px solid var(--input-border)',
+                    color: 'var(--input-text)',
                     fontSize: 14,
                     resize: 'vertical',
                     minHeight: 80,
@@ -497,7 +498,7 @@ export const NFTBadges: React.FC = () => {
               </div>
 
               <div>
-                <label style={{ fontSize: 14, fontWeight: 500, color: '#cbd5e1', marginBottom: 8, display: 'block' }}>
+                <label style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-main)', marginBottom: 8, display: 'block' }}>
                   Image
                 </label>
                 <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
@@ -509,8 +510,8 @@ export const NFTBadges: React.FC = () => {
                         width: 48,
                         height: 48,
                         borderRadius: 12,
-                        background: newBadge.image === image ? 'rgba(192, 132, 252, 0.2)' : 'rgba(30, 41, 59, 0.3)',
-                        border: `2px solid ${newBadge.image === image ? '#c084fc' : 'transparent'}`,
+                        background: newBadge.image === image ? 'rgba(192, 132, 252, 0.2)' : 'var(--bg-subtle)',
+                        border: `2px solid ${newBadge.image === image ? '#c084fc' : 'var(--border-app)'}`,
                         cursor: 'pointer',
                         fontSize: 24,
                         display: 'flex',
@@ -525,7 +526,7 @@ export const NFTBadges: React.FC = () => {
               </div>
 
               <div>
-                <label style={{ fontSize: 14, fontWeight: 500, color: '#cbd5e1', marginBottom: 8, display: 'block' }}>
+                <label style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-main)', marginBottom: 8, display: 'block' }}>
                   Rarity
                 </label>
                 <select
@@ -535,9 +536,9 @@ export const NFTBadges: React.FC = () => {
                     width: '100%',
                     padding: 12,
                     borderRadius: 12,
-                    background: 'rgba(30, 41, 59, 0.5)',
-                    border: '1px solid rgba(51, 65, 85, 0.5)',
-                    color: '#e2e8f0',
+                    background: 'var(--input-bg)',
+                    border: '1px solid var(--input-border)',
+                    color: 'var(--input-text)',
                     fontSize: 14,
                   }}
                 >
@@ -549,7 +550,7 @@ export const NFTBadges: React.FC = () => {
               </div>
 
               <div>
-                <label style={{ fontSize: 14, fontWeight: 500, color: '#cbd5e1', marginBottom: 8, display: 'block' }}>
+                <label style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-main)', marginBottom: 8, display: 'block' }}>
                   Blockchain
                 </label>
                 <select
@@ -559,9 +560,9 @@ export const NFTBadges: React.FC = () => {
                     width: '100%',
                     padding: 12,
                     borderRadius: 12,
-                    background: 'rgba(30, 41, 59, 0.5)',
-                    border: '1px solid rgba(51, 65, 85, 0.5)',
-                    color: '#e2e8f0',
+                    background: 'var(--input-bg)',
+                    border: '1px solid var(--input-border)',
+                    color: 'var(--input-text)',
                     fontSize: 14,
                   }}
                 >

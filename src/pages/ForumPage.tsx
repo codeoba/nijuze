@@ -55,9 +55,9 @@ export const ForumPage: React.FC = () => {
       <div style={{ marginBottom: 32 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 8 }}>
           <MessageSquare size={32} color="#6366f1" />
-          <h1 style={{ fontSize: 32, fontWeight: 700 }}>Forum</h1>
+          <h1 style={{ fontSize: 32, fontWeight: 700, color: 'var(--text-main)' }}>Forum</h1>
         </div>
-        <p style={{ color: '#94a3b8' }}>Jiunge na mazungumzo na watumiaji wengine</p>
+        <p style={{ color: 'var(--text-muted)' }}>Jiunge na mazungumzo na watumiaji wengine</p>
       </div>
 
       {/* Stats */}
@@ -68,10 +68,10 @@ export const ForumPage: React.FC = () => {
         marginBottom: 32,
       }}>
         {[
-          { label: 'Total Posts', value: posts.length, icon: FileText, color: '#a5b4fc' },
-          { label: 'Active Users', value: users.filter(u => u.postsCount > 0).length, icon: Users, color: '#6ee7b7' },
-          { label: 'Categories', value: categories.length, icon: BookOpen, color: '#fbbf24' },
-          { label: 'Total Views', value: posts.reduce((sum, p) => sum + p.views, 0), icon: Eye, color: '#f472b6' },
+          { label: 'Total Posts', value: posts.length, icon: FileText, color: '#6366f1' },
+          { label: 'Active Users', value: users.filter(u => u.postsCount > 0).length, icon: Users, color: '#10b981' },
+          { label: 'Categories', value: categories.length, icon: BookOpen, color: '#f59e0b' },
+          { label: 'Total Views', value: posts.reduce((sum, p) => sum + p.views, 0), icon: Eye, color: '#ec4899' },
         ].map((stat, i) => (
           <div key={i} className="glass-card" style={{ padding: 20 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
@@ -80,7 +80,7 @@ export const ForumPage: React.FC = () => {
                 {stat.value.toLocaleString()}
               </p>
             </div>
-            <p style={{ fontSize: 13, color: '#64748b' }}>{stat.label}</p>
+            <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>{stat.label}</p>
           </div>
         ))}
       </div>
@@ -89,8 +89,8 @@ export const ForumPage: React.FC = () => {
         {/* Categories Sidebar */}
         <div>
           <div className="glass-card" style={{ padding: 20 }}>
-            <h3 style={{ fontSize: 16, fontWeight: 600, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
-              <BookOpen size={18} color="#a5b4fc" />
+            <h3 style={{ fontSize: 16, fontWeight: 600, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8, color: 'var(--text-main)' }}>
+              <BookOpen size={18} color="var(--border-focus)" />
               Kategoria
             </h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -102,18 +102,18 @@ export const ForumPage: React.FC = () => {
                   gap: 12,
                   padding: '10px 12px',
                   borderRadius: 10,
-                  background: !selectedCategory ? 'rgba(99, 102, 241, 0.15)' : 'transparent',
+                  background: !selectedCategory ? 'var(--btn-ghost-bg)' : 'transparent',
                   border: 'none',
-                  color: !selectedCategory ? '#a5b4fc' : '#94a3b8',
+                  color: !selectedCategory ? 'var(--btn-ghost-text)' : 'var(--text-muted)',
                   cursor: 'pointer',
                   fontSize: 14,
-                  fontWeight: 500,
+                  fontWeight: !selectedCategory ? 600 : 500,
                   textAlign: 'left',
                   width: '100%',
                 }}
               >
                 <span style={{ fontSize: 20 }}>🌐</span>
-                <span>Zote</span>
+                <span style={{ color: 'var(--text-main)' }}>Zote</span>
               </button>
               {categories.map((cat) => (
                 <button
@@ -125,20 +125,20 @@ export const ForumPage: React.FC = () => {
                     gap: 12,
                     padding: '10px 12px',
                     borderRadius: 10,
-                    background: selectedCategory === cat.id ? 'rgba(99, 102, 241, 0.15)' : 'transparent',
+                    background: selectedCategory === cat.id ? 'var(--btn-ghost-bg)' : 'transparent',
                     border: 'none',
-                    color: selectedCategory === cat.id ? '#a5b4fc' : '#94a3b8',
+                    color: selectedCategory === cat.id ? 'var(--btn-ghost-text)' : 'var(--text-muted)',
                     cursor: 'pointer',
                     fontSize: 14,
-                    fontWeight: 500,
+                    fontWeight: selectedCategory === cat.id ? 600 : 500,
                     textAlign: 'left',
                     width: '100%',
                   }}
                 >
                   <span style={{ fontSize: 20 }}>{cat.icon}</span>
                   <div style={{ flex: 1 }}>
-                    <div>{cat.name}</div>
-                    <div style={{ fontSize: 11, color: '#64748b', marginTop: 2 }}>
+                    <div style={{ color: 'var(--text-main)' }}>{cat.name}</div>
+                    <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>
                       {cat.posts.toLocaleString()} posts
                     </div>
                   </div>
@@ -149,7 +149,7 @@ export const ForumPage: React.FC = () => {
 
           {/* Top Contributors */}
           <div className="glass-card" style={{ padding: 20, marginTop: 16 }}>
-            <h3 style={{ fontSize: 16, fontWeight: 600, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
+            <h3 style={{ fontSize: 16, fontWeight: 600, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8, color: 'var(--text-main)' }}>
               <Award size={18} color="#fbbf24" />
               Wachangiaji Bora
             </h3>
@@ -169,12 +169,13 @@ export const ForumPage: React.FC = () => {
                     justifyContent: 'center',
                     fontSize: 12,
                     fontWeight: 'bold',
+                    color: 'white',
                   }}>
                     {user.avatar}
                   </div>
                   <div style={{ flex: 1 }}>
-                    <p style={{ fontSize: 13, fontWeight: 500, color: '#e2e8f0' }}>{user.username}</p>
-                    <p style={{ fontSize: 11, color: '#64748b' }}>{user.postsCount} posts</p>
+                    <p style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-main)', margin: 0 }}>{user.username}</p>
+                    <p style={{ fontSize: 11, color: 'var(--text-muted)', margin: 0 }}>{user.postsCount} posts</p>
                   </div>
                 </div>
               ))}
@@ -187,7 +188,7 @@ export const ForumPage: React.FC = () => {
           {/* Search & Filters */}
           <div style={{ display: 'flex', gap: 12, marginBottom: 24 }}>
             <div style={{ flex: 1, position: 'relative' }}>
-              <Search size={18} color="#64748b" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)' }} />
+              <Search size={18} color="var(--text-muted)" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)' }} />
               <input
                 type="text"
                 value={searchQuery}
@@ -197,9 +198,9 @@ export const ForumPage: React.FC = () => {
                   width: '100%',
                   padding: '10px 12px 10px 40px',
                   borderRadius: 12,
-                  background: 'rgba(30, 41, 59, 0.5)',
-                  border: '1px solid rgba(51, 65, 85, 0.5)',
-                  color: '#e2e8f0',
+                  background: 'var(--input-bg)',
+                  border: '1px solid var(--input-border)',
+                  color: 'var(--input-text)',
                   fontSize: 14,
                 }}
               />
@@ -210,9 +211,9 @@ export const ForumPage: React.FC = () => {
               style={{
                 padding: '10px 16px',
                 borderRadius: 12,
-                background: 'rgba(30, 41, 59, 0.5)',
-                border: '1px solid rgba(51, 65, 85, 0.5)',
-                color: '#e2e8f0',
+                background: 'var(--input-bg)',
+                border: '1px solid var(--input-border)',
+                color: 'var(--input-text)',
                 fontSize: 14,
                 cursor: 'pointer',
               }}
@@ -238,7 +239,7 @@ export const ForumPage: React.FC = () => {
             {searchedPosts.length === 0 ? (
               <div className="glass-card" style={{ padding: 48, textAlign: 'center' }}>
                 <MessageSquare size={48} color="#475569" style={{ margin: '0 auto 16px' }} />
-                <p style={{ fontSize: 16, color: '#94a3b8' }}>Hakuna posts zilizopatikana</p>
+                <p style={{ fontSize: 16, color: 'var(--text-muted)' }}>Hakuna posts zilizopatikana</p>
               </div>
             ) : (
               searchedPosts.map((post) => (
@@ -260,11 +261,11 @@ const ForumPostCard: React.FC<{ post: any; onClick: () => void }> = ({ post, onC
       className="glass-card"
       style={{ padding: 20, cursor: 'pointer', transition: 'all 0.2s ease' }}
       onMouseEnter={(e) => {
-        e.currentTarget.style.borderColor = 'rgba(99, 102, 241, 0.3)';
+        e.currentTarget.style.borderColor = 'var(--border-focus)';
         e.currentTarget.style.transform = 'translateY(-2px)';
       }}
       onMouseLeave={(e) => {
-        e.currentTarget.style.borderColor = 'rgba(51, 65, 85, 0.3)';
+        e.currentTarget.style.borderColor = 'var(--border-app)';
         e.currentTarget.style.transform = 'translateY(0)';
       }}
     >
@@ -277,12 +278,13 @@ const ForumPostCard: React.FC<{ post: any; onClick: () => void }> = ({ post, onC
           gap: 4,
           padding: '8px 12px',
           borderRadius: 12,
-          background: 'rgba(99, 102, 241, 0.1)',
+          background: 'var(--btn-ghost-bg)',
+          border: '1px solid var(--btn-ghost-border)',
           minWidth: 60,
         }}>
-          <ThumbsUp size={16} color="#a5b4fc" />
-          <span style={{ fontSize: 18, fontWeight: 700, color: '#a5b4fc' }}>{post.upvotes}</span>
-          <span style={{ fontSize: 11, color: '#64748b' }}>votes</span>
+          <ThumbsUp size={16} color="var(--btn-ghost-text)" />
+          <span style={{ fontSize: 18, fontWeight: 700, color: 'var(--btn-ghost-text)' }}>{post.upvotes}</span>
+          <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>votes</span>
         </div>
 
         {/* Content */}
@@ -295,8 +297,8 @@ const ForumPostCard: React.FC<{ post: any; onClick: () => void }> = ({ post, onC
                 gap: 4,
                 padding: '2px 8px',
                 borderRadius: 8,
-                background: 'rgba(251, 191, 36, 0.2)',
-                color: '#fbbf24',
+                background: 'rgba(251, 191, 36, 0.15)',
+                color: '#d97706',
                 fontSize: 11,
                 fontWeight: 600,
               }}>
@@ -310,8 +312,8 @@ const ForumPostCard: React.FC<{ post: any; onClick: () => void }> = ({ post, onC
                 gap: 4,
                 padding: '2px 8px',
                 borderRadius: 8,
-                background: 'rgba(100, 116, 139, 0.2)',
-                color: '#94a3b8',
+                background: 'var(--bg-subtle)',
+                color: 'var(--text-muted)',
                 fontSize: 11,
                 fontWeight: 600,
               }}>
@@ -320,35 +322,25 @@ const ForumPostCard: React.FC<{ post: any; onClick: () => void }> = ({ post, onC
             )}
           </div>
 
-          <h3 style={{ fontSize: 18, fontWeight: 600, marginBottom: 8, color: '#e2e8f0' }}>
+          <h3 style={{ fontSize: 18, fontWeight: 600, marginBottom: 8, color: 'var(--text-main)' }}>
             {post.title}
           </h3>
 
-          <p style={{ fontSize: 14, color: '#94a3b8', marginBottom: 12, lineHeight: 1.5 }}>
+          <p style={{ fontSize: 14, color: 'var(--text-body)', marginBottom: 12, lineHeight: 1.5 }}>
             {post.content.substring(0, 150)}...
           </p>
 
           {/* Tags */}
           <div style={{ display: 'flex', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
             {post.tags.slice(0, 3).map((tag: string) => (
-              <span
-                key={tag}
-                style={{
-                  padding: '4px 10px',
-                  borderRadius: 12,
-                  background: 'rgba(99, 102, 241, 0.1)',
-                  border: '1px solid rgba(99, 102, 241, 0.2)',
-                  color: '#a5b4fc',
-                  fontSize: 12,
-                }}
-              >
+              <span key={tag} className="tag">
                 #{tag}
               </span>
             ))}
           </div>
 
           {/* Meta Info */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 16, fontSize: 13, color: '#64748b' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16, fontSize: 13, color: 'var(--text-muted)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
               <div style={{
                 width: 24,
@@ -364,7 +356,7 @@ const ForumPostCard: React.FC<{ post: any; onClick: () => void }> = ({ post, onC
               }}>
                 {post.author.avatar}
               </div>
-              <span>{post.author.username}</span>
+              <span style={{ color: 'var(--text-main)' }}>{post.author.username}</span>
             </div>
             <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
               <Clock size={14} />

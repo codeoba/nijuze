@@ -137,8 +137,6 @@ export const DailyChallenges: React.FC = () => {
     }
   };
 
-  if (!currentUser) return null;
-
   const completedCount = challenges.filter(c => c.completed).length;
   const claimedCount = claimedRewards.length;
   const totalReward = challenges.reduce((sum, c) => sum + c.reward, 0);
@@ -153,8 +151,8 @@ export const DailyChallenges: React.FC = () => {
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <Target size={24} color="#fbbf24" />
           <div>
-            <h3 style={{ fontSize: 18, fontWeight: 700, margin: 0 }}>Changamoto za Kila Siku</h3>
-            <p style={{ fontSize: 13, color: '#94a3b8', margin: 0 }}>
+            <h3 style={{ fontSize: 18, fontWeight: 700, margin: 0, color: 'var(--text-main)' }}>Changamoto za Kila Siku</h3>
+            <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>
               Kamilisha changamoto kupata points!
             </p>
           </div>
@@ -176,18 +174,19 @@ export const DailyChallenges: React.FC = () => {
       {/* Progress Bar */}
       <div style={{ marginBottom: 20 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-          <span style={{ fontSize: 13, color: '#94a3b8' }}>
+          <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>
             Maendeleo: {completedCount}/{challenges.length}
           </span>
-          <span style={{ fontSize: 13, color: '#94a3b8' }}>
+          <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>
             Zilizodaiwa: {claimedCount}/{completedCount}
           </span>
         </div>
         <div style={{
           height: 8,
           borderRadius: 4,
-          background: 'rgba(30, 41, 59, 0.5)',
+          background: 'var(--bg-subtle)',
           overflow: 'hidden',
+          border: '1px solid var(--border-app)',
         }}>
           <div style={{
             height: '100%',
@@ -211,8 +210,8 @@ export const DailyChallenges: React.FC = () => {
               style={{
                 padding: 16,
                 borderRadius: 12,
-                background: challenge.completed ? 'rgba(16, 185, 129, 0.05)' : 'rgba(30, 41, 59, 0.3)',
-                border: `1px solid ${challenge.completed ? 'rgba(16, 185, 129, 0.3)' : 'rgba(51, 65, 85, 0.3)'}`,
+                background: challenge.completed ? 'rgba(16, 185, 129, 0.08)' : 'var(--bg-subtle)',
+                border: `1px solid ${challenge.completed ? 'rgba(16, 185, 129, 0.3)' : 'var(--border-app)'}`,
                 opacity: isClaimed ? 0.6 : 1,
               }}
             >
@@ -232,19 +231,19 @@ export const DailyChallenges: React.FC = () => {
                 </div>
                 <div style={{ flex: 1 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                    <h4 style={{ fontSize: 15, fontWeight: 600, margin: 0 }}>{challenge.title}</h4>
+                    <h4 style={{ fontSize: 15, fontWeight: 600, margin: 0, color: 'var(--text-main)' }}>{challenge.title}</h4>
                     {challenge.completed && (
                       <CheckCircle2 size={16} color="#10b981" />
                     )}
                   </div>
-                  <p style={{ fontSize: 13, color: '#94a3b8', margin: 0 }}>
+                  <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>
                     {challenge.description}
                   </p>
                 </div>
                 <div style={{
                   padding: '4px 12px',
                   borderRadius: 12,
-                  background: 'rgba(251, 191, 36, 0.2)',
+                  background: 'rgba(251, 191, 36, 0.15)',
                   border: '1px solid rgba(251, 191, 36, 0.3)',
                   display: 'flex',
                   alignItems: 'center',
@@ -260,17 +259,17 @@ export const DailyChallenges: React.FC = () => {
               {/* Progress Bar */}
               <div style={{ marginBottom: 12 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                  <span style={{ fontSize: 12, color: '#64748b' }}>
+                  <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>
                     {challenge.current}/{challenge.target}
                   </span>
-                  <span style={{ fontSize: 12, color: '#64748b' }}>
+                  <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>
                     {Math.round(progress)}%
                   </span>
                 </div>
                 <div style={{
                   height: 6,
                   borderRadius: 3,
-                  background: 'rgba(30, 41, 59, 0.5)',
+                  background: 'var(--bg-subtle-hover)',
                   overflow: 'hidden',
                 }}>
                   <div style={{

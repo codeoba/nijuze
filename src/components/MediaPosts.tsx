@@ -261,11 +261,11 @@ export const AudioPost: React.FC<AudioPostProps> = ({ audioUrl, title, artist, d
 
         <div style={{ flex: 1 }}>
           <h4 style={{ fontSize: 15, fontWeight: 600, marginBottom: 4 }}>{title}</h4>
-          {artist && <p style={{ fontSize: 13, color: '#94a3b8' }}>{artist}</p>}
+          {artist && <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>{artist}</p>}
         </div>
 
         {duration && (
-          <span style={{ fontSize: 13, color: '#94a3b8', fontWeight: 500 }}>
+          <span style={{ fontSize: 13, color: 'var(--text-muted)', fontWeight: 500 }}>
             {duration}
           </span>
         )}
@@ -275,7 +275,7 @@ export const AudioPost: React.FC<AudioPostProps> = ({ audioUrl, title, artist, d
       <div style={{
         height: 6,
         borderRadius: 3,
-        background: 'rgba(30, 41, 59, 0.5)',
+        background: 'var(--input-bg)',
         cursor: 'pointer',
       }}>
         <div style={{

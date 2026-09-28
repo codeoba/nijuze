@@ -121,7 +121,7 @@ export const ABTesting: React.FC = () => {
           <FlaskConical size={32} color="#6366f1" />
           <div>
             <h2 style={{ fontSize: 28, fontWeight: 700, margin: 0 }}>A/B Testing</h2>
-            <p style={{ fontSize: 14, color: '#94a3b8', margin: 0 }}>
+            <p style={{ fontSize: 14, color: 'var(--text-muted)', margin: 0 }}>
               Jaribu variations tofauti na upime matokeo
             </p>
           </div>
@@ -144,7 +144,7 @@ export const ABTesting: React.FC = () => {
         marginBottom: 32,
       }}>
         {[
-          { label: 'Tests Zote', value: tests.length, icon: FlaskConical, color: '#a5b4fc' },
+          { label: 'Tests Zote', value: tests.length, icon: FlaskConical, color: 'var(--btn-ghost-text)' },
           { label: 'Zinaendelea', value: tests.filter(t => t.status === 'running').length, icon: TrendingUp, color: '#10b981' },
           { label: 'Zimekamilika', value: tests.filter(t => t.status === 'completed').length, icon: Check, color: '#6366f1' },
           { label: 'Winners', value: tests.filter(t => t.results?.winner).length, icon: BarChart3, color: '#fbbf24' },
@@ -178,7 +178,7 @@ export const ABTesting: React.FC = () => {
                     {getStatusLabel(test.status)}
                   </span>
                 </div>
-                <p style={{ fontSize: 14, color: '#94a3b8', margin: 0 }}>{test.description}</p>
+                <p style={{ fontSize: 14, color: 'var(--text-muted)', margin: 0 }}>{test.description}</p>
               </div>
               <button
                 onClick={() => deleteTest(test.id)}
@@ -203,12 +203,12 @@ export const ABTesting: React.FC = () => {
                 border: '1px solid rgba(59, 130, 246, 0.3)',
               }}>
                 <p style={{ fontSize: 12, color: '#60a5fa', marginBottom: 4 }}>Variant A</p>
-                <p style={{ fontSize: 16, fontWeight: 600, color: '#e2e8f0', margin: 0 }}>
+                <p style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-main)', margin: 0 }}>
                   {test.variantA.name}
                 </p>
                 {test.results && (
                   <div style={{ marginTop: 12 }}>
-                    <p style={{ fontSize: 13, color: '#94a3b8', margin: 0 }}>
+                    <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>
                       {test.results.variantA.users} users • {test.results.variantA.rate}% conversion
                     </p>
                   </div>
@@ -221,12 +221,12 @@ export const ABTesting: React.FC = () => {
                 border: '1px solid rgba(147, 51, 234, 0.3)',
               }}>
                 <p style={{ fontSize: 12, color: '#c084fc', marginBottom: 4 }}>Variant B</p>
-                <p style={{ fontSize: 16, fontWeight: 600, color: '#e2e8f0', margin: 0 }}>
+                <p style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-main)', margin: 0 }}>
                   {test.variantB.name}
                 </p>
                 {test.results && (
                   <div style={{ marginTop: 12 }}>
-                    <p style={{ fontSize: 13, color: '#94a3b8', margin: 0 }}>
+                    <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>
                       {test.results.variantB.users} users • {test.results.variantB.rate}% conversion
                     </p>
                   </div>
@@ -245,11 +245,11 @@ export const ABTesting: React.FC = () => {
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
                   <TrendingUp size={18} color={test.results.winner === 'A' ? '#60a5fa' : '#c084fc'} />
-                  <p style={{ fontSize: 14, fontWeight: 600, margin: 0, color: '#e2e8f0' }}>
+                  <p style={{ fontSize: 14, fontWeight: 600, margin: 0, color: 'var(--text-main)' }}>
                     Winner: Variant {test.results.winner}
                   </p>
                 </div>
-                <p style={{ fontSize: 13, color: '#94a3b8', margin: 0 }}>
+                <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>
                   Variant {test.results.winner} ilifanikiwa zaidi kwa {Math.abs(test.results.variantA.rate - test.results.variantB.rate).toFixed(1)}%
                 </p>
               </div>
@@ -333,7 +333,7 @@ const CreateTestModal: React.FC<CreateTestModalProps> = ({ onClose, onCreate }) 
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <div>
-            <label style={{ fontSize: 14, fontWeight: 500, color: '#cbd5e1', marginBottom: 8, display: 'block' }}>
+            <label style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-body)', marginBottom: 8, display: 'block' }}>
               Jina la Test
             </label>
             <input
@@ -347,14 +347,14 @@ const CreateTestModal: React.FC<CreateTestModalProps> = ({ onClose, onCreate }) 
                 borderRadius: 12,
                 background: 'rgba(30, 41, 59, 0.5)',
                 border: '1px solid rgba(51, 65, 85, 0.5)',
-                color: '#e2e8f0',
+                color: 'var(--text-main)',
                 fontSize: 14,
               }}
             />
           </div>
 
           <div>
-            <label style={{ fontSize: 14, fontWeight: 500, color: '#cbd5e1', marginBottom: 8, display: 'block' }}>
+            <label style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-body)', marginBottom: 8, display: 'block' }}>
               Maelezo
             </label>
             <textarea
@@ -367,7 +367,7 @@ const CreateTestModal: React.FC<CreateTestModalProps> = ({ onClose, onCreate }) 
                 borderRadius: 12,
                 background: 'rgba(30, 41, 59, 0.5)',
                 border: '1px solid rgba(51, 65, 85, 0.5)',
-                color: '#e2e8f0',
+                color: 'var(--text-main)',
                 fontSize: 14,
                 resize: 'vertical',
                 minHeight: 80,
@@ -377,7 +377,7 @@ const CreateTestModal: React.FC<CreateTestModalProps> = ({ onClose, onCreate }) 
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
             <div>
-              <label style={{ fontSize: 14, fontWeight: 500, color: '#cbd5e1', marginBottom: 8, display: 'block' }}>
+              <label style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-body)', marginBottom: 8, display: 'block' }}>
                 Variant A
               </label>
               <input
@@ -391,13 +391,13 @@ const CreateTestModal: React.FC<CreateTestModalProps> = ({ onClose, onCreate }) 
                   borderRadius: 12,
                   background: 'rgba(30, 41, 59, 0.5)',
                   border: '1px solid rgba(51, 65, 85, 0.5)',
-                  color: '#e2e8f0',
+                  color: 'var(--text-main)',
                   fontSize: 14,
                 }}
               />
             </div>
             <div>
-              <label style={{ fontSize: 14, fontWeight: 500, color: '#cbd5e1', marginBottom: 8, display: 'block' }}>
+              <label style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-body)', marginBottom: 8, display: 'block' }}>
                 Variant B
               </label>
               <input
@@ -411,7 +411,7 @@ const CreateTestModal: React.FC<CreateTestModalProps> = ({ onClose, onCreate }) 
                   borderRadius: 12,
                   background: 'rgba(30, 41, 59, 0.5)',
                   border: '1px solid rgba(51, 65, 85, 0.5)',
-                  color: '#e2e8f0',
+                  color: 'var(--text-main)',
                   fontSize: 14,
                 }}
               />
@@ -419,7 +419,7 @@ const CreateTestModal: React.FC<CreateTestModalProps> = ({ onClose, onCreate }) 
           </div>
 
           <div>
-            <label style={{ fontSize: 14, fontWeight: 500, color: '#cbd5e1', marginBottom: 8, display: 'block' }}>
+            <label style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-body)', marginBottom: 8, display: 'block' }}>
               Metric
             </label>
             <select
@@ -431,7 +431,7 @@ const CreateTestModal: React.FC<CreateTestModalProps> = ({ onClose, onCreate }) 
                 borderRadius: 12,
                 background: 'rgba(30, 41, 59, 0.5)',
                 border: '1px solid rgba(51, 65, 85, 0.5)',
-                color: '#e2e8f0',
+                color: 'var(--text-main)',
                 fontSize: 14,
               }}
             >
@@ -443,7 +443,7 @@ const CreateTestModal: React.FC<CreateTestModalProps> = ({ onClose, onCreate }) 
           </div>
 
           <div>
-            <label style={{ fontSize: 14, fontWeight: 500, color: '#cbd5e1', marginBottom: 8, display: 'block' }}>
+            <label style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-body)', marginBottom: 8, display: 'block' }}>
               Muda (siku)
             </label>
             <input
@@ -458,7 +458,7 @@ const CreateTestModal: React.FC<CreateTestModalProps> = ({ onClose, onCreate }) 
                 borderRadius: 12,
                 background: 'rgba(30, 41, 59, 0.5)',
                 border: '1px solid rgba(51, 65, 85, 0.5)',
-                color: '#e2e8f0',
+                color: 'var(--text-main)',
                 fontSize: 14,
               }}
             />

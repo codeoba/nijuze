@@ -100,9 +100,9 @@ export const MentionInput: React.FC<MentionInputProps> = ({ value, onChange, pla
           width: '100%',
           padding: 12,
           borderRadius: 12,
-          background: 'rgba(30, 41, 59, 0.5)',
-          border: '1px solid rgba(51, 65, 85, 0.5)',
-          color: '#e2e8f0',
+          background: 'var(--input-bg)',
+          border: '1px solid var(--border-app)',
+          color: 'var(--text-main)',
           fontSize: 14,
           resize: multiline ? 'vertical' : 'none',
           minHeight: multiline ? 80 : 'auto',
@@ -138,7 +138,7 @@ export const MentionInput: React.FC<MentionInputProps> = ({ value, onChange, pla
                 gap: 10,
                 cursor: 'pointer',
                 background: index === selectedIndex ? 'rgba(99, 102, 241, 0.15)' : 'transparent',
-                borderBottom: index < suggestions.length - 1 ? '1px solid rgba(51, 65, 85, 0.3)' : 'none',
+                borderBottom: index < suggestions.length - 1 ? '1px solid var(--border-app)' : 'none',
               }}
               onMouseEnter={() => setSelectedIndex(index)}
             >
@@ -157,10 +157,10 @@ export const MentionInput: React.FC<MentionInputProps> = ({ value, onChange, pla
                 {user.avatar}
               </div>
               <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 14, fontWeight: 500, color: '#e2e8f0' }}>
+                <div style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-main)' }}>
                   {user.username}
                 </div>
-                <div style={{ fontSize: 12, color: '#94a3b8' }}>
+                <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>
                   {user.role}
                 </div>
               </div>

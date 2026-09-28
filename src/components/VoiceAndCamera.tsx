@@ -139,7 +139,7 @@ export const VoiceInput: React.FC<VoiceInputProps> = ({ onTranscript, placeholde
           )}
           <Mic size={32} color="white" />
         </button>
-        <p style={{ fontSize: 13, color: '#94a3b8', marginTop: 12 }}>
+        <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 12 }}>
           {isListening ? 'Inasikiliza...' : 'Bofya kuanza kuzungumza'}
         </p>
       </div>
@@ -153,7 +153,7 @@ export const VoiceInput: React.FC<VoiceInputProps> = ({ onTranscript, placeholde
           border: '1px solid rgba(51, 65, 85, 0.3)',
           marginBottom: 16,
         }}>
-          <p style={{ fontSize: 14, color: '#e2e8f0', marginBottom: 12, lineHeight: 1.6 }}>
+          <p style={{ fontSize: 14, color: 'var(--text-main)', marginBottom: 12, lineHeight: 1.6 }}>
             {transcript}
           </p>
           <div style={{ display: 'flex', gap: 8 }}>

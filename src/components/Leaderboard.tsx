@@ -79,12 +79,13 @@ export const Leaderboard: React.FC = () => {
               style={{
                 padding: '6px 12px',
                 borderRadius: 8,
-                background: timeframe === tf ? 'rgba(99, 102, 241, 0.2)' : 'transparent',
-                border: `1px solid ${timeframe === tf ? 'rgba(99, 102, 241, 0.5)' : 'rgba(51, 65, 85, 0.3)'}`,
-                color: timeframe === tf ? '#a5b4fc' : '#94a3b8',
+                background: timeframe === tf ? 'var(--btn-ghost-bg)' : 'transparent',
+                border: `1px solid ${timeframe === tf ? 'var(--btn-ghost-border)' : 'var(--border-app)'}`,
+                color: timeframe === tf ? 'var(--btn-ghost-text)' : 'var(--text-muted)',
                 cursor: 'pointer',
                 fontSize: 13,
-                fontWeight: 500,
+                fontWeight: timeframe === tf ? 600 : 500,
+                transition: 'all 0.2s ease',
               }}
             >
               {tf === 'week' ? 'Wiki' : tf === 'month' ? 'Mwezi' : 'Yote'}
@@ -123,7 +124,7 @@ export const Leaderboard: React.FC = () => {
               <h4 style={{ fontSize: 15, fontWeight: 600 }}>Nafasi Yako</h4>
               <span style={{
                 background: 'rgba(99, 102, 241, 0.3)',
-                color: '#a5b4fc',
+                color: 'var(--btn-ghost-text)',
                 padding: '2px 8px',
                 borderRadius: 12,
                 fontSize: 12,
@@ -132,12 +133,12 @@ export const Leaderboard: React.FC = () => {
                 #{currentUserEntry.rank}
               </span>
             </div>
-            <p style={{ fontSize: 13, color: '#94a3b8' }}>
+            <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>
               {currentUserEntry.points.toLocaleString()} points • {currentUserEntry.posts} posts • {currentUserEntry.answers} answers
             </p>
           </div>
           <div style={{ textAlign: 'right' }}>
-            <p style={{ fontSize: 20, fontWeight: 700, color: '#a5b4fc' }}>
+            <p style={{ fontSize: 20, fontWeight: 700, color: 'var(--btn-ghost-text)' }}>
               {currentUserEntry.points.toLocaleString()}
             </p>
             <p style={{ fontSize: 12, color: '#64748b' }}>points</p>
@@ -185,7 +186,7 @@ export const Leaderboard: React.FC = () => {
             <h4 style={{ fontSize: 14, fontWeight: 600, marginBottom: 4 }}>
               {entry.user.username}
             </h4>
-            <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 8 }}>
+            <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 8 }}>
               {entry.user.role}
             </p>
             <p style={{ fontSize: 18, fontWeight: 700, color: entry.rank === 1 ? '#fbbf24' : entry.rank === 2 ? '#94a3b8' : '#cd7f32' }}>
@@ -204,8 +205,8 @@ export const Leaderboard: React.FC = () => {
             style={{
               padding: 12,
               borderRadius: 12,
-              background: entry.user.id === currentUser?.id ? 'rgba(99, 102, 241, 0.1)' : 'rgba(30, 41, 59, 0.2)',
-              border: `1px solid ${entry.user.id === currentUser?.id ? 'rgba(99, 102, 241, 0.3)' : 'rgba(51, 65, 85, 0.2)'}`,
+              background: entry.user.id === currentUser?.id ? 'var(--btn-ghost-bg)' : 'var(--bg-subtle)',
+              border: `1px solid ${entry.user.id === currentUser?.id ? 'var(--btn-ghost-border)' : 'var(--border-app)'}`,
               display: 'flex',
               alignItems: 'center',
               gap: 12,
@@ -238,7 +239,7 @@ export const Leaderboard: React.FC = () => {
               </div>
             </div>
             <div style={{ textAlign: 'right' }}>
-              <p style={{ fontSize: 16, fontWeight: 700, color: '#a5b4fc' }}>
+              <p style={{ fontSize: 16, fontWeight: 700, color: 'var(--btn-ghost-text)' }}>
                 {entry.points.toLocaleString()}
               </p>
               <div style={{ display: 'flex', alignItems: 'center', gap: 4, justifyContent: 'flex-end' }}>
@@ -265,7 +266,8 @@ export const Leaderboard: React.FC = () => {
         marginTop: 24,
         padding: 16,
         borderRadius: 12,
-        background: 'rgba(30, 41, 59, 0.3)',
+        background: 'var(--bg-subtle)',
+        border: '1px solid var(--border-app)',
         display: 'grid',
         gridTemplateColumns: 'repeat(3, 1fr)',
         gap: 16,
@@ -275,21 +277,21 @@ export const Leaderboard: React.FC = () => {
           <p style={{ fontSize: 18, fontWeight: 700, color: '#fbbf24' }}>
             {leaderboard[0]?.points.toLocaleString()}
           </p>
-          <p style={{ fontSize: 12, color: '#64748b' }}>Highest Points</p>
+          <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>Highest Points</p>
         </div>
         <div style={{ textAlign: 'center' }}>
-          <Award size={20} color="#a5b4fc" style={{ margin: '0 auto 8px' }} />
-          <p style={{ fontSize: 18, fontWeight: 700, color: '#a5b4fc' }}>
+          <Award size={20} color="var(--border-focus)" style={{ margin: '0 auto 8px' }} />
+          <p style={{ fontSize: 18, fontWeight: 700, color: 'var(--border-focus)' }}>
             {leaderboard.reduce((sum, e) => sum + e.posts, 0)}
           </p>
-          <p style={{ fontSize: 12, color: '#64748b' }}>Total Posts</p>
+          <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>Total Posts</p>
         </div>
         <div style={{ textAlign: 'center' }}>
           <Trophy size={20} color="#10b981" style={{ margin: '0 auto 8px' }} />
           <p style={{ fontSize: 18, fontWeight: 700, color: '#10b981' }}>
             {leaderboard.reduce((sum, e) => sum + e.answers, 0)}
           </p>
-          <p style={{ fontSize: 12, color: '#64748b' }}>Total Answers</p>
+          <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>Total Answers</p>
         </div>
       </div>
     </div>

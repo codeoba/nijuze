@@ -135,7 +135,7 @@ export const AdvancedSearchPage: React.FC = () => {
           <Search size={32} color="#6366f1" />
           <h1 style={{ fontSize: 32, fontWeight: 700 }}>Tafuta ya Kisasa</h1>
         </div>
-        <p style={{ color: '#94a3b8' }}>Tafuta posts kwa filters za kisasa</p>
+        <p style={{ color: 'var(--text-muted)' }}>Tafuta posts kwa filters za kisasa</p>
       </div>
 
       {/* Search Bar */}
@@ -151,9 +151,9 @@ export const AdvancedSearchPage: React.FC = () => {
               width: '100%',
               padding: '16px 16px 16px 48px',
               borderRadius: 12,
-              background: 'rgba(30, 41, 59, 0.5)',
-              border: '1px solid rgba(51, 65, 85, 0.5)',
-              color: '#e2e8f0',
+              background: 'var(--input-bg)',
+              border: '1px solid var(--border-app)',
+              color: 'var(--text-main)',
               fontSize: 16,
             }}
           />
@@ -184,8 +184,8 @@ export const AdvancedSearchPage: React.FC = () => {
             gap: 8,
             padding: '10px 16px',
             borderRadius: 10,
-            background: showFilters ? 'rgba(99, 102, 241, 0.2)' : 'rgba(30, 41, 59, 0.3)',
-            border: `1px solid ${showFilters ? 'rgba(99, 102, 241, 0.5)' : 'rgba(51, 65, 85, 0.3)'}`,
+            background: showFilters ? 'rgba(99, 102, 241, 0.2)' : 'var(--bg-subtle)',
+            border: `1px solid ${showFilters ? 'rgba(99, 102, 241, 0.5)' : 'var(--border-app)'}`,
             color: showFilters ? '#a5b4fc' : '#94a3b8',
             cursor: 'pointer',
             fontSize: 14,
@@ -199,11 +199,11 @@ export const AdvancedSearchPage: React.FC = () => {
 
         {/* Filters Panel */}
         {showFilters && (
-          <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px solid rgba(51, 65, 85, 0.3)' }}>
+          <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px solid var(--border-app)' }}>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16 }}>
               {/* Category Filter */}
               <div>
-                <label style={{ fontSize: 13, color: '#94a3b8', marginBottom: 8, display: 'block' }}>
+                <label style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 8, display: 'block' }}>
                   Kategoria
                 </label>
                 <select
@@ -213,9 +213,9 @@ export const AdvancedSearchPage: React.FC = () => {
                     width: '100%',
                     padding: 10,
                     borderRadius: 8,
-                    background: 'rgba(30, 41, 59, 0.5)',
-                    border: '1px solid rgba(51, 65, 85, 0.5)',
-                    color: '#e2e8f0',
+                    background: 'var(--input-bg)',
+                    border: '1px solid var(--border-app)',
+                    color: 'var(--text-main)',
                     fontSize: 14,
                   }}
                 >
@@ -228,7 +228,7 @@ export const AdvancedSearchPage: React.FC = () => {
 
               {/* Author Filter */}
               <div>
-                <label style={{ fontSize: 13, color: '#94a3b8', marginBottom: 8, display: 'block' }}>
+                <label style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 8, display: 'block' }}>
                   Mwandishi
                 </label>
                 <select
@@ -238,9 +238,9 @@ export const AdvancedSearchPage: React.FC = () => {
                     width: '100%',
                     padding: 10,
                     borderRadius: 8,
-                    background: 'rgba(30, 41, 59, 0.5)',
-                    border: '1px solid rgba(51, 65, 85, 0.5)',
-                    color: '#e2e8f0',
+                    background: 'var(--input-bg)',
+                    border: '1px solid var(--border-app)',
+                    color: 'var(--text-main)',
                     fontSize: 14,
                   }}
                 >
@@ -253,7 +253,7 @@ export const AdvancedSearchPage: React.FC = () => {
 
               {/* Date Range Filter */}
               <div>
-                <label style={{ fontSize: 13, color: '#94a3b8', marginBottom: 8, display: 'block' }}>
+                <label style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 8, display: 'block' }}>
                   Muda
                 </label>
                 <select
@@ -263,9 +263,9 @@ export const AdvancedSearchPage: React.FC = () => {
                     width: '100%',
                     padding: 10,
                     borderRadius: 8,
-                    background: 'rgba(30, 41, 59, 0.5)',
-                    border: '1px solid rgba(51, 65, 85, 0.5)',
-                    color: '#e2e8f0',
+                    background: 'var(--input-bg)',
+                    border: '1px solid var(--border-app)',
+                    color: 'var(--text-main)',
                     fontSize: 14,
                   }}
                 >
@@ -279,7 +279,7 @@ export const AdvancedSearchPage: React.FC = () => {
 
               {/* Sort By Filter */}
               <div>
-                <label style={{ fontSize: 13, color: '#94a3b8', marginBottom: 8, display: 'block' }}>
+                <label style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 8, display: 'block' }}>
                   Panga Kwa
                 </label>
                 <select
@@ -289,9 +289,9 @@ export const AdvancedSearchPage: React.FC = () => {
                     width: '100%',
                     padding: 10,
                     borderRadius: 8,
-                    background: 'rgba(30, 41, 59, 0.5)',
-                    border: '1px solid rgba(51, 65, 85, 0.5)',
-                    color: '#e2e8f0',
+                    background: 'var(--input-bg)',
+                    border: '1px solid var(--border-app)',
+                    color: 'var(--text-main)',
                     fontSize: 14,
                   }}
                 >
@@ -305,7 +305,7 @@ export const AdvancedSearchPage: React.FC = () => {
 
               {/* Min Upvotes Filter */}
               <div>
-                <label style={{ fontSize: 13, color: '#94a3b8', marginBottom: 8, display: 'block' }}>
+                <label style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 8, display: 'block' }}>
                   Upvotes Minimum
                 </label>
                 <input
@@ -317,9 +317,9 @@ export const AdvancedSearchPage: React.FC = () => {
                     width: '100%',
                     padding: 10,
                     borderRadius: 8,
-                    background: 'rgba(30, 41, 59, 0.5)',
-                    border: '1px solid rgba(51, 65, 85, 0.5)',
-                    color: '#e2e8f0',
+                    background: 'var(--input-bg)',
+                    border: '1px solid var(--border-app)',
+                    color: 'var(--text-main)',
                     fontSize: 14,
                   }}
                 />
@@ -327,7 +327,7 @@ export const AdvancedSearchPage: React.FC = () => {
 
               {/* Has Comments Filter */}
               <div>
-                <label style={{ fontSize: 13, color: '#94a3b8', marginBottom: 8, display: 'block' }}>
+                <label style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 8, display: 'block' }}>
                   Comments
                 </label>
                 <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
@@ -337,7 +337,7 @@ export const AdvancedSearchPage: React.FC = () => {
                     onChange={(e) => setFilters({ ...filters, hasComments: e.target.checked })}
                     style={{ width: 18, height: 18 }}
                   />
-                  <span style={{ fontSize: 14, color: '#e2e8f0' }}>Zenye comments tu</span>
+                  <span style={{ fontSize: 14, color: 'var(--text-main)' }}>Zenye comments tu</span>
                 </label>
               </div>
             </div>
@@ -364,8 +364,8 @@ export const AdvancedSearchPage: React.FC = () => {
       </div>
 
       {/* Results Count */}
-      <div style={{ marginBottom: 16, fontSize: 14, color: '#94a3b8' }}>
-        Matokeo: <strong style={{ color: '#e2e8f0' }}>{searchResults.length}</strong> posts zilizopatikana
+      <div style={{ marginBottom: 16, fontSize: 14, color: 'var(--text-muted)' }}>
+        Matokeo: <strong style={{ color: 'var(--text-main)' }}>{searchResults.length}</strong> posts zilizopatikana
       </div>
 
       {/* Search Results */}
@@ -373,7 +373,7 @@ export const AdvancedSearchPage: React.FC = () => {
         {searchResults.length === 0 ? (
           <div className="glass-card" style={{ padding: 48, textAlign: 'center' }}>
             <Search size={48} color="#475569" style={{ margin: '0 auto 16px' }} />
-            <p style={{ fontSize: 16, color: '#94a3b8' }}>Hakuna matokeo yaliyopatikana</p>
+            <p style={{ fontSize: 16, color: 'var(--text-muted)' }}>Hakuna matokeo yaliyopatikana</p>
             <p style={{ fontSize: 14, color: '#64748b', marginTop: 8 }}>Jaribu kubadilisha filters au search query</p>
           </div>
         ) : (
@@ -388,7 +388,7 @@ export const AdvancedSearchPage: React.FC = () => {
                 e.currentTarget.style.transform = 'translateY(-2px)';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = 'rgba(51, 65, 85, 0.3)';
+                e.currentTarget.style.borderColor = 'var(--border-app)';
                 e.currentTarget.style.transform = 'translateY(0)';
               }}
             >
@@ -405,17 +405,17 @@ export const AdvancedSearchPage: React.FC = () => {
                   minWidth: 60,
                 }}>
                   <ThumbsUp size={16} color="#a5b4fc" />
-                  <span style={{ fontSize: 18, fontWeight: 700, color: '#a5b4fc' }}>{post.upvotes}</span>
+                  <span style={{ fontSize: 18, fontWeight: 700, color: 'var(--btn-ghost-text)' }}>{post.upvotes}</span>
                   <span style={{ fontSize: 11, color: '#64748b' }}>votes</span>
                 </div>
 
                 {/* Content */}
                 <div style={{ flex: 1 }}>
-                  <h3 style={{ fontSize: 18, fontWeight: 600, marginBottom: 8, color: '#e2e8f0' }}>
+                  <h3 style={{ fontSize: 18, fontWeight: 600, marginBottom: 8, color: 'var(--text-main)' }}>
                     {post.title}
                   </h3>
 
-                  <p style={{ fontSize: 14, color: '#94a3b8', marginBottom: 12, lineHeight: 1.5 }}>
+                  <p style={{ fontSize: 14, color: 'var(--text-muted)', marginBottom: 12, lineHeight: 1.5 }}>
                     {post.content.substring(0, 150)}...
                   </p>
 
@@ -429,7 +429,7 @@ export const AdvancedSearchPage: React.FC = () => {
                           borderRadius: 12,
                           background: 'rgba(99, 102, 241, 0.1)',
                           border: '1px solid rgba(99, 102, 241, 0.2)',
-                          color: '#a5b4fc',
+                          color: 'var(--btn-ghost-text)',
                           fontSize: 12,
                         }}
                       >

@@ -28,27 +28,32 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, mode, onT
     // Simulate API delay
     await new Promise(resolve => setTimeout(resolve, 800));
 
-    if (mode === 'login') {
-      const success = login(email, password);
-      if (success) {
-        onClose();
+    try {
+      if (mode === 'login') {
+        const result = await login(email, password);
+        if (result && result.success) {
+          onClose();
+        } else {
+          setError(result?.error || 'Email au password si sahihi');
+        }
       } else {
-        setError('Email au password si sahihi');
+        if (password.length < 6) {
+          setError('Password lazima iwe na herufi 6 au zaidi');
+          setIsLoading(false);
+          return;
+        }
+        const result = await register(username, email, password);
+        if (result && result.success) {
+          onClose();
+        } else {
+          setError(result?.error || 'Email hii imeshajiriwa');
+        }
       }
-    } else {
-      if (password.length < 6) {
-        setError('Password lazima iwe na herufi 6 au zaidi');
-        setIsLoading(false);
-        return;
-      }
-      const success = register(username, email, password);
-      if (success) {
-        onClose();
-      } else {
-        setError('Email hii imeshajiriwa');
-      }
+    } catch (err: any) {
+      setError(err.message || 'Hitilafu imetokea');
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   return (
@@ -80,7 +85,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, mode, onT
         <form onSubmit={handleSubmit}>
           {mode === 'register' && (
             <div style={{ marginBottom: 16 }}>
-              <label style={{ fontSize: 14, fontWeight: 500, color: '#cbd5e1', marginBottom: 8, display: 'block' }}>
+              <label style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-body)', marginBottom: 8, display: 'block' }}>
                 Jina Kamili
               </label>
               <div style={{ position: 'relative' }}>
@@ -101,7 +106,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, mode, onT
                     borderRadius: 12,
                     background: 'rgba(30, 41, 59, 0.5)',
                     border: '1px solid rgba(51, 65, 85, 0.5)',
-                    color: '#e2e8f0',
+                    color: 'var(--text-main)',
                     fontSize: 14,
                   }}
                 />
@@ -110,7 +115,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, mode, onT
           )}
 
           <div style={{ marginBottom: 16 }}>
-            <label style={{ fontSize: 14, fontWeight: 500, color: '#cbd5e1', marginBottom: 8, display: 'block' }}>
+            <label style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-body)', marginBottom: 8, display: 'block' }}>
               Email
             </label>
             <div style={{ position: 'relative' }}>
@@ -131,7 +136,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, mode, onT
                   borderRadius: 12,
                   background: 'rgba(30, 41, 59, 0.5)',
                   border: '1px solid rgba(51, 65, 85, 0.5)',
-                  color: '#e2e8f0',
+                  color: 'var(--text-main)',
                   fontSize: 14,
                 }}
               />
@@ -139,7 +144,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, mode, onT
           </div>
 
           <div style={{ marginBottom: 24 }}>
-            <label style={{ fontSize: 14, fontWeight: 500, color: '#cbd5e1', marginBottom: 8, display: 'block' }}>
+            <label style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-body)', marginBottom: 8, display: 'block' }}>
               Password
             </label>
             <div style={{ position: 'relative' }}>
@@ -161,7 +166,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, mode, onT
                   borderRadius: 12,
                   background: 'rgba(30, 41, 59, 0.5)',
                   border: '1px solid rgba(51, 65, 85, 0.5)',
-                  color: '#e2e8f0',
+                  color: 'var(--text-main)',
                   fontSize: 14,
                 }}
               />
@@ -218,7 +223,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, mode, onT
         </form>
 
         <div style={{ textAlign: 'center', marginTop: 20 }}>
-          <span style={{ fontSize: 14, color: '#94a3b8' }}>
+          <span style={{ fontSize: 14, color: 'var(--text-muted)' }}>
             {mode === 'login' ? 'Huna akaunti? ' : 'Una akaunti? '}
           </span>
           <button
@@ -238,8 +243,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, mode, onT
 
         {mode === 'login' && (
           <div style={{ marginTop: 16, padding: 12, borderRadius: 8, background: 'rgba(99, 102, 241, 0.05)', border: '1px solid rgba(99, 102, 241, 0.2)' }}>
-            <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 8 }}>
-              <strong style={{ color: '#a5b4fc' }}>Demo Accounts:</strong>
+            <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 8 }}>
+              <strong style={{ color: 'var(--btn-ghost-text)' }}>Demo Accounts:</strong>
             </p>
             <p style={{ fontSize: 11, color: '#64748b', marginBottom: 4 }}>Email: amina@example.com</p>
             <p style={{ fontSize: 11, color: '#64748b' }}>Password: password123</p>

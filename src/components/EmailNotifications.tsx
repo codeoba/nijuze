@@ -42,7 +42,7 @@ export const EmailNotifications: React.FC = () => {
         <Mail size={24} color="#a5b4fc" />
         <div>
           <h3 style={{ fontSize: 18, fontWeight: 600, margin: 0 }}>Arifa za Email</h3>
-          <p style={{ fontSize: 13, color: '#94a3b8', margin: 0 }}>
+          <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>
             Chagua arifa zipi unataka kupata kwa email
           </p>
         </div>
@@ -71,7 +71,7 @@ export const EmailNotifications: React.FC = () => {
           >
             <div>
               <p style={{ fontSize: 14, fontWeight: 500, marginBottom: 4 }}>{item.label}</p>
-              <p style={{ fontSize: 13, color: '#94a3b8', margin: 0 }}>{item.description}</p>
+              <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>{item.description}</p>
             </div>
             <label style={{ position: 'relative', display: 'inline-block', width: 52, height: 28 }}>
               <input

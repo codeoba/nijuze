@@ -114,7 +114,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({ onImageSelect, current
           }}
         >
           <Upload size={32} color="#64748b" style={{ margin: '0 auto 12px' }} />
-          <p style={{ fontSize: 14, color: '#94a3b8', marginBottom: 4 }}>
+          <p style={{ fontSize: 14, color: 'var(--text-muted)', marginBottom: 4 }}>
             Bofya au buruta picha hapa
           </p>
           <p style={{ fontSize: 12, color: '#64748b' }}>

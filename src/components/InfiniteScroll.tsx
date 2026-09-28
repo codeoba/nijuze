@@ -53,7 +53,7 @@ export const InfiniteScroll: React.FC<InfiniteScrollProps> = ({
         {loading && (
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
             <Loader2 size={20} className="animate-spin" color="#a5b4fc" />
-            <span style={{ color: '#94a3b8', fontSize: 14 }}>Inapakia zaidi...</span>
+            <span style={{ color: 'var(--text-muted)', fontSize: 14 }}>Inapakia zaidi...</span>
           </div>
         )}
         

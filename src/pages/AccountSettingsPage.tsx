@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../contexts/AppContext';
+import { useTheme } from '../contexts/ThemeContext';
 import { 
   User, Mail, Lock, Bell, Shield, Palette, Globe, 
   Download, Upload, Trash2, Eye, EyeOff, Check, X,
@@ -8,6 +9,7 @@ import {
 
 export const AccountSettingsPage: React.FC = () => {
   const { currentUser } = useApp();
+  const { theme, setTheme } = useTheme();
   const [activeSection, setActiveSection] = useState('profile');
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [show2FAModal, setShow2FAModal] = useState(false);
@@ -159,7 +161,7 @@ export const AccountSettingsPage: React.FC = () => {
               
               <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
                 <div>
-                  <label style={{ fontSize: 14, fontWeight: 500, color: '#cbd5e1', marginBottom: 8, display: 'block' }}>
+                  <label style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-body)', marginBottom: 8, display: 'block' }}>
                     Jina la Mtumiaji
                   </label>
                   <input
@@ -170,16 +172,16 @@ export const AccountSettingsPage: React.FC = () => {
                       width: '100%',
                       padding: 12,
                       borderRadius: 12,
-                      background: 'rgba(30, 41, 59, 0.5)',
-                      border: '1px solid rgba(51, 65, 85, 0.5)',
-                      color: '#e2e8f0',
+                      background: 'var(--input-bg)',
+                      border: '1px solid var(--border-app)',
+                      color: 'var(--text-main)',
                       fontSize: 14,
                     }}
                   />
                 </div>
 
                 <div>
-                  <label style={{ fontSize: 14, fontWeight: 500, color: '#cbd5e1', marginBottom: 8, display: 'block' }}>
+                  <label style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-body)', marginBottom: 8, display: 'block' }}>
                     Bio
                   </label>
                   <textarea
@@ -189,9 +191,9 @@ export const AccountSettingsPage: React.FC = () => {
                       width: '100%',
                       padding: 12,
                       borderRadius: 12,
-                      background: 'rgba(30, 41, 59, 0.5)',
-                      border: '1px solid rgba(51, 65, 85, 0.5)',
-                      color: '#e2e8f0',
+                      background: 'var(--input-bg)',
+                      border: '1px solid var(--border-app)',
+                      color: 'var(--text-main)',
                       fontSize: 14,
                       resize: 'vertical',
                       minHeight: 120,
@@ -212,7 +214,7 @@ export const AccountSettingsPage: React.FC = () => {
               
               <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
                 <div>
-                  <label style={{ fontSize: 14, fontWeight: 500, color: '#cbd5e1', marginBottom: 8, display: 'block' }}>
+                  <label style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-body)', marginBottom: 8, display: 'block' }}>
                     Email
                   </label>
                   <input
@@ -223,9 +225,9 @@ export const AccountSettingsPage: React.FC = () => {
                       width: '100%',
                       padding: 12,
                       borderRadius: 12,
-                      background: 'rgba(30, 41, 59, 0.5)',
-                      border: '1px solid rgba(51, 65, 85, 0.5)',
-                      color: '#e2e8f0',
+                      background: 'var(--input-bg)',
+                      border: '1px solid var(--border-app)',
+                      color: 'var(--text-main)',
                       fontSize: 14,
                     }}
                   />
@@ -237,11 +239,11 @@ export const AccountSettingsPage: React.FC = () => {
                 <div style={{
                   padding: 20,
                   borderRadius: 12,
-                  background: 'rgba(30, 41, 59, 0.3)',
-                  border: '1px solid rgba(51, 65, 85, 0.3)',
+                  background: 'var(--bg-subtle)',
+                  border: '1px solid var(--border-app)',
                 }}>
                   <h3 style={{ fontSize: 16, fontWeight: 600, marginBottom: 12 }}>Password</h3>
-                  <p style={{ fontSize: 14, color: '#94a3b8', marginBottom: 16 }}>
+                  <p style={{ fontSize: 14, color: 'var(--text-muted)', marginBottom: 16 }}>
                     Badilisha password yako ya akaunti
                   </p>
                   <button onClick={handleChangePassword} className="btn-ghost">
@@ -264,14 +266,14 @@ export const AccountSettingsPage: React.FC = () => {
                 <div style={{
                   padding: 20,
                   borderRadius: 12,
-                  background: 'rgba(30, 41, 59, 0.3)',
-                  border: '1px solid rgba(51, 65, 85, 0.3)',
+                  background: 'var(--bg-subtle)',
+                  border: '1px solid var(--border-app)',
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
                     <Key size={24} color="#fbbf24" />
                     <h3 style={{ fontSize: 16, fontWeight: 600 }}>Password</h3>
                   </div>
-                  <p style={{ fontSize: 14, color: '#94a3b8', marginBottom: 16 }}>
+                  <p style={{ fontSize: 14, color: 'var(--text-muted)', marginBottom: 16 }}>
                     Badilisha password yako mara kwa mara kwa usalama zaidi
                   </p>
                   <button onClick={handleChangePassword} className="btn-ghost">
@@ -282,14 +284,14 @@ export const AccountSettingsPage: React.FC = () => {
                 <div style={{
                   padding: 20,
                   borderRadius: 12,
-                  background: 'rgba(30, 41, 59, 0.3)',
-                  border: '1px solid rgba(51, 65, 85, 0.3)',
+                  background: 'var(--bg-subtle)',
+                  border: '1px solid var(--border-app)',
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
                     <Smartphone size={24} color="#10b981" />
                     <h3 style={{ fontSize: 16, fontWeight: 600 }}>Two-Factor Authentication</h3>
                   </div>
-                  <p style={{ fontSize: 14, color: '#94a3b8', marginBottom: 16 }}>
+                  <p style={{ fontSize: 14, color: 'var(--text-muted)', marginBottom: 16 }}>
                     Ongeza layer ya ziada ya usalama kwa akaunti yako
                   </p>
                   <button onClick={handleSetup2FA} className="btn-ghost">
@@ -307,7 +309,7 @@ export const AccountSettingsPage: React.FC = () => {
                     <AlertTriangle size={24} color="#ef4444" />
                     <h3 style={{ fontSize: 16, fontWeight: 600, color: '#fca5a5' }}>Futa Akaunti</h3>
                   </div>
-                  <p style={{ fontSize: 14, color: '#94a3b8', marginBottom: 16 }}>
+                  <p style={{ fontSize: 14, color: 'var(--text-muted)', marginBottom: 16 }}>
                     Futa akaunti yako na data zote. Hatua hii haiwezi kurudishwa!
                   </p>
                   <button
@@ -351,13 +353,13 @@ export const AccountSettingsPage: React.FC = () => {
                       justifyContent: 'space-between',
                       padding: 16,
                       borderRadius: 12,
-                      background: 'rgba(30, 41, 59, 0.3)',
-                      border: '1px solid rgba(51, 65, 85, 0.3)',
+                      background: 'var(--bg-subtle)',
+                      border: '1px solid var(--border-app)',
                     }}
                   >
                     <div>
                       <p style={{ fontSize: 15, fontWeight: 500, marginBottom: 4 }}>{item.label}</p>
-                      <p style={{ fontSize: 13, color: '#94a3b8' }}>{item.description}</p>
+                      <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>{item.description}</p>
                     </div>
                     <label style={{ position: 'relative', display: 'inline-block', width: 52, height: 28 }}>
                       <input
@@ -373,7 +375,7 @@ export const AccountSettingsPage: React.FC = () => {
                         position: 'absolute',
                         cursor: 'pointer',
                         inset: 0,
-                        background: notificationSettings[item.key as keyof typeof notificationSettings] ? '#6366f1' : 'rgba(51, 65, 85, 0.5)',
+                        background: notificationSettings[item.key as keyof typeof notificationSettings] ? '#6366f1' : 'var(--border-app)',
                         borderRadius: 28,
                         transition: '0.3s',
                       }}>
@@ -414,13 +416,13 @@ export const AccountSettingsPage: React.FC = () => {
                       justifyContent: 'space-between',
                       padding: 16,
                       borderRadius: 12,
-                      background: 'rgba(30, 41, 59, 0.3)',
-                      border: '1px solid rgba(51, 65, 85, 0.3)',
+                      background: 'var(--bg-subtle)',
+                      border: '1px solid var(--border-app)',
                     }}
                   >
                     <div>
                       <p style={{ fontSize: 15, fontWeight: 500, marginBottom: 4 }}>{item.label}</p>
-                      <p style={{ fontSize: 13, color: '#94a3b8' }}>{item.description}</p>
+                      <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>{item.description}</p>
                     </div>
                     <label style={{ position: 'relative', display: 'inline-block', width: 52, height: 28 }}>
                       <input
@@ -436,7 +438,7 @@ export const AccountSettingsPage: React.FC = () => {
                         position: 'absolute',
                         cursor: 'pointer',
                         inset: 0,
-                        background: privacySettings[item.key as keyof typeof privacySettings] ? '#6366f1' : 'rgba(51, 65, 85, 0.5)',
+                        background: privacySettings[item.key as keyof typeof privacySettings] ? '#6366f1' : 'var(--border-app)',
                         borderRadius: 28,
                         transition: '0.3s',
                       }}>
@@ -464,7 +466,7 @@ export const AccountSettingsPage: React.FC = () => {
               
               <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
                 <div>
-                  <label style={{ fontSize: 15, fontWeight: 500, color: '#cbd5e1', marginBottom: 12, display: 'block' }}>
+                  <label style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-main)', marginBottom: 12, display: 'block' }}>
                     Theme
                   </label>
                   <div style={{ display: 'flex', gap: 12 }}>
@@ -472,33 +474,37 @@ export const AccountSettingsPage: React.FC = () => {
                       { value: 'light', label: 'Mwanga', icon: '☀️' },
                       { value: 'dark', label: 'Giza', icon: '🌙' },
                       { value: 'system', label: 'System', icon: '💻' },
-                    ].map((theme) => (
+                    ].map((t) => (
                       <button
-                        key={theme.value}
-                        onClick={() => setAppearanceSettings({ ...appearanceSettings, theme: theme.value as any })}
+                        key={t.value}
+                        onClick={() => {
+                          setAppearanceSettings({ ...appearanceSettings, theme: t.value as any });
+                          setTheme(t.value as any);
+                        }}
                         style={{
                           flex: 1,
                           padding: 16,
                           borderRadius: 12,
-                          background: appearanceSettings.theme === theme.value ? 'rgba(99, 102, 241, 0.15)' : 'rgba(30, 41, 59, 0.3)',
-                          border: `1px solid ${appearanceSettings.theme === theme.value ? 'rgba(99, 102, 241, 0.5)' : 'rgba(51, 65, 85, 0.3)'}`,
-                          color: appearanceSettings.theme === theme.value ? '#a5b4fc' : '#94a3b8',
+                          background: theme === t.value ? 'var(--btn-ghost-bg)' : 'var(--bg-subtle)',
+                          border: `1px solid ${theme === t.value ? 'var(--border-focus)' : 'var(--border-app)'}`,
+                          color: theme === t.value ? 'var(--border-focus)' : 'var(--text-muted)',
                           cursor: 'pointer',
                           display: 'flex',
                           flexDirection: 'column',
                           alignItems: 'center',
                           gap: 8,
+                          transition: 'all 0.2s ease',
                         }}
                       >
-                        <span style={{ fontSize: 24 }}>{theme.icon}</span>
-                        <span style={{ fontSize: 14 }}>{theme.label}</span>
+                        <span style={{ fontSize: 24 }}>{t.icon}</span>
+                        <span style={{ fontSize: 14, fontWeight: 500 }}>{t.label}</span>
                       </button>
                     ))}
                   </div>
                 </div>
 
                 <div>
-                  <label style={{ fontSize: 15, fontWeight: 500, color: '#cbd5e1', marginBottom: 12, display: 'block' }}>
+                  <label style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-main)', marginBottom: 12, display: 'block' }}>
                     Ukubwa wa Fonti
                   </label>
                   <div style={{ display: 'flex', gap: 12 }}>
@@ -514,11 +520,13 @@ export const AccountSettingsPage: React.FC = () => {
                           flex: 1,
                           padding: 12,
                           borderRadius: 12,
-                          background: appearanceSettings.fontSize === size.value ? 'rgba(99, 102, 241, 0.15)' : 'rgba(30, 41, 59, 0.3)',
-                          border: `1px solid ${appearanceSettings.fontSize === size.value ? 'rgba(99, 102, 241, 0.5)' : 'rgba(51, 65, 85, 0.3)'}`,
-                          color: appearanceSettings.fontSize === size.value ? '#a5b4fc' : '#94a3b8',
+                          background: appearanceSettings.fontSize === size.value ? 'var(--btn-ghost-bg)' : 'var(--bg-subtle)',
+                          border: `1px solid ${appearanceSettings.fontSize === size.value ? 'var(--btn-ghost-border)' : 'var(--border-app)'}`,
+                          color: appearanceSettings.fontSize === size.value ? 'var(--btn-ghost-text)' : 'var(--text-muted)',
                           cursor: 'pointer',
                           fontSize: 14,
+                          fontWeight: 500,
+                          transition: 'all 0.2s ease',
                         }}
                       >
                         {size.label}
@@ -532,7 +540,7 @@ export const AccountSettingsPage: React.FC = () => {
 
           {activeSection === 'language' && (
             <div className="glass-card" style={{ padding: 32 }}>
-              <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 24 }}>Lugha</h2>
+              <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 24, color: 'var(--text-main)' }}>Lugha</h2>
               
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 {[
@@ -549,18 +557,19 @@ export const AccountSettingsPage: React.FC = () => {
                       gap: 12,
                       padding: 16,
                       borderRadius: 12,
-                      background: appearanceSettings.language === lang.value ? 'rgba(99, 102, 241, 0.15)' : 'rgba(30, 41, 59, 0.3)',
-                      border: `1px solid ${appearanceSettings.language === lang.value ? 'rgba(99, 102, 241, 0.5)' : 'rgba(51, 65, 85, 0.3)'}`,
-                      color: appearanceSettings.language === lang.value ? '#a5b4fc' : '#94a3b8',
+                      background: appearanceSettings.language === lang.value ? 'var(--btn-ghost-bg)' : 'var(--bg-subtle)',
+                      border: `1px solid ${appearanceSettings.language === lang.value ? 'var(--btn-ghost-border)' : 'var(--border-app)'}`,
+                      color: appearanceSettings.language === lang.value ? 'var(--btn-ghost-text)' : 'var(--text-muted)',
                       cursor: 'pointer',
                       fontSize: 15,
                       fontWeight: 500,
+                      transition: 'all 0.2s ease',
                     }}
                   >
                     <span style={{ fontSize: 24 }}>{lang.flag}</span>
-                    {lang.label}
+                    <span style={{ color: 'var(--text-main)' }}>{lang.label}</span>
                     {appearanceSettings.language === lang.value && (
-                      <Check size={20} style={{ marginLeft: 'auto' }} />
+                      <Check size={20} color="var(--btn-ghost-text)" style={{ marginLeft: 'auto' }} />
                     )}
                   </button>
                 ))}
@@ -576,14 +585,14 @@ export const AccountSettingsPage: React.FC = () => {
                 <div style={{
                   padding: 20,
                   borderRadius: 12,
-                  background: 'rgba(30, 41, 59, 0.3)',
-                  border: '1px solid rgba(51, 65, 85, 0.3)',
+                  background: 'var(--bg-subtle)',
+                  border: '1px solid var(--border-app)',
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
                     <Download size={24} color="#10b981" />
                     <h3 style={{ fontSize: 16, fontWeight: 600 }}>Export Data</h3>
                   </div>
-                  <p style={{ fontSize: 14, color: '#94a3b8', marginBottom: 16 }}>
+                  <p style={{ fontSize: 14, color: 'var(--text-muted)', marginBottom: 16 }}>
                     Pakua data yako yote kama JSON file
                   </p>
                   <button onClick={handleExportData} className="btn-primary">
@@ -594,14 +603,14 @@ export const AccountSettingsPage: React.FC = () => {
                 <div style={{
                   padding: 20,
                   borderRadius: 12,
-                  background: 'rgba(30, 41, 59, 0.3)',
-                  border: '1px solid rgba(51, 65, 85, 0.3)',
+                  background: 'var(--bg-subtle)',
+                  border: '1px solid var(--border-app)',
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
                     <Upload size={24} color="#60a5fa" />
                     <h3 style={{ fontSize: 16, fontWeight: 600 }}>Import Data</h3>
                   </div>
-                  <p style={{ fontSize: 14, color: '#94a3b8', marginBottom: 16 }}>
+                  <p style={{ fontSize: 14, color: 'var(--text-muted)', marginBottom: 16 }}>
                     Ingiza data kutoka JSON file
                   </p>
                   <button onClick={handleImportData} className="btn-ghost">
@@ -619,7 +628,7 @@ export const AccountSettingsPage: React.FC = () => {
                     <Trash2 size={24} color="#ef4444" />
                     <h3 style={{ fontSize: 16, fontWeight: 600, color: '#fca5a5' }}>Futa Data Yote</h3>
                   </div>
-                  <p style={{ fontSize: 14, color: '#94a3b8', marginBottom: 16 }}>
+                  <p style={{ fontSize: 14, color: 'var(--text-muted)', marginBottom: 16 }}>
                     Futa data yako yote kutoka browser hii
                   </p>
                   <button
@@ -669,7 +678,7 @@ export const AccountSettingsPage: React.FC = () => {
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               <div>
-                <label style={{ fontSize: 14, fontWeight: 500, color: '#cbd5e1', marginBottom: 8, display: 'block' }}>
+                <label style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-body)', marginBottom: 8, display: 'block' }}>
                   Password ya Sasa
                 </label>
                 <input
@@ -679,16 +688,16 @@ export const AccountSettingsPage: React.FC = () => {
                     width: '100%',
                     padding: 12,
                     borderRadius: 12,
-                    background: 'rgba(30, 41, 59, 0.5)',
-                    border: '1px solid rgba(51, 65, 85, 0.5)',
-                    color: '#e2e8f0',
+                    background: 'var(--input-bg)',
+                    border: '1px solid var(--border-app)',
+                    color: 'var(--text-main)',
                     fontSize: 14,
                   }}
                 />
               </div>
 
               <div>
-                <label style={{ fontSize: 14, fontWeight: 500, color: '#cbd5e1', marginBottom: 8, display: 'block' }}>
+                <label style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-body)', marginBottom: 8, display: 'block' }}>
                   Password Mpya
                 </label>
                 <input
@@ -698,16 +707,16 @@ export const AccountSettingsPage: React.FC = () => {
                     width: '100%',
                     padding: 12,
                     borderRadius: 12,
-                    background: 'rgba(30, 41, 59, 0.5)',
-                    border: '1px solid rgba(51, 65, 85, 0.5)',
-                    color: '#e2e8f0',
+                    background: 'var(--input-bg)',
+                    border: '1px solid var(--border-app)',
+                    color: 'var(--text-main)',
                     fontSize: 14,
                   }}
                 />
               </div>
 
               <div>
-                <label style={{ fontSize: 14, fontWeight: 500, color: '#cbd5e1', marginBottom: 8, display: 'block' }}>
+                <label style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-body)', marginBottom: 8, display: 'block' }}>
                   Thibitisha Password Mpya
                 </label>
                 <input
@@ -717,9 +726,9 @@ export const AccountSettingsPage: React.FC = () => {
                     width: '100%',
                     padding: 12,
                     borderRadius: 12,
-                    background: 'rgba(30, 41, 59, 0.5)',
-                    border: '1px solid rgba(51, 65, 85, 0.5)',
-                    color: '#e2e8f0',
+                    background: 'var(--input-bg)',
+                    border: '1px solid var(--border-app)',
+                    color: 'var(--text-main)',
                     fontSize: 14,
                   }}
                 />
@@ -759,7 +768,7 @@ export const AccountSettingsPage: React.FC = () => {
             <div style={{ textAlign: 'center', padding: 24 }}>
               <Smartphone size={64} color="#10b981" style={{ margin: '0 auto 24px' }} />
               <h3 style={{ fontSize: 18, fontWeight: 600, marginBottom: 12 }}>Weka 2FA</h3>
-              <p style={{ fontSize: 14, color: '#94a3b8', marginBottom: 24, lineHeight: 1.6 }}>
+              <p style={{ fontSize: 14, color: 'var(--text-muted)', marginBottom: 24, lineHeight: 1.6 }}>
                 Two-factor authentication inaongeza layer ya ziada ya usalama kwa akaunti yako. Utahitaji app ya authenticator kama Google Authenticator au Authy.
               </p>
               <button className="btn-primary" style={{ width: '100%' }}>

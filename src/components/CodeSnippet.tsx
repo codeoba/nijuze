@@ -69,7 +69,7 @@ export const CodeSnippet: React.FC<CodeSnippetProps> = ({ code, language = 'java
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <Code size={16} color="#818cf8" />
-          <span style={{ fontSize: 13, color: '#94a3b8', fontWeight: 500 }}>
+          <span style={{ fontSize: 13, color: 'var(--text-muted)', fontWeight: 500 }}>
             {language}
           </span>
         </div>
@@ -105,7 +105,7 @@ export const CodeSnippet: React.FC<CodeSnippetProps> = ({ code, language = 'java
         fontFamily: 'Consolas, Monaco, "Courier New", monospace',
       }}>
         <code
-          style={{ color: '#e2e8f0' }}
+          style={{ color: 'var(--text-main)' }}
           dangerouslySetInnerHTML={{ __html: highlightCode(code) }}
         />
       </pre>
@@ -171,7 +171,7 @@ export const CodeBlockInput: React.FC<CodeBlockInputProps> = ({
               borderRadius: 6,
               background: 'rgba(30, 41, 59, 0.5)',
               border: '1px solid rgba(51, 65, 85, 0.5)',
-              color: '#e2e8f0',
+              color: 'var(--text-main)',
               fontSize: 13,
               cursor: 'pointer',
             }}
@@ -197,7 +197,7 @@ export const CodeBlockInput: React.FC<CodeBlockInputProps> = ({
           margin: 0,
           background: 'transparent',
           border: 'none',
-          color: '#e2e8f0',
+          color: 'var(--text-main)',
           fontSize: 14,
           lineHeight: 1.6,
           fontFamily: 'Consolas, Monaco, "Courier New", monospace',

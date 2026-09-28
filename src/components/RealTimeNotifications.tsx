@@ -198,7 +198,7 @@ export const RealTimeNotifications: React.FC = () => {
                     borderRadius: 8,
                     background: 'rgba(99, 102, 241, 0.1)',
                     border: '1px solid rgba(99, 102, 241, 0.2)',
-                    color: '#a5b4fc',
+                    color: 'var(--btn-ghost-text)',
                     fontSize: 12,
                     cursor: 'pointer',
                     display: 'flex',
@@ -270,7 +270,7 @@ export const RealTimeNotifications: React.FC = () => {
 
                   {/* Content */}
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <p style={{ fontSize: 14, color: '#e2e8f0', marginBottom: 4, lineHeight: 1.4 }}>
+                    <p style={{ fontSize: 14, color: 'var(--text-main)', marginBottom: 4, lineHeight: 1.4 }}>
                       {notif.message}
                     </p>
                     <p style={{ fontSize: 12, color: '#64748b' }}>

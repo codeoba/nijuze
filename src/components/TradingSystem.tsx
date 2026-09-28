@@ -230,7 +230,7 @@ export const TradingSystem: React.FC = () => {
           <ShoppingCart size={32} color="#6366f1" />
           <div>
             <h2 style={{ fontSize: 28, fontWeight: 700, margin: 0 }}>Soko la Biashara</h2>
-            <p style={{ fontSize: 14, color: '#94a3b8', margin: 0 }}>
+            <p style={{ fontSize: 14, color: 'var(--text-muted)', margin: 0 }}>
               Nunua na uuze virtual items
             </p>
           </div>
@@ -287,7 +287,7 @@ export const TradingSystem: React.FC = () => {
                     </div>
                     <div style={{ flex: 1 }}>
                       <h4 style={{ fontSize: 16, fontWeight: 600, margin: 0 }}>{item.name}</h4>
-                      <p style={{ fontSize: 13, color: '#94a3b8', margin: 0 }}>
+                      <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>
                         Offer: {offer.offeredPrice} coins
                       </p>
                     </div>
@@ -365,7 +365,7 @@ export const TradingSystem: React.FC = () => {
                     </div>
                     <div style={{ flex: 1 }}>
                       <p style={{ fontSize: 14, fontWeight: 500, margin: 0 }}>{item.name}</p>
-                      <p style={{ fontSize: 12, color: '#94a3b8', margin: 0 }}>
+                      <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: 0 }}>
                         Offer: {offer.offeredPrice} coins
                       </p>
                     </div>
@@ -421,7 +421,7 @@ export const TradingSystem: React.FC = () => {
                 </span>
               </div>
 
-              <p style={{ fontSize: 13, color: '#94a3b8', marginBottom: 16, lineHeight: 1.5 }}>
+              <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 16, lineHeight: 1.5 }}>
                 {item.description}
               </p>
 
@@ -437,7 +437,7 @@ export const TradingSystem: React.FC = () => {
                   borderRadius: 8,
                   background: 'rgba(30, 41, 59, 0.5)',
                   fontSize: 12,
-                  color: '#94a3b8',
+                  color: 'var(--text-muted)',
                   textTransform: 'capitalize',
                 }}>
                   {item.category}
@@ -484,7 +484,7 @@ export const TradingSystem: React.FC = () => {
             </div>
 
             <div style={{ marginBottom: 24 }}>
-              <label style={{ fontSize: 14, fontWeight: 500, color: '#cbd5e1', marginBottom: 8, display: 'block' }}>
+              <label style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-body)', marginBottom: 8, display: 'block' }}>
                 Bei ya Offer (coins)
               </label>
               <input
@@ -498,7 +498,7 @@ export const TradingSystem: React.FC = () => {
                   borderRadius: 12,
                   background: 'rgba(30, 41, 59, 0.5)',
                   border: '1px solid rgba(51, 65, 85, 0.5)',
-                  color: '#e2e8f0',
+                  color: 'var(--text-main)',
                   fontSize: 16,
                 }}
               />
@@ -536,7 +536,7 @@ export const TradingSystem: React.FC = () => {
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               <div>
-                <label style={{ fontSize: 14, fontWeight: 500, color: '#cbd5e1', marginBottom: 8, display: 'block' }}>
+                <label style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-body)', marginBottom: 8, display: 'block' }}>
                   Jina la Item
                 </label>
                 <input
@@ -550,14 +550,14 @@ export const TradingSystem: React.FC = () => {
                     borderRadius: 12,
                     background: 'rgba(30, 41, 59, 0.5)',
                     border: '1px solid rgba(51, 65, 85, 0.5)',
-                    color: '#e2e8f0',
+                    color: 'var(--text-main)',
                     fontSize: 14,
                   }}
                 />
               </div>
 
               <div>
-                <label style={{ fontSize: 14, fontWeight: 500, color: '#cbd5e1', marginBottom: 8, display: 'block' }}>
+                <label style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-body)', marginBottom: 8, display: 'block' }}>
                   Maelezo
                 </label>
                 <textarea
@@ -570,7 +570,7 @@ export const TradingSystem: React.FC = () => {
                     borderRadius: 12,
                     background: 'rgba(30, 41, 59, 0.5)',
                     border: '1px solid rgba(51, 65, 85, 0.5)',
-                    color: '#e2e8f0',
+                    color: 'var(--text-main)',
                     fontSize: 14,
                     resize: 'vertical',
                     minHeight: 80,
@@ -579,7 +579,7 @@ export const TradingSystem: React.FC = () => {
               </div>
 
               <div>
-                <label style={{ fontSize: 14, fontWeight: 500, color: '#cbd5e1', marginBottom: 8, display: 'block' }}>
+                <label style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-body)', marginBottom: 8, display: 'block' }}>
                   Icon
                 </label>
                 <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
@@ -607,7 +607,7 @@ export const TradingSystem: React.FC = () => {
               </div>
 
               <div>
-                <label style={{ fontSize: 14, fontWeight: 500, color: '#cbd5e1', marginBottom: 8, display: 'block' }}>
+                <label style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-body)', marginBottom: 8, display: 'block' }}>
                   Bei (coins)
                 </label>
                 <input
@@ -621,14 +621,14 @@ export const TradingSystem: React.FC = () => {
                     borderRadius: 12,
                     background: 'rgba(30, 41, 59, 0.5)',
                     border: '1px solid rgba(51, 65, 85, 0.5)',
-                    color: '#e2e8f0',
+                    color: 'var(--text-main)',
                     fontSize: 14,
                   }}
                 />
               </div>
 
               <div>
-                <label style={{ fontSize: 14, fontWeight: 500, color: '#cbd5e1', marginBottom: 8, display: 'block' }}>
+                <label style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-body)', marginBottom: 8, display: 'block' }}>
                   Category
                 </label>
                 <select
@@ -640,7 +640,7 @@ export const TradingSystem: React.FC = () => {
                     borderRadius: 12,
                     background: 'rgba(30, 41, 59, 0.5)',
                     border: '1px solid rgba(51, 65, 85, 0.5)',
-                    color: '#e2e8f0',
+                    color: 'var(--text-main)',
                     fontSize: 14,
                   }}
                 >
@@ -652,7 +652,7 @@ export const TradingSystem: React.FC = () => {
               </div>
 
               <div>
-                <label style={{ fontSize: 14, fontWeight: 500, color: '#cbd5e1', marginBottom: 8, display: 'block' }}>
+                <label style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-body)', marginBottom: 8, display: 'block' }}>
                   Rarity
                 </label>
                 <select
@@ -664,7 +664,7 @@ export const TradingSystem: React.FC = () => {
                     borderRadius: 12,
                     background: 'rgba(30, 41, 59, 0.5)',
                     border: '1px solid rgba(51, 65, 85, 0.5)',
-                    color: '#e2e8f0',
+                    color: 'var(--text-main)',
                     fontSize: 14,
                   }}
                 >

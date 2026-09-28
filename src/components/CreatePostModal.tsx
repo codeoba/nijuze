@@ -19,11 +19,34 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
   const [error, setError] = useState('');
   const [imageData, setImageData] = useState<string | null>(null);
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const contentRef = React.useRef<HTMLTextAreaElement>(null);
+
   if (!isOpen) return null;
 
+  const insertMarkdown = (prefix: string, suffix: string = '') => {
+    const textarea = contentRef.current;
+    if (!textarea) {
+      setContent(prev => prev + prefix + suffix);
+      return;
+    }
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selected = content.substring(start, end);
+    const replacement = prefix + (selected || 'maandishi') + suffix;
+
+    const newContent = content.substring(0, start) + replacement + content.substring(end);
+    setContent(newContent);
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(start + prefix.length, start + prefix.length + (selected || 'maandishi').length);
+    }, 50);
+  };
+
   const addTag = () => {
-    if (tagInput && tags.length < 5 && !tags.includes(tagInput)) {
-      setTags([...tags, tagInput]);
+    if (tagInput && tags.length < 5 && !tags.includes(tagInput.trim())) {
+      setTags([...tags, tagInput.trim()]);
       setTagInput('');
     }
   };
@@ -32,7 +55,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
     setTags(tags.filter(t => t !== tagToRemove));
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     setError('');
 
     if (!title.trim()) {
@@ -55,13 +78,26 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
       return;
     }
 
-    createPost(title, content, tags, category, isAnonymous);
-    setTitle('');
-    setContent('');
-    setTags([]);
-    setCategory('Teknolojia');
-    setIsAnonymous(false);
-    onClose();
+    setIsSubmitting(true);
+    let finalContent = content.trim();
+    if (imageData && !finalContent.includes(imageData)) {
+      finalContent += `\n\n![Picha](${imageData})`;
+    }
+
+    try {
+      await createPost(title.trim(), finalContent, tags, category, isAnonymous);
+      setTitle('');
+      setContent('');
+      setTags([]);
+      setCategory('Teknolojia');
+      setImageData(null);
+      setIsAnonymous(false);
+      onClose();
+    } catch (err: any) {
+      setError(err?.message || 'Hitilafu wakati wa kutuma swali. Jaribu tena.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -78,15 +114,15 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
           <h2 className="gradient-text" style={{ fontSize: 20, fontWeight: 'bold' }}>Uliza Swali</h2>
           <button
             onClick={onClose}
-            style={{ padding: 8, borderRadius: 8, background: 'transparent', border: 'none', cursor: 'pointer' }}
+            style={{ padding: 8, borderRadius: 8, background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}
           >
-            <X size={20} color="#cbd5e1" />
+            <X size={20} />
           </button>
         </div>
 
         {/* Title */}
         <div style={{ marginBottom: 16 }}>
-          <label style={{ fontSize: 14, fontWeight: 500, color: '#cbd5e1', marginBottom: 8, display: 'block' }}>
+          <label style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-main)', marginBottom: 8, display: 'block' }}>
             Swali lako *
           </label>
           <input
@@ -96,42 +132,43 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
             placeholder="Andika swali lako kwa ufasaha..."
             style={{
               width: '100%', padding: 12, borderRadius: 12,
-              background: 'rgba(30, 41, 59, 0.5)',
-              border: '1px solid rgba(51, 65, 85, 0.5)',
-              color: '#e2e8f0', fontSize: 14
+              background: 'var(--input-bg)',
+              border: '1px solid var(--input-border)',
+              color: 'var(--input-text)', fontSize: 14
             }}
           />
-          <p style={{ fontSize: 12, color: '#64748b', marginTop: 4 }}>
+          <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 4 }}>
             {title.length}/200 herufi (minimum 10)
           </p>
         </div>
 
         {/* Content */}
         <div style={{ marginBottom: 16 }}>
-          <label style={{ fontSize: 14, fontWeight: 500, color: '#cbd5e1', marginBottom: 8, display: 'block' }}>
+          <label style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-main)', marginBottom: 8, display: 'block' }}>
             Maelezo *
           </label>
-          <div style={{ borderRadius: 12, border: '1px solid rgba(51, 65, 85, 0.5)', overflow: 'hidden' }}>
+          <div style={{ borderRadius: 12, border: '1px solid var(--border-app)', overflow: 'hidden' }}>
             <div style={{
               display: 'flex', alignItems: 'center', gap: 4, padding: 8,
-              borderBottom: '1px solid rgba(51, 65, 85, 0.5)',
-              background: 'rgba(30, 41, 59, 0.3)'
+              borderBottom: '1px solid var(--border-app)',
+              background: 'var(--bg-subtle)'
             }}>
-              <button style={{ padding: 6, borderRadius: 4, background: 'transparent', border: 'none', cursor: 'pointer' }}><Bold size={16} color="#94a3b8" /></button>
-              <button style={{ padding: 6, borderRadius: 4, background: 'transparent', border: 'none', cursor: 'pointer' }}><Italic size={16} color="#94a3b8" /></button>
-              <button style={{ padding: 6, borderRadius: 4, background: 'transparent', border: 'none', cursor: 'pointer' }}><Code size={16} color="#94a3b8" /></button>
-              <button style={{ padding: 6, borderRadius: 4, background: 'transparent', border: 'none', cursor: 'pointer' }}><Link2 size={16} color="#94a3b8" /></button>
-              <button style={{ padding: 6, borderRadius: 4, background: 'transparent', border: 'none', cursor: 'pointer' }}><List size={16} color="#94a3b8" /></button>
-              <button style={{ padding: 6, borderRadius: 4, background: 'transparent', border: 'none', cursor: 'pointer' }}><Quote size={16} color="#94a3b8" /></button>
-              <button style={{ padding: 6, borderRadius: 4, background: 'transparent', border: 'none', cursor: 'pointer' }}><Image size={16} color="#94a3b8" /></button>
+              <button type="button" onClick={() => insertMarkdown('**', '**')} title="Bold" className="tool-btn" style={{ padding: 6 }}><Bold size={16} /></button>
+              <button type="button" onClick={() => insertMarkdown('*', '*')} title="Italic" className="tool-btn" style={{ padding: 6 }}><Italic size={16} /></button>
+              <button type="button" onClick={() => insertMarkdown('`', '`')} title="Inline Code" className="tool-btn" style={{ padding: 6 }}><Code size={16} /></button>
+              <button type="button" onClick={() => insertMarkdown('[Kichwa cha Link](', ')')} title="Link" className="tool-btn" style={{ padding: 6 }}><Link2 size={16} /></button>
+              <button type="button" onClick={() => insertMarkdown('\n- ')} title="List" className="tool-btn" style={{ padding: 6 }}><List size={16} /></button>
+              <button type="button" onClick={() => insertMarkdown('\n> ')} title="Quote" className="tool-btn" style={{ padding: 6 }}><Quote size={16} /></button>
+              <button type="button" onClick={() => insertMarkdown('```\n', '\n```')} title="Code Block" className="tool-btn" style={{ padding: 6 }}><Image size={16} /></button>
             </div>
             <textarea
+              ref={contentRef}
               value={content}
               onChange={(e) => setContent(e.target.value)}
               placeholder="Eleza swali lako kwa undani..."
               style={{
-                width: '100%', padding: 12, background: 'transparent',
-                border: 'none', color: '#e2e8f0', fontSize: 14,
+                width: '100%', padding: 12, background: 'var(--input-bg)',
+                border: 'none', color: 'var(--input-text)', fontSize: 14,
                 resize: 'none', height: 128
               }}
             />
@@ -140,7 +177,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
 
         {/* Image Upload */}
         <div style={{ marginBottom: 16 }}>
-          <label style={{ fontSize: 14, fontWeight: 500, color: '#cbd5e1', marginBottom: 8, display: 'block' }}>
+          <label style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-main)', marginBottom: 8, display: 'block' }}>
             Picha (Hiari)
           </label>
           <ImageUpload
@@ -152,7 +189,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
 
         {/* Category */}
         <div style={{ marginBottom: 16 }}>
-          <label style={{ fontSize: 14, fontWeight: 500, color: '#cbd5e1', marginBottom: 8, display: 'block' }}>
+          <label style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-main)', marginBottom: 8, display: 'block' }}>
             Kategoria
           </label>
           <select
@@ -160,9 +197,9 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
             onChange={(e) => setCategory(e.target.value)}
             style={{
               width: '100%', padding: 12, borderRadius: 12,
-              background: 'rgba(30, 41, 59, 0.5)',
-              border: '1px solid rgba(51, 65, 85, 0.5)',
-              color: '#e2e8f0', fontSize: 14
+              background: 'var(--input-bg)',
+              border: '1px solid var(--input-border)',
+              color: 'var(--input-text)', fontSize: 14
             }}
           >
             {categories.map((cat) => (
@@ -175,7 +212,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
 
         {/* Tags */}
         <div style={{ marginBottom: 16 }}>
-          <label style={{ fontSize: 14, fontWeight: 500, color: '#cbd5e1', marginBottom: 8, display: 'block' }}>
+          <label style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-main)', marginBottom: 8, display: 'block' }}>
             Tags (max 5) *
           </label>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
@@ -184,7 +221,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
                 {tag}
                 <button
                   onClick={() => removeTag(tag)}
-                  style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: 0 }}
+                  style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: 0, color: 'inherit' }}
                 >
                   <X size={12} />
                 </button>
@@ -204,9 +241,9 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
                 placeholder="Ongeza tag..."
                 style={{
                   flex: 1, minWidth: 120, padding: 8, borderRadius: 8,
-                  background: 'rgba(30, 41, 59, 0.5)',
-                  border: '1px solid rgba(51, 65, 85, 0.5)',
-                  color: '#e2e8f0', fontSize: 13
+                  background: 'var(--input-bg)',
+                  border: '1px solid var(--input-border)',
+                  color: 'var(--input-text)', fontSize: 13
                 }}
               />
             )}
@@ -220,9 +257,9 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ isOpen, onClos
               type="checkbox"
               checked={isAnonymous}
               onChange={(e) => setIsAnonymous(e.target.checked)}
-              style={{ width: 16, height: 16, borderRadius: 4, border: '1px solid #475569', background: '#1e293b' }}
+              style={{ width: 16, height: 16, borderRadius: 4 }}
             />
-            <span style={{ fontSize: 14, color: '#cbd5e1', display: 'flex', alignItems: 'center', gap: 4 }}>
+            <span style={{ fontSize: 14, color: 'var(--text-body)', display: 'flex', alignItems: 'center', gap: 4 }}>
               <Lock size={14} /> Jibu kwa siri (Anonymous)
             </span>
           </label>

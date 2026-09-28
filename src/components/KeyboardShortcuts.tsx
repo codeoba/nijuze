@@ -83,7 +83,7 @@ export const KeyboardShortcutsModal: React.FC<KeyboardShortcutsModalProps> = ({ 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
           {shortcuts.map((section) => (
             <div key={section.category}>
-              <h3 style={{ fontSize: 16, fontWeight: 600, marginBottom: 12, color: '#a5b4fc' }}>
+              <h3 style={{ fontSize: 16, fontWeight: 600, marginBottom: 12, color: 'var(--btn-ghost-text)' }}>
                 {section.category}
               </h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -96,10 +96,10 @@ export const KeyboardShortcutsModal: React.FC<KeyboardShortcutsModalProps> = ({ 
                       justifyContent: 'space-between',
                       padding: 12,
                       borderRadius: 8,
-                      background: 'rgba(30, 41, 59, 0.3)',
+                      background: 'var(--bg-subtle)',
                     }}
                   >
-                    <span style={{ fontSize: 14, color: '#cbd5e1' }}>{shortcut.action}</span>
+                    <span style={{ fontSize: 14, color: 'var(--text-body)' }}>{shortcut.action}</span>
                     <div style={{ display: 'flex', gap: 4 }}>
                       {shortcut.keys.map((key, i) => (
                         <React.Fragment key={i}>
@@ -107,11 +107,11 @@ export const KeyboardShortcutsModal: React.FC<KeyboardShortcutsModalProps> = ({ 
                             style={{
                               padding: '4px 8px',
                               borderRadius: 6,
-                              background: 'rgba(51, 65, 85, 0.5)',
+                              background: 'var(--border-app)',
                               border: '1px solid rgba(71, 85, 105, 0.5)',
                               fontSize: 12,
                               fontFamily: 'monospace',
-                              color: '#e2e8f0',
+                              color: 'var(--text-main)',
                               minWidth: 24,
                               textAlign: 'center',
                             }}
@@ -138,11 +138,11 @@ export const KeyboardShortcutsModal: React.FC<KeyboardShortcutsModalProps> = ({ 
           background: 'rgba(99, 102, 241, 0.05)',
           border: '1px solid rgba(99, 102, 241, 0.2)',
         }}>
-          <p style={{ fontSize: 13, color: '#94a3b8', lineHeight: 1.6 }}>
-            💡 <strong style={{ color: '#a5b4fc' }}>Tip:</strong> Bofya <kbd style={{
+          <p style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.6 }}>
+            💡 <strong style={{ color: 'var(--btn-ghost-text)' }}>Tip:</strong> Bofya <kbd style={{
               padding: '2px 6px',
               borderRadius: 4,
-              background: 'rgba(51, 65, 85, 0.5)',
+              background: 'var(--border-app)',
               fontSize: 11,
               fontFamily: 'monospace',
             }}>?</kbd> wakati wowote kuona shortcuts hizi

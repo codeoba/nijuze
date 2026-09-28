@@ -2,6 +2,7 @@
 // This simulates a real backend - can be swapped with API calls later
 
 import { User, Post, Comment, Notification, Message } from '../types';
+import { generateSampleUsers, generateSamplePosts } from '../utils/data';
 
 const DB_KEYS = {
   USERS: 'nijuze_db_users',
@@ -38,7 +39,13 @@ class Database {
 
   // Users
   getUsers(): User[] {
-    return this.get<User>(DB_KEYS.USERS);
+    const users = this.get<User>(DB_KEYS.USERS);
+    if (!users || users.length === 0) {
+      const samples = generateSampleUsers();
+      this.set(DB_KEYS.USERS, samples);
+      return samples;
+    }
+    return users;
   }
 
   getUserById(id: string): User | undefined {
@@ -79,7 +86,14 @@ class Database {
 
   // Posts
   getPosts(): Post[] {
-    return this.get<Post>(DB_KEYS.POSTS);
+    const posts = this.get<Post>(DB_KEYS.POSTS);
+    if (!posts || posts.length === 0) {
+      const users = this.getUsers();
+      const samples = generateSamplePosts(users);
+      this.set(DB_KEYS.POSTS, samples);
+      return samples;
+    }
+    return posts;
   }
 
   getPostById(id: string): Post | undefined {

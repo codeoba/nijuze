@@ -23,14 +23,14 @@ export const MobileBottomNav: React.FC = () => {
   };
 
   return (
-    <nav style={{
+    <nav className="mobile-bottom-nav" style={{
       position: 'fixed',
       bottom: 0,
       left: 0,
       right: 0,
-      background: 'rgba(15, 15, 35, 0.95)',
+      background: 'var(--bg-surface)',
       backdropFilter: 'blur(20px)',
-      borderTop: '1px solid rgba(51, 65, 85, 0.3)',
+      borderTop: '1px solid var(--border-app)',
       padding: '8px 0',
       zIndex: 100,
       display: 'flex',
@@ -79,18 +79,18 @@ export const MobileBottomNav: React.FC = () => {
               background: 'transparent',
               border: 'none',
               cursor: 'pointer',
-              color: isActive ? '#a5b4fc' : '#64748b',
+              color: isActive ? 'var(--border-focus)' : 'var(--text-muted)',
               transition: 'all 0.2s ease',
             }}
           >
             <Icon size={24} />
-            <span style={{ fontSize: 11, fontWeight: 500 }}>{tab.label}</span>
+            <span style={{ fontSize: 11, fontWeight: isActive ? 600 : 500 }}>{tab.label}</span>
             {isActive && (
               <div style={{
                 width: 4,
                 height: 4,
                 borderRadius: '50%',
-                background: '#6366f1',
+                background: 'var(--border-focus)',
                 marginTop: 2,
               }} />
             )}

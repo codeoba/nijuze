@@ -68,7 +68,7 @@ export const ActivityFeedPage: React.FC = () => {
           targetId: users[i - 1].id,
           timestamp: new Date(Date.now() - i * 3600000).toISOString(),
           icon: UserPlus,
-          color: '#a5b4fc',
+          color: 'var(--btn-ghost-text)',
         });
       }
     });
@@ -119,7 +119,7 @@ export const ActivityFeedPage: React.FC = () => {
           <Activity size={32} color="#6366f1" />
           <h1 style={{ fontSize: 32, fontWeight: 700 }}>Activity Feed</h1>
         </div>
-        <p style={{ color: '#94a3b8' }}>Fuata shughuli zote kwenye jukwaa</p>
+        <p style={{ color: 'var(--text-muted)' }}>Fuata shughuli zote kwenye jukwaa</p>
       </div>
 
       {/* Stats */}
@@ -140,7 +140,7 @@ export const ActivityFeedPage: React.FC = () => {
             const commentDate = new Date(c.createdAt);
             return commentDate.toDateString() === today.toDateString();
           }).length, icon: MessageSquare, color: '#60a5fa' },
-          { label: 'Active Users', value: users.filter(u => u.postsCount > 0 || u.answersCount > 0).length, icon: Users, color: '#a5b4fc' },
+          { label: 'Active Users', value: users.filter(u => u.postsCount > 0 || u.answersCount > 0).length, icon: Users, color: 'var(--btn-ghost-text)' },
           { label: 'Total Activities', value: allActivities.length, icon: Zap, color: '#fbbf24' },
         ].map((stat, i) => (
           <div key={i} className="glass-card" style={{ padding: 20 }}>
@@ -159,7 +159,7 @@ export const ActivityFeedPage: React.FC = () => {
       <div className="glass-card" style={{ padding: 20, marginBottom: 24 }}>
         <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
           <div>
-            <label style={{ fontSize: 13, color: '#94a3b8', marginBottom: 8, display: 'block' }}>Aina</label>
+            <label style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 8, display: 'block' }}>Aina</label>
             <div style={{ display: 'flex', gap: 8 }}>
               {[
                 { id: 'all', label: 'Zote', icon: Activity },
@@ -179,8 +179,8 @@ export const ActivityFeedPage: React.FC = () => {
                       gap: 6,
                       padding: '8px 14px',
                       borderRadius: 10,
-                      background: filter === f.id ? 'rgba(99, 102, 241, 0.2)' : 'rgba(30, 41, 59, 0.3)',
-                      border: `1px solid ${filter === f.id ? 'rgba(99, 102, 241, 0.5)' : 'rgba(51, 65, 85, 0.3)'}`,
+                      background: filter === f.id ? 'rgba(99, 102, 241, 0.2)' : 'var(--bg-subtle)',
+                      border: `1px solid ${filter === f.id ? 'rgba(99, 102, 241, 0.5)' : 'var(--border-app)'}`,
                       color: filter === f.id ? '#a5b4fc' : '#94a3b8',
                       cursor: 'pointer',
                       fontSize: 13,
@@ -196,7 +196,7 @@ export const ActivityFeedPage: React.FC = () => {
           </div>
 
           <div>
-            <label style={{ fontSize: 13, color: '#94a3b8', marginBottom: 8, display: 'block' }}>Muda</label>
+            <label style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 8, display: 'block' }}>Muda</label>
             <div style={{ display: 'flex', gap: 8 }}>
               {[
                 { id: 'today', label: 'Leo' },
@@ -210,8 +210,8 @@ export const ActivityFeedPage: React.FC = () => {
                   style={{
                     padding: '8px 14px',
                     borderRadius: 10,
-                    background: timeRange === t.id ? 'rgba(99, 102, 241, 0.2)' : 'rgba(30, 41, 59, 0.3)',
-                    border: `1px solid ${timeRange === t.id ? 'rgba(99, 102, 241, 0.5)' : 'rgba(51, 65, 85, 0.3)'}`,
+                    background: timeRange === t.id ? 'rgba(99, 102, 241, 0.2)' : 'var(--bg-subtle)',
+                    border: `1px solid ${timeRange === t.id ? 'rgba(99, 102, 241, 0.5)' : 'var(--border-app)'}`,
                     color: timeRange === t.id ? '#a5b4fc' : '#94a3b8',
                     cursor: 'pointer',
                     fontSize: 13,
@@ -231,7 +231,7 @@ export const ActivityFeedPage: React.FC = () => {
         {filteredActivities.length === 0 ? (
           <div className="glass-card" style={{ padding: 48, textAlign: 'center' }}>
             <Activity size={48} color="#475569" style={{ margin: '0 auto 16px' }} />
-            <p style={{ fontSize: 16, color: '#94a3b8' }}>Hakuna shughuli zilizopatikana</p>
+            <p style={{ fontSize: 16, color: 'var(--text-muted)' }}>Hakuna shughuli zilizopatikana</p>
           </div>
         ) : (
           filteredActivities.map((activity) => (
@@ -260,7 +260,7 @@ const ActivityCard: React.FC<{ activity: any }> = ({ activity }) => {
         e.currentTarget.style.borderColor = 'rgba(99, 102, 241, 0.3)';
       }}
       onMouseLeave={(e) => {
-        e.currentTarget.style.borderColor = 'rgba(51, 65, 85, 0.3)';
+        e.currentTarget.style.borderColor = 'var(--border-app)';
       }}
     >
       {/* Icon */}
@@ -295,10 +295,10 @@ const ActivityCard: React.FC<{ activity: any }> = ({ activity }) => {
             {activity.user.avatar}
           </div>
           <div>
-            <p style={{ fontSize: 14, color: '#e2e8f0' }}>
+            <p style={{ fontSize: 14, color: 'var(--text-main)' }}>
               <strong>{activity.user.username}</strong>{' '}
-              <span style={{ color: '#94a3b8' }}>{activity.action}</span>{' '}
-              <strong style={{ color: '#a5b4fc' }}>{activity.target}</strong>
+              <span style={{ color: 'var(--text-muted)' }}>{activity.action}</span>{' '}
+              <strong style={{ color: 'var(--btn-ghost-text)' }}>{activity.target}</strong>
             </p>
             <p style={{ fontSize: 12, color: '#64748b', display: 'flex', alignItems: 'center', gap: 4 }}>
               <Clock size={12} />

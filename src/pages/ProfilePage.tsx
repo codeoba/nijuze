@@ -46,7 +46,7 @@ export const ProfilePage: React.FC = () => {
     return (
       <div style={{ padding: 48, textAlign: 'center' }}>
         <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 8 }}>User hajapatikana</h2>
-        <p style={{ color: '#94a3b8' }}>User huyu hayupo au amefutwa</p>
+        <p style={{ color: 'var(--text-muted)' }}>User huyu hayupo au amefutwa</p>
       </div>
     );
   }
@@ -109,7 +109,8 @@ export const ProfilePage: React.FC = () => {
                 justifyContent: 'center',
                 fontSize: 48,
                 fontWeight: 'bold',
-                border: '4px solid #0f0f23',
+                border: '4px solid var(--bg-surface)',
+                color: 'white',
               }}>
                 {profileUser.avatar}
               </div>
@@ -123,7 +124,7 @@ export const ProfilePage: React.FC = () => {
                 height: 36,
                 borderRadius: '50%',
                 background: '#6366f1',
-                border: '3px solid #0f0f23',
+                border: '3px solid var(--bg-surface)',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
@@ -143,7 +144,7 @@ export const ProfilePage: React.FC = () => {
                 <CheckCircle2 size={24} color="#34d399" />
               )}
             </div>
-            <p style={{ fontSize: 16, color: '#94a3b8' }}>{profileUser.role}</p>
+            <p style={{ fontSize: 16, color: 'var(--text-muted)' }}>{profileUser.role}</p>
           </div>
 
           {/* Action Buttons */}
@@ -186,9 +187,9 @@ export const ProfilePage: React.FC = () => {
                 width: '100%',
                 padding: 12,
                 borderRadius: 12,
-                background: 'rgba(30, 41, 59, 0.5)',
-                border: '1px solid rgba(51, 65, 85, 0.5)',
-                color: '#e2e8f0',
+                background: 'var(--input-bg)',
+                border: '1px solid var(--input-border)',
+                color: 'var(--input-text)',
                 fontSize: 14,
                 resize: 'vertical',
                 minHeight: 100,
@@ -203,9 +204,9 @@ export const ProfilePage: React.FC = () => {
                 style={{
                   padding: 10,
                   borderRadius: 8,
-                  background: 'rgba(30, 41, 59, 0.5)',
-                  border: '1px solid rgba(51, 65, 85, 0.5)',
-                  color: '#e2e8f0',
+                  background: 'var(--input-bg)',
+                  border: '1px solid var(--input-border)',
+                  color: 'var(--input-text)',
                   fontSize: 14,
                 }}
               />
@@ -217,9 +218,9 @@ export const ProfilePage: React.FC = () => {
                 style={{
                   padding: 10,
                   borderRadius: 8,
-                  background: 'rgba(30, 41, 59, 0.5)',
-                  border: '1px solid rgba(51, 65, 85, 0.5)',
-                  color: '#e2e8f0',
+                  background: 'var(--input-bg)',
+                  border: '1px solid var(--input-border)',
+                  color: 'var(--input-text)',
                   fontSize: 14,
                 }}
               />
@@ -234,9 +235,9 @@ export const ProfilePage: React.FC = () => {
                   flex: 1,
                   padding: 10,
                   borderRadius: 8,
-                  background: 'rgba(30, 41, 59, 0.5)',
-                  border: '1px solid rgba(51, 65, 85, 0.5)',
-                  color: '#e2e8f0',
+                  background: 'var(--input-bg)',
+                  border: '1px solid var(--input-border)',
+                  color: 'var(--input-text)',
                   fontSize: 14,
                 }}
               />
@@ -249,9 +250,9 @@ export const ProfilePage: React.FC = () => {
                   flex: 1,
                   padding: 10,
                   borderRadius: 8,
-                  background: 'rgba(30, 41, 59, 0.5)',
-                  border: '1px solid rgba(51, 65, 85, 0.5)',
-                  color: '#e2e8f0',
+                  background: 'var(--input-bg)',
+                  border: '1px solid var(--input-border)',
+                  color: 'var(--input-text)',
                   fontSize: 14,
                 }}
               />
@@ -264,9 +265,9 @@ export const ProfilePage: React.FC = () => {
                   flex: 1,
                   padding: 10,
                   borderRadius: 8,
-                  background: 'rgba(30, 41, 59, 0.5)',
-                  border: '1px solid rgba(51, 65, 85, 0.5)',
-                  color: '#e2e8f0',
+                  background: 'var(--input-bg)',
+                  border: '1px solid var(--input-border)',
+                  color: 'var(--input-text)',
                   fontSize: 14,
                 }}
               />
@@ -281,13 +282,13 @@ export const ProfilePage: React.FC = () => {
             </div>
           </div>
         ) : (
-          <p style={{ fontSize: 16, color: '#cbd5e1', marginBottom: 16, lineHeight: 1.6 }}>
+          <p style={{ fontSize: 16, color: 'var(--text-body)', marginBottom: 16, lineHeight: 1.6 }}>
             {profileUser.bio || 'Hakuna bio bado.'}
           </p>
         )}
 
         {/* Meta Info */}
-        <div style={{ display: 'flex', gap: 24, marginBottom: 24, fontSize: 14, color: '#94a3b8', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: 24, marginBottom: 24, fontSize: 14, color: 'var(--text-muted)', flexWrap: 'wrap' }}>
           <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             <MapPin size={16} /> Dar es Salaam, Tanzania
           </span>
@@ -311,11 +312,12 @@ export const ProfilePage: React.FC = () => {
           gap: 16,
           padding: 20,
           borderRadius: 16,
-          background: 'rgba(30, 41, 59, 0.3)',
+          background: 'var(--bg-subtle)',
+          border: '1px solid var(--border-app)',
           marginBottom: 24,
         }}>
           {[
-            { label: 'Posts', value: userPosts.length, icon: BookOpen, color: '#a5b4fc' },
+            { label: 'Posts', value: userPosts.length, icon: BookOpen, color: 'var(--btn-ghost-text)' },
             { label: 'Majibu', value: userComments.length, icon: MessageCircle, color: '#6ee7b7' },
             { label: 'Upvotes', value: totalUpvotes, icon: ThumbsUp, color: '#fbbf24' },
             { label: 'Followers', value: profileUser.followers, icon: Users, color: '#f472b6' },
@@ -389,7 +391,7 @@ export const ProfilePage: React.FC = () => {
                     borderRadius: 8,
                     background: 'rgba(255, 255, 255, 0.1)',
                     border: '1px solid rgba(255, 255, 255, 0.3)',
-                    color: '#e2e8f0',
+                    color: 'var(--text-main)',
                     fontSize: 14,
                     textDecoration: 'none',
                   }}
@@ -466,7 +468,7 @@ export const ProfilePage: React.FC = () => {
                   <h3 style={{ fontSize: 18, fontWeight: 600, marginBottom: 12 }}>
                     {post.title}
                   </h3>
-                  <p style={{ fontSize: 14, color: '#94a3b8', marginBottom: 16, lineHeight: 1.6 }}>
+                  <p style={{ fontSize: 14, color: 'var(--text-muted)', marginBottom: 16, lineHeight: 1.6 }}>
                     {post.content.substring(0, 200)}...
                   </p>
                   <div style={{ display: 'flex', gap: 24, fontSize: 13, color: '#64748b' }}>
@@ -500,7 +502,7 @@ export const ProfilePage: React.FC = () => {
                   className="glass-card"
                   style={{ padding: 20 }}
                 >
-                  <p style={{ fontSize: 14, color: '#cbd5e1', marginBottom: 12, lineHeight: 1.6 }}>
+                  <p style={{ fontSize: 14, color: 'var(--text-body)', marginBottom: 12, lineHeight: 1.6 }}>
                     {comment.content}
                   </p>
                   <div style={{ display: 'flex', gap: 24, fontSize: 13, color: '#64748b' }}>
@@ -522,21 +524,21 @@ export const ProfilePage: React.FC = () => {
             <div className="glass-card" style={{ padding: 24 }}>
               <h3 style={{ fontSize: 18, fontWeight: 600, marginBottom: 16 }}>Takwimu za Mtumiaji</h3>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-                <div style={{ padding: 16, borderRadius: 12, background: 'rgba(30, 41, 59, 0.3)' }}>
-                  <p style={{ fontSize: 14, color: '#94a3b8', marginBottom: 4 }}>Level</p>
-                  <p style={{ fontSize: 24, fontWeight: 700, color: '#a5b4fc' }}>
+                <div style={{ padding: 16, borderRadius: 12, background: 'var(--bg-subtle)', border: '1px solid var(--border-app)' }}>
+                  <p style={{ fontSize: 14, color: 'var(--text-muted)', marginBottom: 4 }}>Level</p>
+                  <p style={{ fontSize: 24, fontWeight: 700, color: 'var(--border-focus)' }}>
                     Level {Math.floor(profileUser.reputation / 1000) + 1}
                   </p>
                 </div>
-                <div style={{ padding: 16, borderRadius: 12, background: 'rgba(30, 41, 59, 0.3)' }}>
-                  <p style={{ fontSize: 14, color: '#94a3b8', marginBottom: 4 }}>Reputation</p>
-                  <p style={{ fontSize: 24, fontWeight: 700, color: '#fbbf24' }}>
+                <div style={{ padding: 16, borderRadius: 12, background: 'var(--bg-subtle)', border: '1px solid var(--border-app)' }}>
+                  <p style={{ fontSize: 14, color: 'var(--text-muted)', marginBottom: 4 }}>Reputation</p>
+                  <p style={{ fontSize: 24, fontWeight: 700, color: '#f59e0b' }}>
                     {profileUser.reputation.toLocaleString()} points
                   </p>
                 </div>
-                <div style={{ padding: 16, borderRadius: 12, background: 'rgba(30, 41, 59, 0.3)' }}>
-                  <p style={{ fontSize: 14, color: '#94a3b8', marginBottom: 4 }}>Amejiunga</p>
-                  <p style={{ fontSize: 16, fontWeight: 600, color: '#cbd5e1' }}>
+                <div style={{ padding: 16, borderRadius: 12, background: 'var(--bg-subtle)', border: '1px solid var(--border-app)' }}>
+                  <p style={{ fontSize: 14, color: 'var(--text-muted)', marginBottom: 4 }}>Amejiunga</p>
+                  <p style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-main)' }}>
                     {new Date(profileUser.joinedAt).toLocaleDateString('sw-TZ', {
                       year: 'numeric',
                       month: 'long',
@@ -544,9 +546,9 @@ export const ProfilePage: React.FC = () => {
                     })}
                   </p>
                 </div>
-                <div style={{ padding: 16, borderRadius: 12, background: 'rgba(30, 41, 59, 0.3)' }}>
-                  <p style={{ fontSize: 14, color: '#94a3b8', marginBottom: 4 }}>Email</p>
-                  <p style={{ fontSize: 14, fontWeight: 500, color: '#cbd5e1' }}>
+                <div style={{ padding: 16, borderRadius: 12, background: 'var(--bg-subtle)', border: '1px solid var(--border-app)' }}>
+                  <p style={{ fontSize: 14, color: 'var(--text-muted)', marginBottom: 4 }}>Email</p>
+                  <p style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-main)' }}>
                     {profileUser.email}
                   </p>
                 </div>

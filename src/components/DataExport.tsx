@@ -172,7 +172,7 @@ export const DataExport: React.FC = () => {
         <Download size={24} color="#a5b4fc" />
         <div>
           <h3 style={{ fontSize: 18, fontWeight: 600, margin: 0 }}>Export Data</h3>
-          <p style={{ fontSize: 13, color: '#94a3b8', margin: 0 }}>
+          <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>
             Pakua data yako kwa format tofauti
           </p>
         </div>
@@ -180,7 +180,7 @@ export const DataExport: React.FC = () => {
 
       {/* Export Type */}
       <div style={{ marginBottom: 20 }}>
-        <label style={{ fontSize: 14, fontWeight: 500, color: '#cbd5e1', marginBottom: 12, display: 'block' }}>
+        <label style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-body)', marginBottom: 12, display: 'block' }}>
           Aina ya Data
         </label>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 12 }}>
@@ -220,7 +220,7 @@ export const DataExport: React.FC = () => {
 
       {/* Export Format */}
       <div style={{ marginBottom: 24 }}>
-        <label style={{ fontSize: 14, fontWeight: 500, color: '#cbd5e1', marginBottom: 12, display: 'block' }}>
+        <label style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-body)', marginBottom: 12, display: 'block' }}>
           Format
         </label>
         <div style={{ display: 'flex', gap: 12 }}>

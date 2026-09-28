@@ -105,8 +105,8 @@ export const DragDropPosts: React.FC<DragDropPostsProps> = ({ posts, onReorder }
               : dragOverItem === post.id
               ? 'rgba(99, 102, 241, 0.1)'
               : post.archived
-              ? 'rgba(30, 41, 59, 0.2)'
-              : 'rgba(30, 41, 59, 0.3)',
+              ? 'var(--bg-subtle)'
+              : 'var(--bg-subtle)',
             border: `1px solid ${
               draggedItem === post.id
                 ? 'rgba(99, 102, 241, 0.5)'
@@ -114,7 +114,7 @@ export const DragDropPosts: React.FC<DragDropPostsProps> = ({ posts, onReorder }
                 ? 'rgba(99, 102, 241, 0.3)'
                 : post.archived
                 ? 'rgba(51, 65, 85, 0.2)'
-                : 'rgba(51, 65, 85, 0.3)'
+                : 'var(--border-app)'
             }`,
             opacity: draggedItem === post.id ? 0.5 : post.archived ? 0.6 : 1,
             cursor: 'grab',
@@ -141,7 +141,7 @@ export const DragDropPosts: React.FC<DragDropPostsProps> = ({ posts, onReorder }
               {post.pinned && (
                 <Pin size={14} color="#fbbf24" />
               )}
-              <h4 style={{ fontSize: 15, fontWeight: 600, margin: 0, color: '#e2e8f0' }}>
+              <h4 style={{ fontSize: 15, fontWeight: 600, margin: 0, color: 'var(--text-main)' }}>
                 {post.title}
               </h4>
             </div>
@@ -158,7 +158,7 @@ export const DragDropPosts: React.FC<DragDropPostsProps> = ({ posts, onReorder }
               style={{
                 padding: 8,
                 borderRadius: 8,
-                background: post.pinned ? 'rgba(251, 191, 36, 0.2)' : 'rgba(30, 41, 59, 0.5)',
+                background: post.pinned ? 'rgba(251, 191, 36, 0.2)' : 'var(--input-bg)',
                 border: 'none',
                 cursor: 'pointer',
               }}
@@ -171,7 +171,7 @@ export const DragDropPosts: React.FC<DragDropPostsProps> = ({ posts, onReorder }
               style={{
                 padding: 8,
                 borderRadius: 8,
-                background: post.archived ? 'rgba(100, 116, 139, 0.2)' : 'rgba(30, 41, 59, 0.5)',
+                background: post.archived ? 'rgba(100, 116, 139, 0.2)' : 'var(--input-bg)',
                 border: 'none',
                 cursor: 'pointer',
               }}

@@ -44,7 +44,7 @@ export const UserAnalyticsPage: React.FC = () => {
           <BarChart3 size={32} color="#6366f1" />
           <h1 style={{ fontSize: 32, fontWeight: 700 }}>Analytics Zangu</h1>
         </div>
-        <p style={{ color: '#94a3b8' }}>Tazama takwimu na utendaji wako kwenye jukwaa</p>
+        <p style={{ color: 'var(--text-muted)' }}>Tazama takwimu na utendaji wako kwenye jukwaa</p>
       </div>
 
       {/* Time Range Selector */}
@@ -61,8 +61,8 @@ export const UserAnalyticsPage: React.FC = () => {
             style={{
               padding: '8px 16px',
               borderRadius: 10,
-              background: timeRange === range.id ? 'rgba(99, 102, 241, 0.2)' : 'rgba(30, 41, 59, 0.3)',
-              border: `1px solid ${timeRange === range.id ? 'rgba(99, 102, 241, 0.5)' : 'rgba(51, 65, 85, 0.3)'}`,
+              background: timeRange === range.id ? 'rgba(99, 102, 241, 0.2)' : 'var(--bg-subtle)',
+              border: `1px solid ${timeRange === range.id ? 'rgba(99, 102, 241, 0.5)' : 'var(--border-app)'}`,
               color: timeRange === range.id ? '#a5b4fc' : '#94a3b8',
               cursor: 'pointer',
               fontSize: 14,
@@ -87,7 +87,7 @@ export const UserAnalyticsPage: React.FC = () => {
           { label: 'Total Upvotes', value: totalUpvotes, icon: ThumbsUp, color: '#fbbf24', change: '+24%' },
           { label: 'Total Views', value: totalViews, icon: Eye, color: '#f472b6', change: '+18%' },
           { label: 'Engagement Rate', value: `${engagementRate}%`, icon: Target, color: '#c084fc', change: '+5%' },
-          { label: 'Reputation', value: currentUser.reputation, icon: Award, color: '#a5b4fc', change: '+15%' },
+          { label: 'Reputation', value: currentUser.reputation, icon: Award, color: 'var(--btn-ghost-text)', change: '+15%' },
         ].map((stat, i) => (
           <div key={i} className="glass-card" style={{ padding: 20 }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
@@ -121,19 +121,19 @@ export const UserAnalyticsPage: React.FC = () => {
           </h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontSize: 14, color: '#94a3b8' }}>Upvotes kwa Post</span>
+              <span style={{ fontSize: 14, color: 'var(--text-muted)' }}>Upvotes kwa Post</span>
               <span style={{ fontSize: 20, fontWeight: 700, color: '#fbbf24' }}>{avgUpvotesPerPost}</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontSize: 14, color: '#94a3b8' }}>Views kwa Post</span>
+              <span style={{ fontSize: 14, color: 'var(--text-muted)' }}>Views kwa Post</span>
               <span style={{ fontSize: 20, fontWeight: 700, color: '#f472b6' }}>{avgViewsPerPost}</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontSize: 14, color: '#94a3b8' }}>Comments kwa Post</span>
+              <span style={{ fontSize: 14, color: 'var(--text-muted)' }}>Comments kwa Post</span>
               <span style={{ fontSize: 20, fontWeight: 700, color: '#60a5fa' }}>{totalComments}</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontSize: 14, color: '#94a3b8' }}>Engagement Rate</span>
+              <span style={{ fontSize: 14, color: 'var(--text-muted)' }}>Engagement Rate</span>
               <span style={{ fontSize: 20, fontWeight: 700, color: '#c084fc' }}>{engagementRate}%</span>
             </div>
           </div>
@@ -147,13 +147,13 @@ export const UserAnalyticsPage: React.FC = () => {
           </h3>
           <div style={{ marginBottom: 20 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-              <span style={{ fontSize: 14, color: '#94a3b8' }}>Level {Math.floor(currentUser.reputation / 1000) + 1}</span>
-              <span style={{ fontSize: 14, color: '#94a3b8' }}>Level {Math.floor(currentUser.reputation / 1000) + 2}</span>
+              <span style={{ fontSize: 14, color: 'var(--text-muted)' }}>Level {Math.floor(currentUser.reputation / 1000) + 1}</span>
+              <span style={{ fontSize: 14, color: 'var(--text-muted)' }}>Level {Math.floor(currentUser.reputation / 1000) + 2}</span>
             </div>
             <div style={{
               height: 12,
               borderRadius: 6,
-              background: 'rgba(30, 41, 59, 0.5)',
+              background: 'var(--input-bg)',
               overflow: 'hidden',
             }}>
               <div style={{
@@ -169,8 +169,8 @@ export const UserAnalyticsPage: React.FC = () => {
             </p>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: 14, color: '#94a3b8' }}>Reputation Yako</span>
-            <span style={{ fontSize: 24, fontWeight: 700, color: '#a5b4fc' }}>
+            <span style={{ fontSize: 14, color: 'var(--text-muted)' }}>Reputation Yako</span>
+            <span style={{ fontSize: 24, fontWeight: 700, color: 'var(--btn-ghost-text)' }}>
               {currentUser.reputation.toLocaleString()}
             </span>
           </div>
@@ -195,8 +195,8 @@ export const UserAnalyticsPage: React.FC = () => {
                 style={{
                   padding: 16,
                   borderRadius: 12,
-                  background: 'rgba(30, 41, 59, 0.3)',
-                  border: '1px solid rgba(51, 65, 85, 0.3)',
+                  background: 'var(--bg-subtle)',
+                  border: '1px solid var(--border-app)',
                   display: 'flex',
                   alignItems: 'center',
                   gap: 16,
@@ -253,7 +253,7 @@ export const UserAnalyticsPage: React.FC = () => {
                 style={{
                   padding: 12,
                   borderRadius: 10,
-                  background: 'rgba(30, 41, 59, 0.3)',
+                  background: 'var(--bg-subtle)',
                   display: 'flex',
                   alignItems: 'center',
                   gap: 12,
@@ -275,7 +275,7 @@ export const UserAnalyticsPage: React.FC = () => {
                   )}
                 </div>
                 <div style={{ flex: 1 }}>
-                  <p style={{ fontSize: 14, color: '#e2e8f0', marginBottom: 4 }}>
+                  <p style={{ fontSize: 14, color: 'var(--text-main)', marginBottom: 4 }}>
                     {activity.type === 'post' ? 'Uliunda post:' : 'Uli comment:'}{' '}
                     <strong>{activity.text}</strong>
                   </p>

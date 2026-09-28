@@ -23,11 +23,11 @@ export const LoginPage: React.FC = () => {
 
     await new Promise(resolve => setTimeout(resolve, 800));
 
-    const result = login(email, password);
-    if (result.success) {
+    const result = await login(email, password);
+    if (result && result.success) {
       navigate('/');
     } else {
-      setError(result.error || 'Hitilafu imetokea');
+      setError(result?.error || 'Hitilafu imetokea');
     }
     setIsLoading(false);
   };
@@ -44,7 +44,7 @@ export const LoginPage: React.FC = () => {
       alignItems: 'center',
       justifyContent: 'center',
       padding: 16,
-      background: 'linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%)',
+      background: 'var(--bg-app)',
     }}>
       <div style={{ width: '100%', maxWidth: 480 }}>
         {/* Logo */}
@@ -65,7 +65,7 @@ export const LoginPage: React.FC = () => {
           <h1 className="gradient-text" style={{ fontSize: 32, fontWeight: 700 }}>
             Karibu Tena
           </h1>
-          <p style={{ fontSize: 16, color: '#94a3b8', marginTop: 8 }}>
+          <p style={{ fontSize: 16, color: 'var(--text-muted)', marginTop: 8 }}>
             Ingia kwenye akaunti yako ya Nijuze
           </p>
         </div>
@@ -75,13 +75,13 @@ export const LoginPage: React.FC = () => {
           <form onSubmit={handleSubmit}>
             {/* Email */}
             <div style={{ marginBottom: 20 }}>
-              <label style={{ fontSize: 14, fontWeight: 500, color: '#cbd5e1', marginBottom: 8, display: 'block' }}>
+              <label style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-main)', marginBottom: 8, display: 'block' }}>
                 Email
               </label>
               <div style={{ position: 'relative' }}>
                 <Mail
                   size={18}
-                  color="#64748b"
+                  color="var(--text-muted)"
                   style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)' }}
                 />
                 <input
@@ -94,9 +94,9 @@ export const LoginPage: React.FC = () => {
                     width: '100%',
                     padding: '12px 12px 12px 40px',
                     borderRadius: 12,
-                    background: 'rgba(30, 41, 59, 0.5)',
-                    border: '1px solid rgba(51, 65, 85, 0.5)',
-                    color: '#e2e8f0',
+                    background: 'var(--input-bg)',
+                    border: '1px solid var(--input-border)',
+                    color: 'var(--input-text)',
                     fontSize: 14,
                   }}
                 />
@@ -105,13 +105,13 @@ export const LoginPage: React.FC = () => {
 
             {/* Password */}
             <div style={{ marginBottom: 20 }}>
-              <label style={{ fontSize: 14, fontWeight: 500, color: '#cbd5e1', marginBottom: 8, display: 'block' }}>
+              <label style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-main)', marginBottom: 8, display: 'block' }}>
                 Password
               </label>
               <div style={{ position: 'relative' }}>
                 <Lock
                   size={18}
-                  color="#64748b"
+                  color="var(--text-muted)"
                   style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)' }}
                 />
                 <input
@@ -124,9 +124,9 @@ export const LoginPage: React.FC = () => {
                     width: '100%',
                     padding: '12px 44px 12px 40px',
                     borderRadius: 12,
-                    background: 'rgba(30, 41, 59, 0.5)',
-                    border: '1px solid rgba(51, 65, 85, 0.5)',
-                    color: '#e2e8f0',
+                    background: 'var(--input-bg)',
+                    border: '1px solid var(--input-border)',
+                    color: 'var(--input-text)',
                     fontSize: 14,
                   }}
                 />
@@ -144,7 +144,7 @@ export const LoginPage: React.FC = () => {
                     padding: 4,
                   }}
                 >
-                  {showPassword ? <EyeOff size={18} color="#64748b" /> : <Eye size={18} color="#64748b" />}
+                  {showPassword ? <EyeOff size={18} color="var(--text-muted)" /> : <Eye size={18} color="var(--text-muted)" />}
                 </button>
               </div>
             </div>
@@ -158,7 +158,7 @@ export const LoginPage: React.FC = () => {
                   onChange={(e) => setRememberMe(e.target.checked)}
                   style={{ width: 16, height: 16, borderRadius: 4 }}
                 />
-                <span style={{ fontSize: 14, color: '#cbd5e1' }}>Nikumbuke</span>
+                <span style={{ fontSize: 14, color: 'var(--text-body)' }}>Nikumbuke</span>
               </label>
               <button
                 type="button"
@@ -225,9 +225,9 @@ export const LoginPage: React.FC = () => {
             gap: 16,
             margin: '24px 0',
           }}>
-            <div style={{ flex: 1, height: 1, background: 'rgba(51, 65, 85, 0.5)' }} />
-            <span style={{ fontSize: 13, color: '#64748b' }}>AU</span>
-            <div style={{ flex: 1, height: 1, background: 'rgba(51, 65, 85, 0.5)' }} />
+            <div style={{ flex: 1, height: 1, background: 'var(--border-app)' }} />
+            <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>AU</span>
+            <div style={{ flex: 1, height: 1, background: 'var(--border-app)' }} />
           </div>
 
           {/* Social Login */}
@@ -241,9 +241,9 @@ export const LoginPage: React.FC = () => {
                 gap: 12,
                 padding: 12,
                 borderRadius: 12,
-                background: 'rgba(255, 255, 255, 0.05)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                color: '#e2e8f0',
+                background: 'var(--bg-subtle)',
+                border: '1px solid var(--border-app)',
+                color: 'var(--text-main)',
                 cursor: 'pointer',
                 fontSize: 14,
                 fontWeight: 500,
@@ -267,9 +267,9 @@ export const LoginPage: React.FC = () => {
                 gap: 12,
                 padding: 12,
                 borderRadius: 12,
-                background: 'rgba(255, 255, 255, 0.05)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                color: '#e2e8f0',
+                background: 'var(--bg-subtle)',
+                border: '1px solid var(--border-app)',
+                color: 'var(--text-main)',
                 cursor: 'pointer',
                 fontSize: 14,
                 fontWeight: 500,
@@ -282,14 +282,14 @@ export const LoginPage: React.FC = () => {
 
           {/* Register Link */}
           <div style={{ textAlign: 'center', marginTop: 24 }}>
-            <span style={{ fontSize: 14, color: '#94a3b8' }}>
+            <span style={{ fontSize: 14, color: 'var(--text-muted)' }}>
               Huna akaunti?{' '}
             </span>
             <button
               onClick={() => navigate('/register')}
               style={{
                 fontSize: 14,
-                color: '#818cf8',
+                color: 'var(--border-focus)',
                 fontWeight: 600,
                 background: 'transparent',
                 border: 'none',
@@ -309,8 +309,8 @@ export const LoginPage: React.FC = () => {
           background: 'rgba(99, 102, 241, 0.05)',
           border: '1px solid rgba(99, 102, 241, 0.2)',
         }}>
-          <p style={{ fontSize: 13, color: '#94a3b8', marginBottom: 8 }}>
-            <strong style={{ color: '#a5b4fc' }}>Demo Accounts:</strong>
+          <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 8 }}>
+            <strong style={{ color: 'var(--btn-ghost-text)' }}>Demo Accounts:</strong>
           </p>
           <p style={{ fontSize: 12, color: '#64748b', marginBottom: 4 }}>
             Email: amina@example.com

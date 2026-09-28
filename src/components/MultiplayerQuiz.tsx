@@ -125,7 +125,7 @@ export const MultiplayerQuiz: React.FC<QuizGameProps> = ({ onComplete }) => {
         <p style={{ fontSize: 48, fontWeight: 700, color: '#fbbf24', marginBottom: 8 }}>
           {score} / {questions.length * 10}
         </p>
-        <p style={{ fontSize: 16, color: '#94a3b8', marginBottom: 32 }}>
+        <p style={{ fontSize: 16, color: 'var(--text-muted)', marginBottom: 32 }}>
           Points Zilizopatikana
         </p>
         <button
@@ -149,7 +149,7 @@ export const MultiplayerQuiz: React.FC<QuizGameProps> = ({ onComplete }) => {
           <Gamepad2 size={24} color="#a5b4fc" />
           <div>
             <h3 style={{ fontSize: 18, fontWeight: 600, margin: 0 }}>Quiz Challenge</h3>
-            <p style={{ fontSize: 13, color: '#94a3b8', margin: 0 }}>
+            <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>
               Swali {currentQuestion + 1} / {questions.length}
             </p>
           </div>
@@ -188,8 +188,8 @@ export const MultiplayerQuiz: React.FC<QuizGameProps> = ({ onComplete }) => {
       <div style={{
         padding: 24,
         borderRadius: 12,
-        background: 'rgba(30, 41, 59, 0.3)',
-        border: '1px solid rgba(51, 65, 85, 0.3)',
+        background: 'var(--bg-subtle)',
+        border: '1px solid var(--border-app)',
         marginBottom: 24,
       }}>
         <h2 style={{ fontSize: 20, fontWeight: 600, marginBottom: 0, lineHeight: 1.5 }}>
@@ -219,7 +219,7 @@ export const MultiplayerQuiz: React.FC<QuizGameProps> = ({ onComplete }) => {
                   ? 'rgba(239, 68, 68, 0.2)'
                   : isSelected
                   ? 'rgba(99, 102, 241, 0.2)'
-                  : 'rgba(30, 41, 59, 0.3)',
+                  : 'var(--bg-subtle)',
                 border: `2px solid ${
                   showCorrect
                     ? '#10b981'
@@ -227,9 +227,9 @@ export const MultiplayerQuiz: React.FC<QuizGameProps> = ({ onComplete }) => {
                     ? '#ef4444'
                     : isSelected
                     ? '#6366f1'
-                    : 'rgba(51, 65, 85, 0.3)'
+                    : 'var(--border-app)'
                 }`,
-                color: '#e2e8f0',
+                color: 'var(--text-main)',
                 cursor: showResult ? 'not-allowed' : 'pointer',
                 fontSize: 16,
                 textAlign: 'left',
@@ -288,7 +288,7 @@ export const MultiplayerQuiz: React.FC<QuizGameProps> = ({ onComplete }) => {
           }}>
             {selectedAnswer === question.correctAnswer ? '✓ Sahihi!' : '✗ Si Sahihi'}
           </p>
-          <p style={{ fontSize: 14, color: '#94a3b8', margin: '8px 0 0 0' }}>
+          <p style={{ fontSize: 14, color: 'var(--text-muted)', margin: '8px 0 0 0' }}>
             {selectedAnswer === question.correctAnswer
               ? `+${question.points} points`
               : 'Jibu sahihi: ' + question.options[question.correctAnswer]}

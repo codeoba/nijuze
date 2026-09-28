@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Palette, Sun, Moon, Monitor, Check } from 'lucide-react';
+import { useTheme } from '../contexts/ThemeContext';
 
 interface Theme {
   id: string;
@@ -22,8 +23,8 @@ const themes: Theme[] = [
     colors: {
       primary: '#6366f1',
       secondary: '#9333ea',
-      background: '#0f0f23',
-      surface: '#1a1a2e',
+      background: '#0b0f19',
+      surface: '#121826',
       text: '#f8fafc',
       textSecondary: '#94a3b8',
       border: 'rgba(51, 65, 85, 0.3)',
@@ -35,11 +36,11 @@ const themes: Theme[] = [
     colors: {
       primary: '#6366f1',
       secondary: '#9333ea',
-      background: '#ffffff',
-      surface: '#f8fafc',
+      background: '#f8fafc',
+      surface: '#ffffff',
       text: '#0f172a',
       textSecondary: '#64748b',
-      border: 'rgba(226, 232, 240, 1)',
+      border: '#e2e8f0',
     },
   },
   {
@@ -123,48 +124,35 @@ const themes: Theme[] = [
 ];
 
 export const CustomThemes: React.FC = () => {
-  const [selectedTheme, setSelectedTheme] = useState<string>('dark');
+  const { theme, setTheme } = useTheme();
+  const [selectedTheme, setSelectedTheme] = useState<string>(theme);
 
   useEffect(() => {
-    const saved = localStorage.getItem('selected_theme');
-    if (saved) {
-      setSelectedTheme(saved);
-      applyTheme(saved);
-    }
-  }, []);
-
-  const applyTheme = (themeId: string) => {
-    const theme = themes.find(t => t.id === themeId);
-    if (!theme) return;
-
-    // Apply CSS variables
-    const root = document.documentElement;
-    root.style.setProperty('--theme-primary', theme.colors.primary);
-    root.style.setProperty('--theme-secondary', theme.colors.secondary);
-    root.style.setProperty('--theme-background', theme.colors.background);
-    root.style.setProperty('--theme-surface', theme.colors.surface);
-    root.style.setProperty('--theme-text', theme.colors.text);
-    root.style.setProperty('--theme-text-secondary', theme.colors.textSecondary);
-    root.style.setProperty('--theme-border', theme.colors.border);
-
-    // Apply to body
-    document.body.style.background = theme.colors.background;
-    document.body.style.color = theme.colors.text;
-  };
+    setSelectedTheme(theme);
+  }, [theme]);
 
   const handleThemeChange = (themeId: string) => {
     setSelectedTheme(themeId);
-    localStorage.setItem('selected_theme', themeId);
-    applyTheme(themeId);
+    if (themeId === 'light' || themeId === 'dark' || themeId === 'system') {
+      setTheme(themeId as any);
+    } else {
+      const customTheme = themes.find(t => t.id === themeId);
+      if (customTheme) {
+        setTheme('dark');
+        const root = document.documentElement;
+        root.style.setProperty('--theme-primary', customTheme.colors.primary);
+        root.style.setProperty('--theme-secondary', customTheme.colors.secondary);
+      }
+    }
   };
 
   return (
     <div className="glass-card" style={{ padding: 24 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
-        <Palette size={24} color="#a5b4fc" />
+        <Palette size={24} color="var(--border-focus)" />
         <div>
-          <h3 style={{ fontSize: 18, fontWeight: 600, margin: 0 }}>Mandhari Maalum</h3>
-          <p style={{ fontSize: 13, color: '#94a3b8', margin: 0 }}>
+          <h3 style={{ fontSize: 18, fontWeight: 600, margin: 0, color: 'var(--text-main)' }}>Mandhari Maalum</h3>
+          <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>
             Chagua mandhari unayopenda
           </p>
         </div>
@@ -178,18 +166,19 @@ export const CustomThemes: React.FC = () => {
             flex: 1,
             padding: 16,
             borderRadius: 12,
-            background: selectedTheme === 'dark' ? 'rgba(99, 102, 241, 0.2)' : 'rgba(30, 41, 59, 0.3)',
-            border: `1px solid ${selectedTheme === 'dark' ? 'rgba(99, 102, 241, 0.5)' : 'rgba(51, 65, 85, 0.3)'}`,
-            color: selectedTheme === 'dark' ? '#a5b4fc' : '#94a3b8',
+            background: theme === 'dark' ? 'var(--btn-ghost-bg)' : 'var(--bg-subtle)',
+            border: `1px solid ${theme === 'dark' ? 'var(--border-focus)' : 'var(--border-app)'}`,
+            color: theme === 'dark' ? 'var(--border-focus)' : 'var(--text-muted)',
             cursor: 'pointer',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
             gap: 8,
+            transition: 'all 0.2s ease',
           }}
         >
           <Moon size={24} />
-          <span style={{ fontSize: 13 }}>Giza</span>
+          <span style={{ fontSize: 13, fontWeight: 500 }}>Giza</span>
         </button>
         <button
           onClick={() => handleThemeChange('light')}
@@ -197,37 +186,39 @@ export const CustomThemes: React.FC = () => {
             flex: 1,
             padding: 16,
             borderRadius: 12,
-            background: selectedTheme === 'light' ? 'rgba(99, 102, 241, 0.2)' : 'rgba(30, 41, 59, 0.3)',
-            border: `1px solid ${selectedTheme === 'light' ? 'rgba(99, 102, 241, 0.5)' : 'rgba(51, 65, 85, 0.3)'}`,
-            color: selectedTheme === 'light' ? '#a5b4fc' : '#94a3b8',
+            background: theme === 'light' ? 'var(--btn-ghost-bg)' : 'var(--bg-subtle)',
+            border: `1px solid ${theme === 'light' ? 'var(--border-focus)' : 'var(--border-app)'}`,
+            color: theme === 'light' ? 'var(--border-focus)' : 'var(--text-muted)',
             cursor: 'pointer',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
             gap: 8,
+            transition: 'all 0.2s ease',
           }}
         >
           <Sun size={24} />
-          <span style={{ fontSize: 13 }}>Mwanga</span>
+          <span style={{ fontSize: 13, fontWeight: 500 }}>Mwanga</span>
         </button>
         <button
-          onClick={() => handleThemeChange('dark')}
+          onClick={() => handleThemeChange('system')}
           style={{
             flex: 1,
             padding: 16,
             borderRadius: 12,
-            background: selectedTheme === 'system' ? 'rgba(99, 102, 241, 0.2)' : 'rgba(30, 41, 59, 0.3)',
-            border: `1px solid ${selectedTheme === 'system' ? 'rgba(99, 102, 241, 0.5)' : 'rgba(51, 65, 85, 0.3)'}`,
-            color: selectedTheme === 'system' ? '#a5b4fc' : '#94a3b8',
+            background: theme === 'system' ? 'var(--btn-ghost-bg)' : 'var(--bg-subtle)',
+            border: `1px solid ${theme === 'system' ? 'var(--border-focus)' : 'var(--border-app)'}`,
+            color: theme === 'system' ? 'var(--border-focus)' : 'var(--text-muted)',
             cursor: 'pointer',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
             gap: 8,
+            transition: 'all 0.2s ease',
           }}
         >
           <Monitor size={24} />
-          <span style={{ fontSize: 13 }}>System</span>
+          <span style={{ fontSize: 13, fontWeight: 500 }}>System</span>
         </button>
       </div>
 

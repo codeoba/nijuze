@@ -52,17 +52,18 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
                 width: 80, height: 80, borderRadius: '50%',
                 background: 'linear-gradient(135deg, #6366f1, #9333ea)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 28, fontWeight: 'bold', border: '4px solid #0f0f23',
+                fontSize: 28, fontWeight: 'bold', border: '4px solid var(--bg-surface)',
+                color: 'white',
               }}>
                 {displayUser.avatar}
               </div>
             </div>
             <div style={{ flex: 1, paddingBottom: 8 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <h2 style={{ fontSize: 22, fontWeight: 700 }}>{displayUser.username}</h2>
+                <h2 style={{ fontSize: 22, fontWeight: 700, color: 'var(--text-main)' }}>{displayUser.username}</h2>
                 {displayUser.isVerified && <CheckCircle2 size={18} color="#34d399" />}
               </div>
-              <p style={{ fontSize: 14, color: '#94a3b8' }}>{displayUser.role}</p>
+              <p style={{ fontSize: 14, color: 'var(--text-muted)' }}>{displayUser.role}</p>
             </div>
             {!isOwnProfile && (
               <button
@@ -74,13 +75,13 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
             )}
           </div>
 
-          <p style={{ fontSize: 14, color: '#cbd5e1', marginBottom: 16, lineHeight: 1.5 }}>
+          <p style={{ fontSize: 14, color: 'var(--text-body)', marginBottom: 16, lineHeight: 1.5 }}>
             {displayUser.bio || 'Hakuna bio bado.'}
           </p>
 
           <div style={{
             display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12,
-            padding: 16, borderRadius: 12, background: 'rgba(30, 41, 59, 0.3)', marginBottom: 16,
+            padding: 16, borderRadius: 12, background: 'var(--bg-subtle)', border: '1px solid var(--border-app)', marginBottom: 16,
           }}>
             {[
               { label: 'Posts', value: userPosts.length, icon: BookOpen },
@@ -89,23 +90,23 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
               { label: 'Followers', value: displayUser.followers, icon: Users },
             ].map((stat, i) => (
               <div key={i} style={{ textAlign: 'center' }}>
-                <stat.icon size={20} color="#a5b4fc" style={{ margin: '0 auto 4px' }} />
-                <p style={{ fontSize: 18, fontWeight: 700, color: '#a5b4fc' }}>{stat.value}</p>
-                <p style={{ fontSize: 11, color: '#64748b' }}>{stat.label}</p>
+                <stat.icon size={20} color="var(--border-focus)" style={{ margin: '0 auto 4px' }} />
+                <p style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-main)' }}>{stat.value}</p>
+                <p style={{ fontSize: 11, color: 'var(--text-muted)' }}>{stat.label}</p>
               </div>
             ))}
           </div>
 
-          <div style={{ display: 'flex', gap: 8, borderBottom: '1px solid rgba(51, 65, 85, 0.3)', marginBottom: 16 }}>
+          <div style={{ display: 'flex', gap: 8, borderBottom: '1px solid var(--border-app)', marginBottom: 16 }}>
             {(['posts', 'about'] as const).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 style={{
                   padding: '12px 20px', background: 'transparent', border: 'none',
-                  borderBottom: activeTab === tab ? '2px solid #6366f1' : '2px solid transparent',
-                  color: activeTab === tab ? '#a5b4fc' : '#94a3b8',
-                  cursor: 'pointer', fontSize: 14, fontWeight: 500,
+                  borderBottom: activeTab === tab ? '2px solid var(--border-focus)' : '2px solid transparent',
+                  color: activeTab === tab ? 'var(--border-focus)' : 'var(--text-muted)',
+                  cursor: 'pointer', fontSize: 14, fontWeight: 600,
                 }}
               >
                 {tab === 'posts' ? 'Posts' : 'Kuhusu'}
@@ -117,19 +118,19 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
             {activeTab === 'posts' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 {userPosts.length === 0 ? (
-                  <p style={{ textAlign: 'center', color: '#64748b', padding: 32 }}>Hakuna posts bado</p>
+                  <p style={{ textAlign: 'center', color: 'var(--text-muted)', padding: 32 }}>Hakuna posts bado</p>
                 ) : (
                   userPosts.map((post) => (
                     <div
                       key={post.id}
                       style={{
                         padding: 16, borderRadius: 12,
-                        background: 'rgba(30, 41, 59, 0.3)',
-                        border: '1px solid rgba(51, 65, 85, 0.3)',
+                        background: 'var(--bg-subtle)',
+                        border: '1px solid var(--border-app)',
                       }}
                     >
-                      <h4 style={{ fontSize: 15, fontWeight: 600, marginBottom: 8 }}>{post.title}</h4>
-                      <div style={{ display: 'flex', gap: 16, fontSize: 12, color: '#64748b' }}>
+                      <h4 style={{ fontSize: 15, fontWeight: 600, marginBottom: 8, color: 'var(--text-main)' }}>{post.title}</h4>
+                      <div style={{ display: 'flex', gap: 16, fontSize: 12, color: 'var(--text-muted)' }}>
                         <span><ThumbsUp size={12} style={{ display: 'inline' }} /> {post.upvotes}</span>
                         <span><MessageCircle size={12} style={{ display: 'inline' }} /> {post.commentsCount}</span>
                         <span>{new Date(post.createdAt).toLocaleDateString('sw-TZ')}</span>
@@ -142,15 +143,15 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
 
             {activeTab === 'about' && (
               <div>
-                <div style={{ padding: 16, borderRadius: 12, background: 'rgba(30, 41, 59, 0.3)', marginBottom: 12 }}>
-                  <p style={{ fontSize: 14, color: '#94a3b8', marginBottom: 4 }}>Reputation</p>
-                  <p style={{ fontSize: 20, fontWeight: 700, color: '#fbbf24' }}>
+                <div style={{ padding: 16, borderRadius: 12, background: 'var(--bg-subtle)', border: '1px solid var(--border-app)', marginBottom: 12 }}>
+                  <p style={{ fontSize: 14, color: 'var(--text-muted)', marginBottom: 4 }}>Reputation</p>
+                  <p style={{ fontSize: 20, fontWeight: 700, color: '#f59e0b' }}>
                     {displayUser.reputation.toLocaleString()} points
                   </p>
                 </div>
-                <div style={{ padding: 16, borderRadius: 12, background: 'rgba(30, 41, 59, 0.3)' }}>
-                  <p style={{ fontSize: 14, color: '#94a3b8', marginBottom: 4 }}>Amejiunga</p>
-                  <p style={{ fontSize: 16, fontWeight: 600, color: '#cbd5e1' }}>
+                <div style={{ padding: 16, borderRadius: 12, background: 'var(--bg-subtle)', border: '1px solid var(--border-app)' }}>
+                  <p style={{ fontSize: 14, color: 'var(--text-muted)', marginBottom: 4 }}>Amejiunga</p>
+                  <p style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-main)' }}>
                     {new Date(displayUser.joinedAt).toLocaleDateString('sw-TZ', { year: 'numeric', month: 'long', day: 'numeric' })}
                   </p>
                 </div>

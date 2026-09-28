@@ -1,5 +1,13 @@
 node_modules/
+backend/node_modules/
 .next/
 dist/
 build/
 *.log
+backend/uploads/*
+!backend/uploads/.gitkeep
+live_verified_light.png
+.env
+.env.local
+.DS_Store
+Thumbs.db
