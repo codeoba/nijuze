@@ -87,14 +87,24 @@ class Database {
   // Posts
   getPosts(): Post[] {
     const posts = this.get<Post>(DB_KEYS.POSTS);
-    if (!posts || posts.length === 0) {
-      const users = this.getUsers();
-      const samples = generateSamplePosts(users);
-      this.set(DB_KEYS.POSTS, samples);
-      return samples;
+    const cleanPosts = (posts || []).filter(p => {
+      if (!p || !p.id) return false;
+      if (p.id.startsWith('post') || p.id === 'd2401122-7827-4363-9a71-7beed04b6b1b') return false;
+      const title = (p.title || '').toLowerCase();
+      if (
+        title.includes('machine learning mwaka 2026') ||
+        title.includes('react na vue.js') ||
+        title.includes('blockchain') ||
+        title.includes('jaribio la chapisho')
+      ) return false;
+      return true;
+    });
+    if (cleanPosts.length !== (posts || []).length) {
+      this.set(DB_KEYS.POSTS, cleanPosts);
     }
-    return posts;
+    return cleanPosts;
   }
+
 
   getPostById(id: string): Post | undefined {
     return this.getPosts().find(p => p.id === id);
@@ -175,7 +185,17 @@ class Database {
 
   // Comments
   getComments(): Comment[] {
-    return this.get<Comment>(DB_KEYS.COMMENTS);
+    const comments = this.get<Comment>(DB_KEYS.COMMENTS);
+    const cleanComments = (comments || []).filter(c => {
+      if (!c || !c.id) return false;
+      if (c.id.startsWith('comment')) return false;
+      if (c.postId && (c.postId.startsWith('post') || c.postId === 'd2401122-7827-4363-9a71-7beed04b6b1b')) return false;
+      return true;
+    });
+    if (cleanComments.length !== (comments || []).length) {
+      this.set(DB_KEYS.COMMENTS, cleanComments);
+    }
+    return cleanComments;
   }
 
   getCommentsByPost(postId: string): Comment[] {

@@ -79,30 +79,48 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [searchQuery, setSearchQuery] = useState('');
   const [isOnlineBackend, setIsOnlineBackend] = useState(false);
 
+  const isNotDemoPost = useCallback((p: Post) => {
+    if (!p || !p.id) return false;
+    if (p.id.startsWith('post') || p.id === 'd2401122-7827-4363-9a71-7beed04b6b1b') return false;
+    const title = (p.title || '').toLowerCase();
+    if (
+      title.includes('machine learning mwaka 2026') ||
+      title.includes('react na vue.js') ||
+      title.includes('blockchain') ||
+      title.includes('jaribio la chapisho')
+    ) {
+      return false;
+    }
+    return true;
+  }, []);
+
   // Sync data from local storage as initial/offline baseline
   const loadLocalBaseline = useCallback(() => {
-    const localPosts = db.getPosts().map(p => ({
-      ...p,
-      author: db.getUserById(p.authorId) || p.author,
-      isUpvoted: currentUser ? db.getPostVote(p.id, currentUser.id) === 'upvote' : false,
-      isDownvoted: currentUser ? db.getPostVote(p.id, currentUser.id) === 'downvote' : false,
-      isBookmarked: currentUser ? db.isBookmarked(p.id, currentUser.id) : false,
-    }));
+    const localPosts = db.getPosts()
+      .filter(isNotDemoPost)
+      .map(p => ({
+        ...p,
+        author: db.getUserById(p.authorId) || p.author,
+        isUpvoted: currentUser ? db.getPostVote(p.id, currentUser.id) === 'upvote' : false,
+        isDownvoted: currentUser ? db.getPostVote(p.id, currentUser.id) === 'downvote' : false,
+        isBookmarked: currentUser ? db.isBookmarked(p.id, currentUser.id) : false,
+      }));
     setPosts(localPosts);
     setUsers(db.getUsers());
     setComments(db.getComments());
     if (currentUser) {
       setNotifications(db.getNotificationsByUser(currentUser.id));
     }
-  }, [currentUser]);
+  }, [currentUser, isNotDemoPost]);
 
   // Synchronize with real backend API
   const syncWithBackend = useCallback(async () => {
     try {
       // 1. Fetch posts from API
       const postsRes = await postsAPI.getAll({ limit: 50 });
-      if (postsRes && postsRes.posts && postsRes.posts.length > 0) {
-        setPosts(postsRes.posts);
+      if (postsRes && Array.isArray(postsRes.posts)) {
+        const cleanPosts = postsRes.posts.filter(isNotDemoPost);
+        setPosts(cleanPosts);
         setIsOnlineBackend(true);
       } else {
         loadLocalBaseline();
@@ -138,7 +156,33 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       setIsOnlineBackend(false);
       loadLocalBaseline();
     }
-  }, [loadLocalBaseline]);
+  }, [loadLocalBaseline, isNotDemoPost]);
+
+  // Purge legacy demo posts from localStorage on start
+  useEffect(() => {
+    try {
+      const storedPosts = localStorage.getItem('nijuze_db_posts');
+      if (storedPosts) {
+        const parsed = JSON.parse(storedPosts);
+        if (Array.isArray(parsed)) {
+          const cleaned = parsed.filter(isNotDemoPost);
+          localStorage.setItem('nijuze_db_posts', JSON.stringify(cleaned));
+        }
+      }
+      const storedComments = localStorage.getItem('nijuze_db_comments');
+      if (storedComments) {
+        const parsedC = JSON.parse(storedComments);
+        if (Array.isArray(parsedC)) {
+          const cleanedC = parsedC.filter((c: any) => 
+            !c.id?.startsWith('comment') && 
+            !c.postId?.startsWith('post') && 
+            c.postId !== 'd2401122-7827-4363-9a71-7beed04b6b1b'
+          );
+          localStorage.setItem('nijuze_db_comments', JSON.stringify(cleanedC));
+        }
+      }
+    } catch {}
+  }, [isNotDemoPost]);
 
   useEffect(() => {
     loadLocalBaseline();

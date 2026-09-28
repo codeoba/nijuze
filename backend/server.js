@@ -53,6 +53,15 @@ async function connectDB() {
     connection.release();
     db = pool;
     console.log('✅ Connected to MySQL database');
+
+    // Automatically purge demo posts and their comments if present
+    try {
+      await db.query(`DELETE FROM comments WHERE post_id LIKE 'post-%' OR post_id = 'd2401122-7827-4363-9a71-7beed04b6b1b'`);
+      await db.query(`DELETE FROM posts WHERE id LIKE 'post-%' OR id = 'd2401122-7827-4363-9a71-7beed04b6b1b' OR title LIKE '%Machine Learning mwaka 2026%' OR title LIKE '%React na Vue.js%' OR title LIKE '%blockchain%afya%' OR title LIKE '%Jaribio%'`);
+      console.log('🧹 Purged legacy demo posts from MySQL database');
+    } catch (cleanupErr) {
+      // ignore
+    }
   } catch (error) {
     console.warn('⚠️ MySQL server unavailable (' + error.message + '). Activating Local Storage Engine fallback...');
     db = getStorageEngine();
@@ -361,6 +370,12 @@ app.get('/api/posts', optionalAuth, async (req, res) => {
       FROM posts p
       LEFT JOIN users u ON p.author_id = u.id
       WHERE p.is_approved = TRUE
+        AND p.id NOT LIKE 'post-%'
+        AND p.id != 'd2401122-7827-4363-9a71-7beed04b6b1b'
+        AND p.title NOT LIKE '%Machine Learning mwaka 2026%'
+        AND p.title NOT LIKE '%React na Vue.js%'
+        AND p.title NOT LIKE '%blockchain%afya%'
+        AND p.title NOT LIKE '%Jaribio%'
     `;
     const params = [];
 
@@ -390,7 +405,16 @@ app.get('/api/posts', optionalAuth, async (req, res) => {
 
     const [posts] = await db.query(query, params);
 
-    let countQuery = 'SELECT COUNT(*) as total FROM posts WHERE is_approved = TRUE';
+    let countQuery = `
+      SELECT COUNT(*) as total FROM posts 
+      WHERE is_approved = TRUE 
+        AND id NOT LIKE 'post-%'
+        AND id != 'd2401122-7827-4363-9a71-7beed04b6b1b'
+        AND title NOT LIKE '%Machine Learning mwaka 2026%'
+        AND title NOT LIKE '%React na Vue.js%'
+        AND title NOT LIKE '%blockchain%afya%'
+        AND title NOT LIKE '%Jaribio%'
+    `;
     const countParams = [];
     if (category && category !== 'All' && category !== 'Zote') {
       countQuery += ' AND category = ?';
