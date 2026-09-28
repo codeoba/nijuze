@@ -28,6 +28,10 @@ import { Footer } from './components/Footer';
 
 // Pages
 import { PostDetailPage } from './pages/PostDetailPage';
+import { CreatePostPage } from './pages/CreatePostPage';
+import { LeaderboardPage } from './pages/LeaderboardPage';
+import { BookmarksPage } from './pages/BookmarksPage';
+import { MessagesPage } from './pages/MessagesPage';
 import { ProfilePage } from './pages/ProfilePage';
 import { AccountSettingsPage } from './pages/AccountSettingsPage';
 import { LoginPage } from './pages/LoginPage';
@@ -114,19 +118,19 @@ const AppContent: React.FC = () => {
             break;
           case 'n':
             e.preventDefault();
-            if (isAuthenticated) setShowAskModal(true);
+            if (isAuthenticated) navigate('/ask');
             break;
           case 'b':
             e.preventDefault();
-            setShowReadingList(true);
+            navigate('/bookmarks');
             break;
           case 'm':
             e.preventDefault();
-            if (isAuthenticated) setShowChat(true);
+            if (isAuthenticated) navigate('/messages');
             break;
           case ',':
             e.preventDefault();
-            if (isAuthenticated) setShowSettings(true);
+            if (isAuthenticated) navigate('/settings');
             break;
         }
       } else if (e.key === 'Escape') {
@@ -175,6 +179,10 @@ const AppContent: React.FC = () => {
 
   const renderCurrentView = () => {
     if (currentPath.startsWith('/post/') || currentPath.startsWith('/swali/')) return <PostDetailPage />;
+    if (currentPath === '/ask' || currentPath === '/create') return <CreatePostPage />;
+    if (currentPath === '/leaderboard') return <LeaderboardPage />;
+    if (currentPath === '/bookmarks' || currentPath === '/reading-list') return <BookmarksPage />;
+    if (currentPath === '/messages' || currentPath === '/chat') return <MessagesPage />;
     if (currentPath.startsWith('/profile')) return <ProfilePage />;
     if (currentPath === '/settings') return <AccountSettingsPage />;
     if (currentPath === '/admin') return <AdminPanel />;
@@ -233,7 +241,7 @@ const AppContent: React.FC = () => {
                 </div>
               </div>
               <button
-                onClick={() => setShowAskModal(true)}
+                onClick={() => navigate('/ask')}
                 style={{
                   flex: 1, textAlign: 'left', padding: 12, borderRadius: 12,
                   background: 'var(--bg-subtle)',
@@ -274,7 +282,7 @@ const AppContent: React.FC = () => {
               {searchQuery ? 'Jaribu kutafuta kwa maneno tofauti' : 'Kuwa wa kwanza kuuliza swali au kuchangia maarifa!'}
             </p>
             {isAuthenticated && (
-              <button onClick={() => setShowAskModal(true)} className="btn-primary" style={{ cursor: 'pointer' }}>
+              <button onClick={() => navigate('/ask')} className="btn-primary" style={{ cursor: 'pointer' }}>
                 Anzisha Mjadala Sasa
               </button>
             )}
@@ -406,11 +414,29 @@ const AppContent: React.FC = () => {
                     }}
                   >
                     <button 
+                      onClick={() => { navigate('/leaderboard'); setShowMoreMenu(false); }}
+                      className={`btn-ghost ${currentPath === '/leaderboard' ? 'active' : ''}`}
+                      style={{ width: '100%', justifyContent: 'flex-start', padding: '8px 12px', borderRadius: 8, gap: 10, fontSize: 13 }}
+                    >
+                      <Trophy size={16} color="#eab308" />
+                      <span>Orodha ya Viongozi</span>
+                    </button>
+
+                    <button 
+                      onClick={() => { navigate('/bookmarks'); setShowMoreMenu(false); }}
+                      className={`btn-ghost ${currentPath === '/bookmarks' ? 'active' : ''}`}
+                      style={{ width: '100%', justifyContent: 'flex-start', padding: '8px 12px', borderRadius: 8, gap: 10, fontSize: 13 }}
+                    >
+                      <Bookmark size={16} color="#38bdf8" />
+                      <span>Orodha ya Kusoma</span>
+                    </button>
+
+                    <button 
                       onClick={() => { navigate('/tournaments'); setShowMoreMenu(false); }}
                       className={`btn-ghost ${currentPath === '/tournaments' ? 'active' : ''}`}
                       style={{ width: '100%', justifyContent: 'flex-start', padding: '8px 12px', borderRadius: 8, gap: 10, fontSize: 13 }}
                     >
-                      <Trophy size={16} color="#eab308" />
+                      <Zap size={16} color="#f59e0b" />
                       <span>Mashindano</span>
                     </button>
                     
@@ -455,7 +481,7 @@ const AppContent: React.FC = () => {
           <div className="header-dropdown-container" style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
             {/* Primary Action Button */}
             <button 
-              onClick={() => setShowAskModal(true)} 
+              onClick={() => navigate('/ask')} 
               className="btn-primary" 
               style={{ 
                 display: 'flex', 
@@ -620,6 +646,24 @@ const AppContent: React.FC = () => {
                       >
                         <User size={16} />
                         <span>Wasifu Wangu</span>
+                      </button>
+
+                      <button 
+                        onClick={() => { navigate('/messages'); setShowUserMenu(false); }}
+                        className="btn-ghost"
+                        style={{ width: '100%', justifyContent: 'flex-start', padding: '8px 10px', borderRadius: 8, gap: 10, fontSize: 13 }}
+                      >
+                        <MessageSquare size={16} color="#818cf8" />
+                        <span>Ujumbe & Soga</span>
+                      </button>
+
+                      <button 
+                        onClick={() => { navigate('/bookmarks'); setShowUserMenu(false); }}
+                        className="btn-ghost"
+                        style={{ width: '100%', justifyContent: 'flex-start', padding: '8px 10px', borderRadius: 8, gap: 10, fontSize: 13 }}
+                      >
+                        <Bookmark size={16} color="#38bdf8" />
+                        <span>Orodha ya Kusoma</span>
                       </button>
 
                       <button 

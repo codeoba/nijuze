@@ -30,23 +30,17 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
   const handleCreateClick = () => {
     if (!isAuthenticated) {
       navigate('/login');
-      return;
+    } else {
+      navigate('/ask');
     }
-    if (onOpenCreatePost) {
-      onOpenCreatePost();
-    }
-    window.dispatchEvent(new CustomEvent('openCreatePost'));
   };
 
   const handleChatClick = () => {
     if (!isAuthenticated) {
       navigate('/login');
-      return;
+    } else {
+      navigate('/messages');
     }
-    if (onOpenChat) {
-      onOpenChat();
-    }
-    window.dispatchEvent(new CustomEvent('openChatModal'));
   };
 
   const handleProfileClick = () => {
@@ -63,6 +57,8 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
 
   const isHomeActive = currentPath === '/' || currentPath === '';
   const isForumActive = currentPath === '/forum';
+  const isChatActive = currentPath === '/messages' || currentPath === '/chat';
+  const isCreateActive = currentPath === '/ask' || currentPath === '/create';
   const isProfileActive = currentPath.startsWith('/profile') || currentPath === '/login';
 
   return (
@@ -191,13 +187,24 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
           background: 'transparent',
           border: 'none',
           cursor: 'pointer',
-          color: 'var(--text-muted)',
+          color: isChatActive ? 'var(--border-focus)' : 'var(--text-muted)',
           transition: 'all 0.2s ease',
           minWidth: 54,
         }}
       >
         <MessageSquare size={22} />
-        <span style={{ fontSize: 11, fontWeight: 500 }}>Ujumbe</span>
+        <span style={{ fontSize: 11, fontWeight: isChatActive ? 700 : 500 }}>Ujumbe</span>
+        {isChatActive && (
+          <div
+            style={{
+              width: 4,
+              height: 4,
+              borderRadius: '50%',
+              background: 'var(--border-focus)',
+              marginTop: 1,
+            }}
+          />
+        )}
       </button>
 
       {/* 5. Wasifu / Ingia */}
