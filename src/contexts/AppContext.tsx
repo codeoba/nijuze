@@ -141,8 +141,26 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         try {
           const me = await authAPI.getCurrentUser();
           if (me) {
-            setCurrentUser(me);
-            localStorage.setItem('nijuze_user', JSON.stringify(me));
+            let savedLocalUser: any = null;
+            try {
+              const raw = localStorage.getItem('nijuze_user');
+              if (raw) savedLocalUser = JSON.parse(raw);
+            } catch {}
+
+            const mergedUser = {
+              ...savedLocalUser,
+              ...me,
+              avatar: (me.avatar && (me.avatar.startsWith('http') || me.avatar.startsWith('/uploads') || me.avatar.startsWith('data:')))
+                ? me.avatar
+                : (savedLocalUser?.avatar || me.avatar),
+              cover_image: me.cover_image || me.coverImage || savedLocalUser?.cover_image || savedLocalUser?.coverImage || null,
+              coverImage: me.cover_image || me.coverImage || savedLocalUser?.cover_image || savedLocalUser?.coverImage || null,
+            };
+
+            setCurrentUser(mergedUser);
+            localStorage.setItem('nijuze_user', JSON.stringify(mergedUser));
+            localStorage.setItem('nijuze_current_user', JSON.stringify(mergedUser));
+            db.updateUser(mergedUser.id, mergedUser);
           }
           const notifs = await notificationsAPI.getAll();
           if (notifs) {
@@ -533,10 +551,16 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const updateUserProfile = async (updates: Partial<User>): Promise<User | null> => {
     if (!currentUser) return null;
 
-    let updatedUser: User = { ...currentUser, ...updates };
+    const normalizedUpdates = {
+      ...updates,
+      ...(updates.cover_image && { coverImage: updates.cover_image }),
+      ...(updates.coverImage && { cover_image: updates.coverImage }),
+    };
+
+    let updatedUser: User = { ...currentUser, ...normalizedUpdates };
 
     try {
-      const res = await usersAPI.updateProfile(updates);
+      const res = await usersAPI.updateProfile(normalizedUpdates);
       if (res) {
         updatedUser = { ...updatedUser, ...res };
       }
@@ -546,8 +570,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     localStorage.setItem('nijuze_user', JSON.stringify(updatedUser));
     localStorage.setItem('nijuze_current_user', JSON.stringify(updatedUser));
 
-    db.updateUser(currentUser.id, updates);
-    setUsers(prev => prev.map(u => u.id === currentUser.id ? { ...u, ...updates } : u));
+    db.updateUser(currentUser.id, normalizedUpdates);
+    setUsers(prev => prev.map(u => u.id === currentUser.id ? { ...u, ...normalizedUpdates } : u));
 
     return updatedUser;
   };
