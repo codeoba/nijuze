@@ -64,10 +64,14 @@ async function connectDB() {
     }
 
     try {
-      await db.query(`ALTER TABLE users ADD COLUMN cover_image VARCHAR(500) NULL`);
-    } catch (colErr) {
-      // column already exists
-    }
+      await db.query(`ALTER TABLE users ADD COLUMN cover_image TEXT NULL`);
+    } catch (colErr) {}
+    try {
+      await db.query(`ALTER TABLE users MODIFY COLUMN cover_image TEXT NULL`);
+    } catch (colErr) {}
+    try {
+      await db.query(`ALTER TABLE users MODIFY COLUMN avatar TEXT NULL`);
+    } catch (colErr) {}
   } catch (error) {
     console.warn('⚠️ MySQL server unavailable (' + error.message + '). Activating Local Storage Engine fallback...');
     db = getStorageEngine();
@@ -322,12 +326,7 @@ app.post('/api/auth/login', async (req, res) => {
 // Get current user
 app.get('/api/auth/me', authenticateToken, async (req, res) => {
   try {
-    const [users] = await db.query(
-      `SELECT id, username, email, avatar, role, bio, reputation, is_verified, 
-              followers_count, following_count, posts_count, answers_count, created_at 
-       FROM users WHERE id = ?`,
-      [req.user.id]
-    );
+    const [users] = await db.query('SELECT * FROM users WHERE id = ?', [req.user.id]);
 
     if (users.length === 0) {
       return res.status(404).json({ success: false, error: 'User not found' });
@@ -343,6 +342,8 @@ app.get('/api/auth/me', authenticateToken, async (req, res) => {
         username: u.username,
         email: u.email,
         avatar: u.avatar,
+        cover_image: u.cover_image || null,
+        coverImage: u.cover_image || null,
         role: u.role,
         bio: u.bio,
         reputation: u.reputation,
@@ -1098,8 +1099,7 @@ app.post('/api/comments/:id/best', authenticateToken, async (req, res) => {
 app.get('/api/users', async (req, res) => {
   try {
     const [users] = await db.query(`
-      SELECT id, username, email, avatar, role, bio, reputation, is_verified,
-             followers_count, following_count, posts_count, answers_count, created_at
+      SELECT *
       FROM users
       ORDER BY reputation DESC, followers_count DESC
       LIMIT 100
@@ -1110,6 +1110,8 @@ app.get('/api/users', async (req, res) => {
       username: u.username,
       email: u.email,
       avatar: u.avatar,
+      cover_image: u.cover_image || null,
+      coverImage: u.cover_image || null,
       role: u.role,
       bio: u.bio,
       reputation: u.reputation,

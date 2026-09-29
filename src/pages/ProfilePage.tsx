@@ -31,6 +31,9 @@ export const ProfilePage: React.FC = () => {
   const [isUploadingBanner, setIsUploadingBanner] = useState(false);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
 
+  const [localCover, setLocalCover] = useState<string | null>(null);
+  const [localAvatar, setLocalAvatar] = useState<string | null>(null);
+
   const [asyncUser, setAsyncUser] = useState<any>(null);
 
   const profileUser = userId 
@@ -90,6 +93,7 @@ export const ProfilePage: React.FC = () => {
         });
       }
       if (imageUrl) {
+        setLocalCover(imageUrl);
         await updateUserProfile({ cover_image: imageUrl, coverImage: imageUrl });
       }
     } catch (err) {
@@ -117,6 +121,7 @@ export const ProfilePage: React.FC = () => {
         });
       }
       if (imageUrl) {
+        setLocalAvatar(imageUrl);
         await updateUserProfile({ avatar: imageUrl });
       }
     } catch (err) {
@@ -164,8 +169,8 @@ export const ProfilePage: React.FC = () => {
     return url;
   };
 
-  const coverUrl = formatImageUrl(profileUser.cover_image || profileUser.coverImage);
-  const avatarUrl = formatImageUrl(profileUser.avatar);
+  const coverUrl = localCover || formatImageUrl(profileUser.cover_image || profileUser.coverImage);
+  const avatarUrl = localAvatar || formatImageUrl(profileUser.avatar);
   const isImageAvatar = avatarUrl && (avatarUrl.startsWith('http') || avatarUrl.startsWith('data:') || avatarUrl.startsWith('/'));
 
   return (

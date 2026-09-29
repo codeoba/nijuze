@@ -298,6 +298,28 @@ class LocalDatabase {
       return [{ insertId: user.id, affectedRows: 1 }, []];
     }
 
+    // 4b. UPDATE users
+    if (s.startsWith('update users')) {
+      const id = params[params.length - 1];
+      const user = this.data.users.find(u => u.id === id);
+      if (user) {
+        const whereIdx = sql.toLowerCase().indexOf('where');
+        const setIdx = sql.toLowerCase().indexOf('set');
+        if (setIdx !== -1 && whereIdx !== -1) {
+          const setPart = sql.substring(setIdx + 3, whereIdx).trim();
+          const fields = setPart.split(',').map(f => f.trim().split('=')[0].trim());
+          fields.forEach((field, idx) => {
+            if (params[idx] !== undefined) {
+              user[field] = params[idx];
+            }
+          });
+          this.save();
+          return [{ affectedRows: 1 }, []];
+        }
+      }
+      return [{ affectedRows: 0 }, []];
+    }
+
     // 5. SELECT posts
     if (s.includes('from posts')) {
       if (s.includes('count(*) as total')) {

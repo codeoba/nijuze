@@ -338,6 +338,9 @@ export const uploadAPI = {
       const data = await response.json();
 
       if (response.ok && data.success && data.data) {
+        if (data.data.url && typeof data.data.url === 'string' && data.data.url.startsWith('http://localhost:5000/')) {
+          data.data.url = data.data.url.replace('http://localhost:5000', '');
+        }
         return data.data;
       }
       throw new Error(data.error || 'Upload failed');
