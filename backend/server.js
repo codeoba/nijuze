@@ -1167,9 +1167,12 @@ app.get('/api/users/:id', async (req, res) => {
 });
 
 // Update current user profile (avatar, cover_image, bio, etc.)
-app.put('/api/users/profile', authenticateToken, async (req, res) => {
+app.put('/api/users/profile', optionalAuth, async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = (req.user && req.user.id) ? req.user.id : req.body.userId;
+    if (!userId) {
+      return res.status(401).json({ success: false, error: 'Tafadhali ingia kwanza au toa User ID' });
+    }
     const { bio, avatar, cover_image, coverImage } = req.body;
     const finalCover = cover_image || coverImage;
 
@@ -1342,8 +1345,7 @@ app.post('/api/upload', optionalAuth, upload.any(), (req, res) => {
       return res.status(400).json({ success: false, error: 'Hakuna faili lililopakiwa' });
     }
 
-    const baseUrl = process.env.API_URL || `http://localhost:${PORT}`;
-    const fileUrl = `${baseUrl.replace('/api', '')}/uploads/${file.filename}`;
+    const fileUrl = `/uploads/${file.filename}`;
 
     res.json({
       success: true,

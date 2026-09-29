@@ -188,7 +188,14 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   useEffect(() => {
     loadLocalBaseline();
     syncWithBackend();
-  }, [loadLocalBaseline, syncWithBackend]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (currentUser) {
+      setNotifications(db.getNotificationsByUser(currentUser.id));
+    }
+  }, [currentUser]);
 
   // Auth methods
   const login = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {

@@ -241,9 +241,16 @@ export const usersAPI = {
   },
 
   updateProfile: async (data: any) => {
+    let userId = data.userId;
+    if (!userId && typeof window !== 'undefined') {
+      try {
+        const u = localStorage.getItem('nijuze_user') || localStorage.getItem('nijuze_current_user');
+        if (u) userId = JSON.parse(u).id;
+      } catch {}
+    }
     const response = await apiCall('/users/profile', {
       method: 'PUT',
-      body: JSON.stringify(data),
+      body: JSON.stringify({ ...data, userId }),
     });
     return response.data;
   },

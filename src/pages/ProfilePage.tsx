@@ -156,9 +156,17 @@ export const ProfilePage: React.FC = () => {
     }
   };
 
-  const coverUrl = profileUser.cover_image || profileUser.coverImage;
-  const avatarUrl = profileUser.avatar;
-  const isImageAvatar = avatarUrl && (avatarUrl.startsWith('http') || avatarUrl.startsWith('data:'));
+  const formatImageUrl = (url?: string) => {
+    if (!url) return '';
+    if (url.startsWith('http://localhost:5000/')) {
+      return url.replace('http://localhost:5000', '');
+    }
+    return url;
+  };
+
+  const coverUrl = formatImageUrl(profileUser.cover_image || profileUser.coverImage);
+  const avatarUrl = formatImageUrl(profileUser.avatar);
+  const isImageAvatar = avatarUrl && (avatarUrl.startsWith('http') || avatarUrl.startsWith('data:') || avatarUrl.startsWith('/'));
 
   return (
     <div style={{ maxWidth: 1000, margin: '0 auto', padding: '24px 16px' }}>
@@ -173,44 +181,42 @@ export const ProfilePage: React.FC = () => {
         boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
       }}>
         {isOwnProfile && (
-          <>
+          <label 
+            htmlFor="banner-file-input"
+            title="Badilisha picha ya cover"
+            style={{
+              position: 'absolute',
+              top: 16,
+              right: 16,
+              padding: '8px 14px',
+              borderRadius: 10,
+              background: 'rgba(0, 0, 0, 0.65)',
+              backdropFilter: 'blur(6px)',
+              border: '1px solid rgba(255, 255, 255, 0.25)',
+              cursor: isUploadingBanner ? 'wait' : 'pointer',
+              color: 'white',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              fontSize: 13,
+              fontWeight: 600,
+              zIndex: 10,
+              userSelect: 'none',
+              transition: 'background 0.2s',
+            }}
+          >
             <input 
+              id="banner-file-input"
               type="file" 
               ref={bannerInputRef} 
               onChange={handleBannerUpload} 
               accept="image/*" 
+              disabled={isUploadingBanner}
               style={{ display: 'none' }} 
             />
-            <button 
-              type="button"
-              onClick={() => bannerInputRef.current?.click()}
-              disabled={isUploadingBanner}
-              title="Badilisha picha ya cover"
-              style={{
-                position: 'absolute',
-                top: 16,
-                right: 16,
-                padding: '8px 14px',
-                borderRadius: 10,
-                background: 'rgba(0, 0, 0, 0.55)',
-                backdropFilter: 'blur(6px)',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
-                cursor: isUploadingBanner ? 'wait' : 'pointer',
-                color: 'white',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 8,
-                fontSize: 13,
-                fontWeight: 600,
-                transition: 'all 0.2s',
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(0, 0, 0, 0.75)')}
-              onMouseLeave={(e) => (e.currentTarget.style.background = 'rgba(0, 0, 0, 0.55)')}
-            >
-              {isUploadingBanner ? <Loader2 size={16} className="animate-spin" /> : <Camera size={16} />}
-              <span>{isUploadingBanner ? 'Inapakia...' : 'Weka Cover'}</span>
-            </button>
-          </>
+            {isUploadingBanner ? <Loader2 size={16} className="animate-spin" /> : <Camera size={16} />}
+            <span>{isUploadingBanner ? 'Inapakia...' : 'Weka Cover'}</span>
+          </label>
         )}
       </div>
 
@@ -247,42 +253,40 @@ export const ProfilePage: React.FC = () => {
               </div>
             </div>
             {isOwnProfile && (
-              <>
+              <label 
+                htmlFor="avatar-file-input"
+                title="Badilisha picha ya wasifu"
+                style={{
+                  position: 'absolute',
+                  bottom: 4,
+                  right: 4,
+                  width: 38,
+                  height: 38,
+                  borderRadius: '50%',
+                  background: '#6366f1',
+                  border: '3px solid var(--bg-surface)',
+                  cursor: isUploadingAvatar ? 'wait' : 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: 'white',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+                  zIndex: 20,
+                  userSelect: 'none',
+                  transition: 'transform 0.15s, background 0.2s',
+                }}
+              >
                 <input 
+                  id="avatar-file-input"
                   type="file" 
                   ref={avatarInputRef} 
                   onChange={handleAvatarUpload} 
                   accept="image/*" 
+                  disabled={isUploadingAvatar}
                   style={{ display: 'none' }} 
                 />
-                <button 
-                  type="button"
-                  onClick={() => avatarInputRef.current?.click()}
-                  disabled={isUploadingAvatar}
-                  title="Badilisha picha ya wasifu"
-                  style={{
-                    position: 'absolute',
-                    bottom: 4,
-                    right: 4,
-                    width: 38,
-                    height: 38,
-                    borderRadius: '50%',
-                    background: '#6366f1',
-                    border: '3px solid var(--bg-surface)',
-                    cursor: isUploadingAvatar ? 'wait' : 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: 'white',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
-                    transition: 'transform 0.15s, background 0.2s',
-                  }}
-                  onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.1)')}
-                  onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
-                >
-                  {isUploadingAvatar ? <Loader2 size={16} className="animate-spin" /> : <Camera size={18} />}
-                </button>
-              </>
+                {isUploadingAvatar ? <Loader2 size={16} className="animate-spin" /> : <Camera size={18} />}
+              </label>
             )}
           </div>
 
