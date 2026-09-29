@@ -182,6 +182,7 @@ export const ProfilePage: React.FC = () => {
               style={{ display: 'none' }} 
             />
             <button 
+              type="button"
               onClick={() => bannerInputRef.current?.click()}
               disabled={isUploadingBanner}
               title="Badilisha picha ya cover"
@@ -255,6 +256,7 @@ export const ProfilePage: React.FC = () => {
                   style={{ display: 'none' }} 
                 />
                 <button 
+                  type="button"
                   onClick={() => avatarInputRef.current?.click()}
                   disabled={isUploadingAvatar}
                   title="Badilisha picha ya wasifu"

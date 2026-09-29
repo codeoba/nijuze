@@ -5,7 +5,17 @@
 
 import { User, Post, Comment, Notification } from '../types';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const getApiUrl = () => {
+  if (typeof window !== 'undefined') {
+    if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+      return '/api';
+    }
+  }
+  return import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+};
+
+const API_URL = getApiUrl();
+
 
 // Helper function for API calls with timeout
 const apiCall = async (endpoint: string, options: RequestInit = {}) => {
