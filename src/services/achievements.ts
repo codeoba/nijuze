@@ -212,8 +212,10 @@ export const awardAchievement = (userId: string, achievement: Achievement): void
   const user = db.getUserById(userId);
   if (!user) return;
   
+  const userBadges = Array.isArray(user.badges) ? user.badges : [];
+
   // Check if already earned
-  const alreadyEarned = user.badges.some(b => b.id === achievement.id);
+  const alreadyEarned = userBadges.some(b => b.id === achievement.id);
   if (alreadyEarned) return;
   
   // Add badge
@@ -226,8 +228,8 @@ export const awardAchievement = (userId: string, achievement: Achievement): void
   };
   
   db.updateUser(userId, {
-    badges: [...user.badges, badge],
-    reputation: user.reputation + achievement.points,
+    badges: [...userBadges, badge],
+    reputation: (user.reputation || 0) + achievement.points,
   });
   
   // Create notification
@@ -245,8 +247,10 @@ export const checkAndAwardAchievements = (userId: string): void => {
   const user = db.getUserById(userId);
   if (!user) return;
   
+  const userBadges = Array.isArray(user.badges) ? user.badges : [];
+
   earned.forEach(achievement => {
-    const alreadyEarned = user.badges.some(b => b.id === achievement.id);
+    const alreadyEarned = userBadges.some(b => b.id === achievement.id);
     if (!alreadyEarned) {
       awardAchievement(userId, achievement);
     }

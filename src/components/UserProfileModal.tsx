@@ -53,9 +53,13 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
                 background: 'linear-gradient(135deg, #6366f1, #9333ea)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 fontSize: 28, fontWeight: 'bold', border: '4px solid var(--bg-surface)',
-                color: 'white',
+                color: 'white', overflow: 'hidden',
               }}>
-                {displayUser.avatar}
+                {(displayUser.avatar && (displayUser.avatar.startsWith('http') || displayUser.avatar.startsWith('data:') || displayUser.avatar.startsWith('/'))) ? (
+                  <img src={displayUser.avatar} alt={displayUser.username} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                ) : (
+                  displayUser.avatar || (displayUser.username ? displayUser.username.slice(0, 2).toUpperCase() : 'NJ')
+                )}
               </div>
             </div>
             <div style={{ flex: 1, paddingBottom: 8 }}>

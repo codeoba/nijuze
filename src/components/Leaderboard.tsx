@@ -26,7 +26,7 @@ export const Leaderboard: React.FC = () => {
         points: user.reputation + Math.floor(Math.random() * 5000),
         posts: user.postsCount + Math.floor(Math.random() * 50),
         answers: user.answersCount + Math.floor(Math.random() * 100),
-        badges: user.badges.length + Math.floor(Math.random() * 5),
+        badges: (Array.isArray(user.badges) ? user.badges.length : 0) + Math.floor(Math.random() * 5),
         change: Math.floor(Math.random() * 5) - 2, // -2 to +2
       }))
       .sort((a, b) => b.points - a.points)

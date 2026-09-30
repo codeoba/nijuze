@@ -25,6 +25,7 @@ import { KeyboardShortcutsModal } from './components/KeyboardShortcuts';
 import { MobileBottomNav } from './components/MobileBottomNav';
 import { AIChatbot } from './components/AIChatbot';
 import { Footer } from './components/Footer';
+import { ErrorBoundary } from './components/ErrorBoundary';
 
 // Pages
 import { PostDetailPage } from './pages/PostDetailPage';
@@ -742,7 +743,9 @@ const AppContent: React.FC = () => {
 
       {/* Main Content Area */}
       <main style={{ paddingTop: 80, paddingBottom: 64, paddingLeft: 16, paddingRight: 16, minHeight: 'calc(100vh - 280px)' }}>
-        {renderCurrentView()}
+        <ErrorBoundary>
+          {renderCurrentView()}
+        </ErrorBoundary>
       </main>
 
       {/* Footer */}

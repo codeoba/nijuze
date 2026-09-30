@@ -1291,7 +1291,8 @@ app.get('/api/users', async (req, res) => {
       following: u.following_count,
       postsCount: u.posts_count,
       answersCount: u.answers_count,
-      joinedAt: u.created_at
+      joinedAt: u.created_at,
+      badges: []
     }));
 
     res.json({ success: true, data: formattedUsers });
@@ -1331,7 +1332,7 @@ app.get('/api/users/:id', async (req, res) => {
         postsCount: u.posts_count,
         answersCount: u.answers_count,
         joinedAt: u.created_at,
-        badges
+        badges: badges || []
       }
     });
   } catch (error) {
@@ -1386,6 +1387,7 @@ app.put('/api/users/profile', optionalAuth, async (req, res) => {
       users = newUsers;
     }
     const u = users[0];
+    const [badges] = await db.query('SELECT * FROM badges WHERE user_id = ?', [userId]);
 
     res.json({
       success: true,
@@ -1405,6 +1407,7 @@ app.put('/api/users/profile', optionalAuth, async (req, res) => {
         postsCount: u.posts_count,
         answersCount: u.answers_count,
         joinedAt: u.created_at,
+        badges: badges || []
       }
     });
   } catch (error) {

@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useParams } from '../router/Router';
+import { useParams, useRouter } from '../router/Router';
 import { useApp } from '../contexts/AppContext';
-import { Comment } from '../types';
+import { Comment, User } from '../types';
 import { 
   Camera, Edit3, MapPin, Calendar, Link as LinkIcon, 
   Award, BookOpen, MessageCircle, ThumbsUp, Users, 
   CheckCircle2, Settings, Share2, Flag, MoreHorizontal,
-  TrendingUp, Clock, Star, Heart, Loader2
+  TrendingUp, Clock, Star, Heart, Loader2, LogIn, UserPlus, ArrowLeft
 } from 'lucide-react';
 
 import { db } from '../services/database';
@@ -14,6 +14,7 @@ import { usersAPI, uploadAPI } from '../services/api';
 
 export const ProfilePage: React.FC = () => {
   const { userId } = useParams();
+  const { navigate } = useRouter();
   const { currentUser, users, posts, comments, toggleFollow, isFollowing, updateUserProfile } = useApp();
   const [activeTab, setActiveTab] = useState<'posts' | 'answers' | 'about' | 'activity'>('posts');
   const [isEditing, setIsEditing] = useState(false);
@@ -35,18 +36,41 @@ export const ProfilePage: React.FC = () => {
   const [localAvatar, setLocalAvatar] = useState<string | null>(null);
 
   const [asyncUser, setAsyncUser] = useState<any>(null);
+  const [isLoadingUser, setIsLoadingUser] = useState<boolean>(Boolean(userId));
 
-  const profileUser = userId 
+  // If currentUser in context is null, fallback to reading localStorage immediately
+  const localSavedUser: User | null = (() => {
+    try {
+      const saved = localStorage.getItem('nijuze_user') || localStorage.getItem('nijuze_current_user');
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  })();
+
+  const effectiveCurrentUser = currentUser || localSavedUser;
+
+  const profileUser: any = userId 
     ? (users.find(u => u.id === userId || u.username?.toLowerCase() === userId?.toLowerCase()) || db.getUserById(userId) || asyncUser) 
-    : currentUser;
+    : effectiveCurrentUser;
 
-  const isOwnProfile = currentUser?.id === profileUser?.id;
+  const isOwnProfile = Boolean(effectiveCurrentUser?.id && profileUser?.id && effectiveCurrentUser.id === profileUser.id);
 
   useEffect(() => {
-    if (userId && !users.find(u => u.id === userId || u.username?.toLowerCase() === userId?.toLowerCase()) && !db.getUserById(userId)) {
-      usersAPI.getById(userId).then(res => {
-        if (res) setAsyncUser(res);
-      }).catch(() => {});
+    if (userId) {
+      const found = users.find(u => u.id === userId || u.username?.toLowerCase() === userId?.toLowerCase()) || db.getUserById(userId);
+      if (found) {
+        setIsLoadingUser(false);
+      } else {
+        setIsLoadingUser(true);
+        usersAPI.getById(userId).then(res => {
+          if (res) setAsyncUser(res);
+        }).catch(() => {}).finally(() => {
+          setIsLoadingUser(false);
+        });
+      }
+    } else {
+      setIsLoadingUser(false);
     }
   }, [userId, users]);
 
@@ -63,18 +87,87 @@ export const ProfilePage: React.FC = () => {
     }
   }, [profileUser]);
 
-  if (!profileUser) {
+  // If visiting /profile directly without being logged in
+  if (!profileUser && !userId) {
     return (
-      <div style={{ padding: 48, textAlign: 'center' }}>
-        <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 8 }}>User hajapatikana</h2>
-        <p style={{ color: 'var(--text-muted)' }}>User huyu hayupo au amefutwa</p>
+      <div style={{ maxWidth: 600, margin: '60px auto', padding: '0 16px' }}>
+        <div className="glass-card" style={{ padding: 40, textAlign: 'center', borderRadius: 20 }}>
+          <div style={{
+            width: 72,
+            height: 72,
+            borderRadius: '50%',
+            background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(147, 51, 234, 0.2))',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            margin: '0 auto 20px',
+            color: '#6366f1'
+          }}>
+            <LogIn size={36} />
+          </div>
+          <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 12, color: 'var(--text-main)' }}>
+            Karibu kwenye Wasifu Wako
+          </h2>
+          <p style={{ color: 'var(--text-muted)', fontSize: 15, lineHeight: 1.6, marginBottom: 28 }}>
+            Tafadhali ingia kwenye akaunti yako au jiunge ili uweze kuona wasifu wako, kupakia picha za wasifu na cover, na kufuatilia michango yako.
+          </p>
+          <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
+            <button 
+              onClick={() => navigate('/login')} 
+              className="btn-primary" 
+              style={{ padding: '10px 24px', display: 'flex', alignItems: 'center', gap: 8, fontSize: 15 }}
+            >
+              <LogIn size={18} />
+              Ingia Kwenye Akaunti
+            </button>
+            <button 
+              onClick={() => navigate('/register')} 
+              className="btn-ghost" 
+              style={{ padding: '10px 24px', display: 'flex', alignItems: 'center', gap: 8, fontSize: 15 }}
+            >
+              <UserPlus size={18} />
+              Jisajili Bure
+            </button>
+          </div>
+        </div>
       </div>
     );
   }
 
-  const userPosts = posts.filter(p => p.authorId === profileUser.id);
-  const userComments = (comments as Comment[]).filter(c => c.authorId === profileUser.id);
-  const totalUpvotes = userPosts.reduce((sum, p) => sum + p.upvotes, 0);
+  // If visiting /profile/:userId and user is still loading
+  if (isLoadingUser) {
+    return (
+      <div style={{ padding: 60, textAlign: 'center' }}>
+        <Loader2 size={36} className="animate-spin" style={{ margin: '0 auto 16px', color: '#6366f1' }} />
+        <p style={{ color: 'var(--text-muted)', fontSize: 16 }}>Inapakia taarifa za mtumiaji...</p>
+      </div>
+    );
+  }
+
+  // If user truly not found
+  if (!profileUser) {
+    return (
+      <div style={{ maxWidth: 500, margin: '60px auto', padding: '0 16px', textAlign: 'center' }}>
+        <div className="glass-card" style={{ padding: 40, borderRadius: 20 }}>
+          <h2 style={{ fontSize: 22, fontWeight: 700, marginBottom: 10, color: 'var(--text-main)' }}>Mtumiaji Hajapatikana</h2>
+          <p style={{ color: 'var(--text-muted)', marginBottom: 24 }}>Akaunti ya mtumiaji huyu haipo au imefutwa.</p>
+          <button onClick={() => navigate('/')} className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+            <ArrowLeft size={16} /> Rudi Mwanzo
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Safe normalized variables
+  const userBadges = Array.isArray(profileUser.badges) ? profileUser.badges : [];
+  const userReputation = typeof profileUser.reputation === 'number' ? profileUser.reputation : 0;
+  const userFollowersCount = typeof profileUser.followers === 'number' 
+    ? profileUser.followers 
+    : (Array.isArray(profileUser.followers) ? profileUser.followers.length : 0);
+  const userPosts = Array.isArray(posts) ? posts.filter(p => p && p.authorId === profileUser.id) : [];
+  const userComments = Array.isArray(comments) ? (comments as Comment[]).filter(c => c && c.authorId === profileUser.id) : [];
+  const totalUpvotes = userPosts.reduce((sum, p) => sum + (p?.upvotes || 0), 0);
 
   const handleBannerUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -85,7 +178,8 @@ export const ProfilePage: React.FC = () => {
       try {
         const res = await uploadAPI.upload(file);
         if (res && res.url) imageUrl = res.url;
-      } catch {
+      } catch (uploadErr) {
+        console.warn('API upload failed, using FileReader fallback:', uploadErr);
         imageUrl = await new Promise((resolve) => {
           const reader = new FileReader();
           reader.onloadend = () => resolve(reader.result as string);
@@ -113,7 +207,8 @@ export const ProfilePage: React.FC = () => {
       try {
         const res = await uploadAPI.upload(file);
         if (res && res.url) imageUrl = res.url;
-      } catch {
+      } catch (uploadErr) {
+        console.warn('API upload failed, using FileReader fallback:', uploadErr);
         imageUrl = await new Promise((resolve) => {
           const reader = new FileReader();
           reader.onloadend = () => resolve(reader.result as string);
@@ -151,7 +246,7 @@ export const ProfilePage: React.FC = () => {
   };
 
   const formatJoinDate = (d?: string, options?: Intl.DateTimeFormatOptions) => {
-    const rawDate = d || (profileUser as any).created_at || (profileUser as any).createdAt;
+    const rawDate = d || profileUser.created_at || profileUser.createdAt || profileUser.joinedAt;
     if (!rawDate) return 'Hivi karibuni';
     try {
       const parsed = new Date(rawDate);
@@ -177,11 +272,11 @@ export const ProfilePage: React.FC = () => {
     <div style={{ maxWidth: 1000, margin: '0 auto', padding: '24px 16px' }}>
       {/* Cover Image Banner */}
       <div style={{
-        height: 200,
+        height: 220,
         borderRadius: 16,
         background: coverUrl ? `url(${coverUrl}) center/cover no-repeat` : 'linear-gradient(135deg, #6366f1, #9333ea, #ec4899)',
         position: 'relative',
-        marginBottom: 80,
+        marginBottom: 70,
         overflow: 'hidden',
         boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
       }}>
@@ -227,7 +322,7 @@ export const ProfilePage: React.FC = () => {
 
       {/* Profile Header */}
       <div style={{ marginTop: -60, marginBottom: 24, position: 'relative', zIndex: 10 }}>
-        <div style={{ display: 'flex', alignItems: 'flex-end', gap: 24, marginBottom: 16 }}>
+        <div style={{ display: 'flex', alignItems: 'flex-end', gap: 24, marginBottom: 16, flexWrap: 'wrap' }}>
           {/* Avatar */}
           <div style={{ position: 'relative', flexShrink: 0 }}>
             <div className="avatar-ring" style={{ padding: 4 }}>
@@ -249,7 +344,7 @@ export const ProfilePage: React.FC = () => {
                 {isImageAvatar ? (
                   <img 
                     src={avatarUrl} 
-                    alt={profileUser.username} 
+                    alt={profileUser.username || 'Wasifu'} 
                     style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
                   />
                 ) : (
@@ -296,18 +391,18 @@ export const ProfilePage: React.FC = () => {
           </div>
 
           {/* User Info */}
-          <div style={{ flex: 1, paddingBottom: 8 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 4 }}>
-              <h1 style={{ fontSize: 28, fontWeight: 700 }}>{profileUser.username}</h1>
+          <div style={{ flex: 1, minWidth: 200, paddingBottom: 8 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 4, flexWrap: 'wrap' }}>
+              <h1 style={{ fontSize: 28, fontWeight: 700 }}>{profileUser.username || 'Mwanachama'}</h1>
               {profileUser.isVerified && (
                 <CheckCircle2 size={24} color="#34d399" />
               )}
             </div>
-            <p style={{ fontSize: 16, color: 'var(--text-muted)' }}>{profileUser.role}</p>
+            <p style={{ fontSize: 16, color: 'var(--text-muted)' }}>{profileUser.role || 'Mwanachama'}</p>
           </div>
 
           {/* Action Buttons */}
-          <div style={{ display: 'flex', gap: 12 }}>
+          <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
             {isOwnProfile ? (
               <button
                 onClick={() => setIsEditing(!isEditing)}
@@ -321,13 +416,21 @@ export const ProfilePage: React.FC = () => {
               <>
                 <button
                   onClick={handleFollow}
-                  className={isFollowing(profileUser.id) ? 'btn-ghost' : 'btn-primary'}
+                  className={profileUser.id && isFollowing(profileUser.id) ? 'btn-ghost' : 'btn-primary'}
                   style={{ display: 'flex', alignItems: 'center', gap: 8 }}
                 >
                   <Users size={16} />
-                  {isFollowing(profileUser.id) ? 'Unafuata' : 'Fuata'}
+                  {profileUser.id && isFollowing(profileUser.id) ? 'Unafuata' : 'Fuata'}
                 </button>
-                <button className="btn-ghost" style={{ padding: 10 }}>
+                <button 
+                  onClick={() => {
+                    navigator.clipboard?.writeText(window.location.href);
+                    alert('Kiungo cha wasifu kimenakiliwa!');
+                  }}
+                  className="btn-ghost" 
+                  style={{ padding: 10 }}
+                  title="Shiriki Kiungo"
+                >
                   <Share2 size={16} />
                 </button>
               </>
@@ -357,7 +460,7 @@ export const ProfilePage: React.FC = () => {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginTop: 12 }}>
               <input
                 type="text"
-                placeholder="Location"
+                placeholder="Location (Mfano: Dar es Salaam)"
                 value={editData.location}
                 onChange={(e) => setEditData({ ...editData, location: e.target.value })}
                 style={{
@@ -371,7 +474,7 @@ export const ProfilePage: React.FC = () => {
               />
               <input
                 type="url"
-                placeholder="Website"
+                placeholder="Website (https://...)"
                 value={editData.website}
                 onChange={(e) => setEditData({ ...editData, website: e.target.value })}
                 style={{
@@ -449,16 +552,16 @@ export const ProfilePage: React.FC = () => {
         {/* Meta Info */}
         <div style={{ display: 'flex', gap: 24, marginBottom: 24, fontSize: 14, color: 'var(--text-muted)', flexWrap: 'wrap' }}>
           <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <MapPin size={16} /> Dar es Salaam, Tanzania
+            <MapPin size={16} /> {profileUser.location || 'Tanzania'}
           </span>
           <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             <Calendar size={16} /> Amejiunga {formatJoinDate(profileUser.joinedAt)}
           </span>
-          {editData.website && (
+          {profileUser.website && (
             <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
               <LinkIcon size={16} />
-              <a href={editData.website} target="_blank" rel="noopener noreferrer" style={{ color: '#6366f1' }}>
-                {editData.website}
+              <a href={profileUser.website.startsWith('http') ? profileUser.website : `https://${profileUser.website}`} target="_blank" rel="noopener noreferrer" style={{ color: '#6366f1' }}>
+                {profileUser.website}
               </a>
             </span>
           )}
@@ -467,7 +570,7 @@ export const ProfilePage: React.FC = () => {
         {/* Stats */}
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(5, 1fr)',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))',
           gap: 16,
           padding: 20,
           borderRadius: 16,
@@ -479,25 +582,25 @@ export const ProfilePage: React.FC = () => {
             { label: 'Posts', value: userPosts.length, icon: BookOpen, color: 'var(--btn-ghost-text)' },
             { label: 'Majibu', value: userComments.length, icon: MessageCircle, color: '#6ee7b7' },
             { label: 'Upvotes', value: totalUpvotes, icon: ThumbsUp, color: '#fbbf24' },
-            { label: 'Followers', value: profileUser.followers, icon: Users, color: '#f472b6' },
-            { label: 'Reputation', value: profileUser.reputation, icon: Award, color: '#c084fc' },
+            { label: 'Followers', value: userFollowersCount, icon: Users, color: '#f472b6' },
+            { label: 'Reputation', value: userReputation, icon: Award, color: '#c084fc' },
           ].map((stat, i) => (
             <div key={i} style={{ textAlign: 'center' }}>
               <stat.icon size={24} color={stat.color} style={{ margin: '0 auto 8px' }} />
               <p style={{ fontSize: 24, fontWeight: 700, color: stat.color }}>{stat.value}</p>
-              <p style={{ fontSize: 12, color: '#64748b' }}>{stat.label}</p>
+              <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>{stat.label}</p>
             </div>
           ))}
         </div>
 
         {/* Badges */}
-        {profileUser.badges.length > 0 && (
+        {userBadges.length > 0 && (
           <div style={{ marginBottom: 24 }}>
             <h3 style={{ fontSize: 16, fontWeight: 600, marginBottom: 12 }}>Badges</h3>
             <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-              {profileUser.badges.map((badge) => (
+              {userBadges.map((badge: any, index: number) => (
                 <div
-                  key={badge.id}
+                  key={badge.id || index}
                   style={{
                     padding: '10px 16px',
                     borderRadius: 20,
@@ -509,8 +612,8 @@ export const ProfilePage: React.FC = () => {
                     fontSize: 14,
                   }}
                 >
-                  <span style={{ fontSize: 20 }}>{badge.icon}</span>
-                  <span style={{ color: '#fcd34d', fontWeight: 500 }}>{badge.name}</span>
+                  <span style={{ fontSize: 20 }}>{badge.icon || '🏅'}</span>
+                  <span style={{ color: '#fcd34d', fontWeight: 500 }}>{badge.name || 'Badge'}</span>
                 </div>
               ))}
             </div>
@@ -518,13 +621,13 @@ export const ProfilePage: React.FC = () => {
         )}
 
         {/* Social Links */}
-        {(editData.twitter || editData.github || editData.linkedin) && (
+        {(profileUser.twitter || profileUser.github || profileUser.linkedin) && (
           <div style={{ marginBottom: 24 }}>
             <h3 style={{ fontSize: 16, fontWeight: 600, marginBottom: 12 }}>Social Links</h3>
-            <div style={{ display: 'flex', gap: 12 }}>
-              {editData.twitter && (
+            <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+              {profileUser.twitter && (
                 <a
-                  href={`https://twitter.com/${editData.twitter}`}
+                  href={`https://twitter.com/${profileUser.twitter}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{
@@ -537,12 +640,12 @@ export const ProfilePage: React.FC = () => {
                     textDecoration: 'none',
                   }}
                 >
-                  Twitter: @{editData.twitter}
+                  Twitter: @{profileUser.twitter}
                 </a>
               )}
-              {editData.github && (
+              {profileUser.github && (
                 <a
-                  href={`https://github.com/${editData.github}`}
+                  href={`https://github.com/${profileUser.github}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{
@@ -555,12 +658,12 @@ export const ProfilePage: React.FC = () => {
                     textDecoration: 'none',
                   }}
                 >
-                  GitHub: @{editData.github}
+                  GitHub: @{profileUser.github}
                 </a>
               )}
-              {editData.linkedin && (
+              {profileUser.linkedin && (
                 <a
-                  href={`https://linkedin.com/in/${editData.linkedin}`}
+                  href={`https://linkedin.com/in/${profileUser.linkedin}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{
@@ -573,7 +676,7 @@ export const ProfilePage: React.FC = () => {
                     textDecoration: 'none',
                   }}
                 >
-                  LinkedIn: {editData.linkedin}
+                  LinkedIn: {profileUser.linkedin}
                 </a>
               )}
             </div>
@@ -613,7 +716,7 @@ export const ProfilePage: React.FC = () => {
         {activeTab === 'posts' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             {userPosts.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: 48, color: '#64748b' }}>
+              <div style={{ textAlign: 'center', padding: 48, color: 'var(--text-muted)' }}>
                 <BookOpen size={48} style={{ margin: '0 auto 16px', opacity: 0.3 }} />
                 <p style={{ fontSize: 16 }}>Hakuna posts bado</p>
               </div>
@@ -622,23 +725,24 @@ export const ProfilePage: React.FC = () => {
                 <div
                   key={post.id}
                   className="glass-card"
-                  style={{ padding: 20 }}
+                  style={{ padding: 20, cursor: 'pointer' }}
+                  onClick={() => navigate(`/post/${post.id}`)}
                 >
                   <h3 style={{ fontSize: 18, fontWeight: 600, marginBottom: 12 }}>
                     {post.title}
                   </h3>
                   <p style={{ fontSize: 14, color: 'var(--text-muted)', marginBottom: 16, lineHeight: 1.6 }}>
-                    {post.content.substring(0, 200)}...
+                    {(post.content || '').substring(0, 200)}...
                   </p>
-                  <div style={{ display: 'flex', gap: 24, fontSize: 13, color: '#64748b' }}>
+                  <div style={{ display: 'flex', gap: 24, fontSize: 13, color: 'var(--text-muted)' }}>
                     <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <ThumbsUp size={14} /> {post.upvotes}
+                      <ThumbsUp size={14} /> {post.upvotes || 0}
                     </span>
                     <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <MessageCircle size={14} /> {post.commentsCount}
+                      <MessageCircle size={14} /> {post.commentsCount || 0}
                     </span>
                     <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <Clock size={14} /> {new Date(post.createdAt).toLocaleDateString('sw-TZ')}
+                      <Clock size={14} /> {post.createdAt ? new Date(post.createdAt).toLocaleDateString('sw-TZ') : 'Hivi karibuni'}
                     </span>
                   </div>
                 </div>
@@ -650,7 +754,7 @@ export const ProfilePage: React.FC = () => {
         {activeTab === 'answers' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             {userComments.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: 48, color: '#64748b' }}>
+              <div style={{ textAlign: 'center', padding: 48, color: 'var(--text-muted)' }}>
                 <MessageCircle size={48} style={{ margin: '0 auto 16px', opacity: 0.3 }} />
                 <p style={{ fontSize: 16 }}>Hakuna majibu bado</p>
               </div>
@@ -664,12 +768,12 @@ export const ProfilePage: React.FC = () => {
                   <p style={{ fontSize: 14, color: 'var(--text-body)', marginBottom: 12, lineHeight: 1.6 }}>
                     {comment.content}
                   </p>
-                  <div style={{ display: 'flex', gap: 24, fontSize: 13, color: '#64748b' }}>
+                  <div style={{ display: 'flex', gap: 24, fontSize: 13, color: 'var(--text-muted)' }}>
                     <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <ThumbsUp size={14} /> {comment.upvotes}
+                      <ThumbsUp size={14} /> {comment.upvotes || 0}
                     </span>
                     <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <Clock size={14} /> {new Date(comment.createdAt).toLocaleDateString('sw-TZ')}
+                      <Clock size={14} /> {comment.createdAt ? new Date(comment.createdAt).toLocaleDateString('sw-TZ') : 'Hivi karibuni'}
                     </span>
                   </div>
                 </div>
@@ -682,17 +786,17 @@ export const ProfilePage: React.FC = () => {
           <div>
             <div className="glass-card" style={{ padding: 24 }}>
               <h3 style={{ fontSize: 18, fontWeight: 600, marginBottom: 16 }}>Takwimu za Mtumiaji</h3>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16 }}>
                 <div style={{ padding: 16, borderRadius: 12, background: 'var(--bg-subtle)', border: '1px solid var(--border-app)' }}>
                   <p style={{ fontSize: 14, color: 'var(--text-muted)', marginBottom: 4 }}>Level</p>
                   <p style={{ fontSize: 24, fontWeight: 700, color: 'var(--border-focus)' }}>
-                    Level {Math.floor(profileUser.reputation / 1000) + 1}
+                    Level {Math.floor(userReputation / 1000) + 1}
                   </p>
                 </div>
                 <div style={{ padding: 16, borderRadius: 12, background: 'var(--bg-subtle)', border: '1px solid var(--border-app)' }}>
                   <p style={{ fontSize: 14, color: 'var(--text-muted)', marginBottom: 4 }}>Reputation</p>
                   <p style={{ fontSize: 24, fontWeight: 700, color: '#f59e0b' }}>
-                    {profileUser.reputation.toLocaleString()} points
+                    {userReputation.toLocaleString()} points
                   </p>
                 </div>
                 <div style={{ padding: 16, borderRadius: 12, background: 'var(--bg-subtle)', border: '1px solid var(--border-app)' }}>
@@ -707,8 +811,8 @@ export const ProfilePage: React.FC = () => {
                 </div>
                 <div style={{ padding: 16, borderRadius: 12, background: 'var(--bg-subtle)', border: '1px solid var(--border-app)' }}>
                   <p style={{ fontSize: 14, color: 'var(--text-muted)', marginBottom: 4 }}>Email</p>
-                  <p style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-main)' }}>
-                    {profileUser.email}
+                  <p style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-main)', wordBreak: 'break-all' }}>
+                    {profileUser.email || 'Haijawekwa'}
                   </p>
                 </div>
               </div>
@@ -718,7 +822,7 @@ export const ProfilePage: React.FC = () => {
 
         {activeTab === 'activity' && (
           <div>
-            <div style={{ textAlign: 'center', padding: 48, color: '#64748b' }}>
+            <div style={{ textAlign: 'center', padding: 48, color: 'var(--text-muted)' }}>
               <TrendingUp size={48} style={{ margin: '0 auto 16px', opacity: 0.3 }} />
               <p style={{ fontSize: 16 }}>Activity feed inakuja hivi karibuni</p>
             </div>

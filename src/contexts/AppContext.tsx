@@ -130,7 +130,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       // 2. Fetch users
       const usersRes = await usersAPI.getAll();
       if (usersRes && usersRes.length > 0) {
-        setUsers(usersRes);
+        setUsers(usersRes.map(u => ({ ...u, badges: Array.isArray(u.badges) ? u.badges : [] })));
       } else {
         setUsers(db.getUsers());
       }
@@ -150,6 +150,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
             const mergedUser = {
               ...savedLocalUser,
               ...me,
+              badges: Array.isArray(me.badges) ? me.badges : (Array.isArray(savedLocalUser?.badges) ? savedLocalUser.badges : []),
               avatar: (me.avatar && (me.avatar.startsWith('http') || me.avatar.startsWith('/uploads') || me.avatar.startsWith('data:')))
                 ? me.avatar
                 : (savedLocalUser?.avatar || me.avatar),
@@ -557,12 +558,20 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       ...(updates.coverImage && { cover_image: updates.coverImage }),
     };
 
-    let updatedUser: User = { ...currentUser, ...normalizedUpdates };
+    let updatedUser: User = { 
+      ...currentUser, 
+      ...normalizedUpdates,
+      badges: Array.isArray(currentUser.badges) ? currentUser.badges : []
+    };
 
     try {
       const res = await usersAPI.updateProfile(normalizedUpdates);
       if (res) {
-        updatedUser = { ...updatedUser, ...res };
+        updatedUser = { 
+          ...updatedUser, 
+          ...res,
+          badges: (Array.isArray(res.badges) && res.badges.length > 0) ? res.badges : (Array.isArray(updatedUser.badges) ? updatedUser.badges : [])
+        };
       }
     } catch {}
 
