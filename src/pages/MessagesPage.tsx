@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useRouter } from '../router/Router';
 import { useApp } from '../contexts/AppContext';
 import { messagesAPI } from '../services/api';
+import { UserAvatar } from '../components/UserAvatar';
 import {
   MessageSquare, Send, Search, User, ArrowLeft, ChevronRight,
   Clock, CheckCircle2, AlertCircle, Smile
@@ -250,23 +251,7 @@ export const MessagesPage: React.FC = () => {
                       transition: 'background 0.15s ease',
                     }}
                   >
-                    <div
-                      style={{
-                        width: 40,
-                        height: 40,
-                        borderRadius: '50%',
-                        background: 'linear-gradient(135deg, #6366f1, #9333ea)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontSize: 14,
-                        fontWeight: 'bold',
-                        color: 'white',
-                        flexShrink: 0,
-                      }}
-                    >
-                      {conv.user?.avatar || 'NJ'}
-                    </div>
+                    <UserAvatar avatar={conv.user?.avatar} username={conv.user?.username} size={40} />
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 2 }}>
                         <span style={{ fontSize: 14, fontWeight: isSelected ? 700 : 600, color: 'var(--text-main)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
@@ -299,22 +284,7 @@ export const MessagesPage: React.FC = () => {
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <div
-                  style={{
-                    width: 40,
-                    height: 40,
-                    borderRadius: '50%',
-                    background: 'linear-gradient(135deg, #10b981, #059669)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: 14,
-                    fontWeight: 'bold',
-                    color: 'white',
-                  }}
-                >
-                  {selectedConversation.user?.avatar || 'NJ'}
-                </div>
+                <UserAvatar avatar={selectedConversation.user?.avatar} username={selectedConversation.user?.username} size={40} />
                 <div>
                   <h3 style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>
                     {selectedConversation.user?.username}

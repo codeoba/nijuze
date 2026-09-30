@@ -4,6 +4,7 @@ import { useApp } from '../contexts/AppContext';
 import { Comment } from '../types';
 import { formatDate } from '../utils/data';
 import { CommentRichEditor, CommentContent } from './CommentRichEditor';
+import { UserAvatar } from './UserAvatar';
 
 interface CommentThreadProps {
   comment: Comment;
@@ -44,21 +45,7 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
       >
         {/* Comment Header */}
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, marginBottom: 12 }}>
-          <div style={{
-            width: 36,
-            height: 36,
-            borderRadius: '50%',
-            background: 'linear-gradient(135deg, #6366f1, #9333ea)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: 14,
-            fontWeight: 'bold',
-            color: 'white',
-            flexShrink: 0,
-          }}>
-            {comment.author.avatar}
-          </div>
+          <UserAvatar avatar={comment.author?.avatar} username={comment.author?.username} size={36} />
           <div style={{ flex: 1 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4, flexWrap: 'wrap' }}>
               <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-main)' }}>

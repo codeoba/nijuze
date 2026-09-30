@@ -4,6 +4,7 @@ import { useApp } from '../contexts/AppContext';
 import { formatDate } from '../utils/data';
 import { Post, Comment } from '../types';
 import { CommentRichEditor, CommentContent } from '../components/CommentRichEditor';
+import { UserAvatar } from '../components/UserAvatar';
 import {
   ArrowLeft, ThumbsUp, ThumbsDown, Bookmark, Share2, MessageCircle,
   CheckCircle2, Award, Trash2, Clock, Eye, Tag, AlertCircle,
@@ -273,24 +274,15 @@ export const PostDetailPage: React.FC = () => {
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <div
-                  style={{
-                    width: 44,
-                    height: 44,
-                    borderRadius: '50%',
-                    background: 'linear-gradient(135deg, #6366f1, #9333ea)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: 16,
-                    fontWeight: 'bold',
-                    color: 'white',
-                    boxShadow: '0 4px 10px rgba(99, 102, 241, 0.3)',
-                    cursor: 'pointer',
-                  }}
+                <div 
+                  style={{ cursor: 'pointer' }}
                   onClick={() => navigate(`/profile/${post.authorId}`)}
                 >
-                  {post.isAnonymous ? '?' : post.author.avatar || 'NJ'}
+                  <UserAvatar 
+                    avatar={post.isAnonymous ? '?' : post.author?.avatar} 
+                    username={post.isAnonymous ? '?' : post.author?.username} 
+                    size={44} 
+                  />
                 </div>
 
                 <div>
@@ -675,23 +667,15 @@ export const PostDetailPage: React.FC = () => {
                         }}
                       >
                         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                          <div
-                            style={{
-                              width: 36,
-                              height: 36,
-                              borderRadius: '50%',
-                              background: 'linear-gradient(135deg, #10b981, #0d9488)',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              fontSize: 13,
-                              fontWeight: 'bold',
-                              color: 'white',
-                              cursor: 'pointer',
-                            }}
+                          <div 
+                            style={{ cursor: 'pointer' }}
                             onClick={() => navigate(`/profile/${comment.authorId}`)}
                           >
-                            {comment.author.avatar || 'NJ'}
+                            <UserAvatar 
+                              avatar={comment.author?.avatar} 
+                              username={comment.author?.username} 
+                              size={36} 
+                            />
                           </div>
                           <div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -834,22 +818,11 @@ export const PostDetailPage: React.FC = () => {
             </h3>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
-              <div
-                style={{
-                  width: 48,
-                  height: 48,
-                  borderRadius: '50%',
-                  background: 'linear-gradient(135deg, #6366f1, #9333ea)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: 18,
-                  fontWeight: 'bold',
-                  color: 'white',
-                }}
-              >
-                {post.isAnonymous ? '?' : post.author.avatar || 'NJ'}
-              </div>
+              <UserAvatar 
+                avatar={post.isAnonymous ? '?' : post.author?.avatar} 
+                username={post.isAnonymous ? '?' : post.author?.username} 
+                size={48} 
+              />
               <div>
                 <h4 style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-main)' }}>
                   {post.isAnonymous ? 'Mwanachama' : post.author.username}

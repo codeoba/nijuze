@@ -7,6 +7,7 @@ import {
 import { Post } from '../types';
 import { useApp } from '../contexts/AppContext';
 import { formatDate } from '../utils/data';
+import { UserAvatar } from './UserAvatar';
 
 interface PostCardProps {
   post: Post;
@@ -67,15 +68,12 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onExpand }) => {
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 12 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <div className="avatar-ring">
-            <div style={{
-              width: 40, height: 40, borderRadius: '50%',
-              background: 'linear-gradient(135deg, #6366f1, #9333ea)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 14, fontWeight: 'bold'
-            }}>
-              {post.isAnonymous ? '?' : post.author.avatar}
-            </div>
+          <div className="avatar-ring" style={{ padding: 2 }}>
+            <UserAvatar 
+              avatar={post.isAnonymous ? '?' : post.author?.avatar} 
+              username={post.isAnonymous ? '?' : post.author?.username} 
+              size={40} 
+            />
           </div>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>

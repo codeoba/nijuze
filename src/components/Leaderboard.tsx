@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Trophy, Medal, Award, TrendingUp, Star, Crown } from 'lucide-react';
 import { useApp } from '../contexts/AppContext';
+import { UserAvatar } from './UserAvatar';
 
 interface LeaderboardEntry {
   rank: number;
@@ -106,19 +107,7 @@ export const Leaderboard: React.FC = () => {
           alignItems: 'center',
           gap: 16,
         }}>
-          <div style={{
-            width: 48,
-            height: 48,
-            borderRadius: '50%',
-            background: 'linear-gradient(135deg, #6366f1, #9333ea)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: 16,
-            fontWeight: 'bold',
-          }}>
-            {currentUserEntry.user.avatar}
-          </div>
+          <UserAvatar avatar={currentUserEntry.user?.avatar} username={currentUserEntry.user?.username} size={48} />
           <div style={{ flex: 1 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
               <h4 style={{ fontSize: 15, fontWeight: 600 }}>Nafasi Yako</h4>
@@ -169,20 +158,12 @@ export const Leaderboard: React.FC = () => {
             <div style={{ marginBottom: 12 }}>
               {getRankIcon(entry.rank)}
             </div>
-            <div style={{
-              width: 56,
-              height: 56,
-              borderRadius: '50%',
-              background: 'linear-gradient(135deg, #6366f1, #9333ea)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: 20,
-              fontWeight: 'bold',
-              margin: '0 auto 12px',
-            }}>
-              {entry.user.avatar}
-            </div>
+            <UserAvatar 
+              avatar={entry.user?.avatar} 
+              username={entry.user?.username} 
+              size={56} 
+              style={{ margin: '0 auto 12px' }} 
+            />
             <h4 style={{ fontSize: 14, fontWeight: 600, marginBottom: 4 }}>
               {entry.user.username}
             </h4>
@@ -215,19 +196,7 @@ export const Leaderboard: React.FC = () => {
             <div style={{ width: 40, textAlign: 'center' }}>
               {getRankIcon(entry.rank)}
             </div>
-            <div style={{
-              width: 40,
-              height: 40,
-              borderRadius: '50%',
-              background: 'linear-gradient(135deg, #6366f1, #9333ea)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: 14,
-              fontWeight: 'bold',
-            }}>
-              {entry.user.avatar}
-            </div>
+            <UserAvatar avatar={entry.user?.avatar} username={entry.user?.username} size={40} />
             <div style={{ flex: 1 }}>
               <h4 style={{ fontSize: 14, fontWeight: 600, marginBottom: 2 }}>
                 {entry.user.username}

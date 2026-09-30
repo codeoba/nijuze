@@ -6,6 +6,7 @@ import {
   Plus, Search, Filter, Pin, Lock, Star, ChevronRight,
   BookOpen, Award, Flame, FileText
 } from 'lucide-react';
+import { UserAvatar } from '../components/UserAvatar';
 
 export const ForumPage: React.FC = () => {
   const { posts, users, currentUser } = useApp();
@@ -159,20 +160,7 @@ export const ForumPage: React.FC = () => {
                   <span style={{ fontSize: 14, fontWeight: 700, color: i === 0 ? '#fbbf24' : i === 1 ? '#94a3b8' : '#cd7f32', width: 20 }}>
                     #{i + 1}
                   </span>
-                  <div style={{
-                    width: 32,
-                    height: 32,
-                    borderRadius: '50%',
-                    background: 'linear-gradient(135deg, #6366f1, #9333ea)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: 12,
-                    fontWeight: 'bold',
-                    color: 'white',
-                  }}>
-                    {user.avatar}
-                  </div>
+                  <UserAvatar avatar={user.avatar} username={user.username} size={32} />
                   <div style={{ flex: 1 }}>
                     <p style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-main)', margin: 0 }}>{user.username}</p>
                     <p style={{ fontSize: 11, color: 'var(--text-muted)', margin: 0 }}>{user.postsCount} posts</p>
@@ -342,20 +330,7 @@ const ForumPostCard: React.FC<{ post: any; onClick: () => void }> = ({ post, onC
           {/* Meta Info */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 16, fontSize: 13, color: 'var(--text-muted)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <div style={{
-                width: 24,
-                height: 24,
-                borderRadius: '50%',
-                background: 'linear-gradient(135deg, #6366f1, #9333ea)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: 10,
-                fontWeight: 'bold',
-                color: 'white',
-              }}>
-                {post.author.avatar}
-              </div>
+              <UserAvatar avatar={post.author?.avatar} username={post.author?.username} size={24} />
               <span style={{ color: 'var(--text-main)' }}>{post.author.username}</span>
             </div>
             <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>

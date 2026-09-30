@@ -26,6 +26,7 @@ import { MobileBottomNav } from './components/MobileBottomNav';
 import { AIChatbot } from './components/AIChatbot';
 import { Footer } from './components/Footer';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import { UserAvatar } from './components/UserAvatar';
 
 // Pages
 import { PostDetailPage } from './pages/PostDetailPage';
@@ -231,15 +232,8 @@ const AppContent: React.FC = () => {
         {isAuthenticated && (
           <div className="glass-card" style={{ padding: 16, marginBottom: 16 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-              <div className="avatar-ring">
-                <div style={{
-                  width: 40, height: 40, borderRadius: '50%',
-                  background: 'linear-gradient(135deg, #6366f1, #9333ea)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 14, fontWeight: 'bold', color: 'white'
-                }}>
-                  {currentUser?.avatar || 'NJ'}
-                </div>
+              <div className="avatar-ring" style={{ padding: 2 }}>
+                <UserAvatar avatar={currentUser?.avatar} username={currentUser?.username} size={40} />
               </div>
               <button
                 onClick={() => navigate('/ask')}
@@ -581,15 +575,7 @@ const AppContent: React.FC = () => {
                     }}
                     title={currentUser?.username || 'Wasifu'}
                   >
-                    <div style={{
-                      width: 32, height: 32, borderRadius: '50%',
-                      background: 'linear-gradient(135deg, #6366f1, #9333ea)',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: 12, fontWeight: 'bold', color: 'white',
-                      boxShadow: '0 2px 6px rgba(99, 102, 241, 0.4)'
-                    }}>
-                      {currentUser?.avatar || 'NJ'}
-                    </div>
+                    <UserAvatar avatar={currentUser?.avatar} username={currentUser?.username} size={32} />
                     <ChevronDown size={14} color="var(--text-muted)" style={{ transform: showUserMenu ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s ease' }} />
                   </button>
 
@@ -613,14 +599,7 @@ const AppContent: React.FC = () => {
                       {/* User Header */}
                       <div style={{ padding: '6px 8px 10px 8px', borderBottom: '1px solid var(--border-app)' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                          <div style={{
-                            width: 38, height: 38, borderRadius: '50%',
-                            background: 'linear-gradient(135deg, #6366f1, #9333ea)',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            fontSize: 13, fontWeight: 'bold', color: 'white'
-                          }}>
-                            {currentUser?.avatar || 'NJ'}
-                          </div>
+                          <UserAvatar avatar={currentUser?.avatar} username={currentUser?.username} size={38} />
                           <div style={{ flex: 1, minWidth: 0 }}>
                             <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                               {currentUser?.username || 'Mwanachama'}

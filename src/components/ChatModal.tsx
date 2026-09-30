@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { X, Send, Search, MessageCircle, User, Users } from 'lucide-react';
 import { useApp } from '../contexts/AppContext';
 import { messagesAPI } from '../services/api';
+import { UserAvatar } from './UserAvatar';
 
 interface Message {
   id: string;
@@ -203,20 +204,7 @@ export const ChatModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ 
                     transition: 'all 0.2s',
                   }}
                 >
-                  <div style={{
-                    width: 40,
-                    height: 40,
-                    borderRadius: '50%',
-                    background: 'linear-gradient(135deg, #6366f1, #9333ea)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontWeight: 'bold',
-                    fontSize: 13,
-                    color: 'white',
-                  }}>
-                    {conv.user?.avatar || conv.user?.username?.slice(0, 2).toUpperCase() || 'NJ'}
-                  </div>
+                  <UserAvatar avatar={conv.user?.avatar} username={conv.user?.username} size={40} />
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2 }}>
                       <span style={{ fontWeight: 600, fontSize: 13 }}>{conv.user?.username || 'Mwanachama'}</span>
@@ -244,20 +232,7 @@ export const ChatModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ 
                 justifyContent: 'space-between',
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <div style={{
-                    width: 36,
-                    height: 36,
-                    borderRadius: '50%',
-                    background: 'linear-gradient(135deg, #6366f1, #9333ea)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontWeight: 'bold',
-                    fontSize: 12,
-                    color: 'white',
-                  }}>
-                    {selectedConversation.user?.avatar || 'NJ'}
-                  </div>
+                  <UserAvatar avatar={selectedConversation.user?.avatar} username={selectedConversation.user?.username} size={36} />
                   <div>
                     <h4 style={{ fontSize: 14, fontWeight: 600, margin: 0, color: 'var(--text-main)' }}>{selectedConversation.user?.username}</h4>
                     <span style={{ fontSize: 11, color: '#22c55e' }}>Mtandaoni</span>

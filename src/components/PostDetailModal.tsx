@@ -4,6 +4,7 @@ import { Post, Comment } from '../types';
 import { useApp } from '../contexts/AppContext';
 import { formatDate } from '../utils/data';
 import { CommentRichEditor, CommentContent } from './CommentRichEditor';
+import { UserAvatar } from './UserAvatar';
 
 interface PostDetailModalProps {
   post: Post | null;
@@ -96,15 +97,8 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({ post, onClose 
           {/* Post Header */}
           <div style={{ marginBottom: 20 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
-              <div className="avatar-ring">
-                <div style={{
-                  width: 40, height: 40, borderRadius: '50%',
-                  background: 'linear-gradient(135deg, #6366f1, #9333ea)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 14, fontWeight: 'bold'
-                }}>
-                  {currentPost.author.avatar}
-                </div>
+              <div className="avatar-ring" style={{ padding: 2 }}>
+                <UserAvatar avatar={currentPost.author?.avatar} username={currentPost.author?.username} size={40} />
               </div>
               <div>
                 <h4 style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-main)' }}>{currentPost.author.username}</h4>
@@ -206,14 +200,7 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({ post, onClose 
                   border: comment.isBestAnswer ? '1px solid rgba(99, 102, 241, 0.4)' : '1px solid var(--border-app)'
                 }}
               >
-                <div style={{
-                  width: 32, height: 32, borderRadius: '50%',
-                  background: 'linear-gradient(135deg, #10b981, #0d9488)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 12, fontWeight: 'bold', flexShrink: 0
-                }}>
-                  {comment.author.avatar}
-                </div>
+                <UserAvatar avatar={comment.author?.avatar} username={comment.author?.username} size={32} />
                 <div style={{ flex: 1 }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4, flexWrap: 'wrap', gap: 8 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -298,14 +285,7 @@ export const PostDetailModal: React.FC<PostDetailModalProps> = ({ post, onClose 
                   Weka Jibu au Maoni Yako:
                 </h4>
                 <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
-                  <div style={{
-                    width: 36, height: 36, borderRadius: '50%',
-                    background: 'linear-gradient(135deg, #6366f1, #9333ea)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: 12, fontWeight: 'bold', color: 'white', flexShrink: 0
-                  }}>
-                    {currentUser?.avatar || 'NJ'}
-                  </div>
+                  <UserAvatar avatar={currentUser?.avatar} username={currentUser?.username} size={36} />
                   <div style={{ flex: 1 }}>
                     <CommentRichEditor
                       value={commentText}
