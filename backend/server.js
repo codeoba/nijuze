@@ -214,11 +214,9 @@ async function ensureTablesExist(pool) {
     `);
 
     // Seed default admin and user 'mohamed' from local_db.json if not exists
-    const [existingUsers] = await pool.query('SELECT COUNT(*) as count FROM users');
-    if (existingUsers[0].count === 0) {
-      console.log('🌱 Seeding initial users into MySQL...');
-      const localDbPath = path.join(__dirname, 'database', 'local_db.json');
-      if (fs.existsSync(localDbPath)) {
+    console.log('🌱 Checking and syncing initial users into MySQL...');
+    const localDbPath = path.join(__dirname, 'database', 'local_db.json');
+    if (fs.existsSync(localDbPath)) {
         try {
           const localData = JSON.parse(fs.readFileSync(localDbPath, 'utf8'));
           if (Array.isArray(localData.users)) {
@@ -247,7 +245,6 @@ async function ensureTablesExist(pool) {
           console.error('Error seeding data:', seedErr.message);
         }
       }
-    }
   } catch (err) {
     console.error('❌ Error creating tables:', err.message);
   }
@@ -1375,8 +1372,19 @@ app.put('/api/users/profile', optionalAuth, async (req, res) => {
       await db.query(`UPDATE users SET ${updates.join(', ')} WHERE id = ?`, params);
     }
 
-    const [users] = await db.query('SELECT * FROM users WHERE id = ?', [userId]);
-    if (users.length === 0) return res.status(404).json({ success: false, error: 'User not found' });
+    let [users] = await db.query('SELECT * FROM users WHERE id = ?', [userId]);
+    if (users.length === 0) {
+      const fallbackUsername = req.user?.username || req.body.username || (userId === '73b476d3-b995-480b-8366-1abcc26822cc' ? 'mohamed' : 'Mwanachama');
+      const fallbackEmail = req.user?.email || req.body.email || (userId === '73b476d3-b995-480b-8366-1abcc26822cc' ? 'pcdrips@gmail.com' : `${userId}@nijuze.com`);
+      await db.query(
+        `INSERT INTO users (id, username, email, password_hash, avatar, cover_image, role, bio)
+         VALUES (?, ?, ?, '$2a$10$CoWaByzUb2rm2aIH9z75Uemv8Lw0iJKc5uL0BqVsVBtobfFxOsjM.', ?, ?, 'Mwanachama', ?)
+         ON DUPLICATE KEY UPDATE avatar = VALUES(avatar), cover_image = VALUES(cover_image), bio = VALUES(bio)`,
+        [userId, fallbackUsername, fallbackEmail, avatar || 'M', finalCover || null, bio || '']
+      );
+      const [newUsers] = await db.query('SELECT * FROM users WHERE id = ?', [userId]);
+      users = newUsers;
+    }
     const u = users[0];
 
     res.json({
