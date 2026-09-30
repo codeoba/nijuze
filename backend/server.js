@@ -54,28 +54,202 @@ async function connectDB() {
     db = pool;
     console.log('✅ Connected to MySQL database');
 
+    await ensureTablesExist(pool);
+
     // Automatically purge demo posts and their comments if present
     try {
       await db.query(`DELETE FROM comments WHERE post_id LIKE 'post-%' OR post_id = 'd2401122-7827-4363-9a71-7beed04b6b1b'`);
       await db.query(`DELETE FROM posts WHERE id LIKE 'post-%' OR id = 'd2401122-7827-4363-9a71-7beed04b6b1b' OR title LIKE '%Machine Learning mwaka 2026%' OR title LIKE '%React na Vue.js%' OR title LIKE '%blockchain%afya%' OR title LIKE '%Jaribio%'`);
-      console.log('🧹 Purged legacy demo posts from MySQL database');
-    } catch (cleanupErr) {
-      // ignore
-    }
-
-    try {
-      await db.query(`ALTER TABLE users ADD COLUMN cover_image TEXT NULL`);
-    } catch (colErr) {}
-    try {
-      await db.query(`ALTER TABLE users MODIFY COLUMN cover_image TEXT NULL`);
-    } catch (colErr) {}
-    try {
-      await db.query(`ALTER TABLE users MODIFY COLUMN avatar TEXT NULL`);
-    } catch (colErr) {}
+    } catch (cleanupErr) {}
   } catch (error) {
     console.warn('⚠️ MySQL server unavailable (' + error.message + '). Activating Local Storage Engine fallback...');
     db = getStorageEngine();
     console.log('✅ Local Storage Engine initialized & ready for full CRUD operations.');
+  }
+}
+
+async function ensureTablesExist(pool) {
+  try {
+    // 1. Users table
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS users (
+        id VARCHAR(36) PRIMARY KEY,
+        username VARCHAR(100) NOT NULL,
+        email VARCHAR(255) UNIQUE NOT NULL,
+        password_hash VARCHAR(255) NOT NULL,
+        avatar TEXT NULL,
+        cover_image TEXT NULL,
+        role ENUM('Admin', 'Moderator', 'Mwanachama') DEFAULT 'Mwanachama',
+        bio TEXT,
+        reputation INT DEFAULT 0,
+        is_verified BOOLEAN DEFAULT FALSE,
+        followers_count INT DEFAULT 0,
+        following_count INT DEFAULT 0,
+        posts_count INT DEFAULT 0,
+        answers_count INT DEFAULT 0,
+        is_banned BOOLEAN DEFAULT FALSE,
+        last_login TIMESTAMP NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        INDEX idx_email (email),
+        INDEX idx_username (username)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    `);
+
+    try { await pool.query(`ALTER TABLE users ADD COLUMN cover_image TEXT NULL`); } catch (e) {}
+    try { await pool.query(`ALTER TABLE users MODIFY COLUMN cover_image TEXT NULL`); } catch (e) {}
+    try { await pool.query(`ALTER TABLE users MODIFY COLUMN avatar TEXT NULL`); } catch (e) {}
+
+    // 2. Posts table
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS posts (
+        id VARCHAR(36) PRIMARY KEY,
+        author_id VARCHAR(36) NOT NULL,
+        title VARCHAR(500) NOT NULL,
+        content TEXT NOT NULL,
+        tags JSON,
+        category VARCHAR(50),
+        upvotes INT DEFAULT 0,
+        downvotes INT DEFAULT 0,
+        comments_count INT DEFAULT 0,
+        views INT DEFAULT 0,
+        shares INT DEFAULT 0,
+        bookmarks_count INT DEFAULT 0,
+        reactions JSON DEFAULT (JSON_OBJECT()),
+        is_pinned BOOLEAN DEFAULT FALSE,
+        is_anonymous BOOLEAN DEFAULT FALSE,
+        is_approved BOOLEAN DEFAULT TRUE,
+        image_url VARCHAR(500),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        INDEX idx_author_id (author_id),
+        INDEX idx_category (category)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    `);
+
+    // 3. Comments table
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS comments (
+        id VARCHAR(36) PRIMARY KEY,
+        post_id VARCHAR(36) NOT NULL,
+        author_id VARCHAR(36) NOT NULL,
+        content TEXT NOT NULL,
+        upvotes INT DEFAULT 0,
+        downvotes INT DEFAULT 0,
+        is_best_answer BOOLEAN DEFAULT FALSE,
+        parent_id VARCHAR(36) NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        INDEX idx_post_id (post_id),
+        INDEX idx_author_id (author_id)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    `);
+
+    // 4. Notifications table
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS notifications (
+        id VARCHAR(36) PRIMARY KEY,
+        user_id VARCHAR(36) NOT NULL,
+        actor_id VARCHAR(36) NOT NULL,
+        type VARCHAR(50) NOT NULL,
+        post_id VARCHAR(36),
+        comment_id VARCHAR(36),
+        content TEXT,
+        is_read BOOLEAN DEFAULT FALSE,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        INDEX idx_user_id (user_id),
+        INDEX idx_is_read (is_read)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    `);
+
+    // 5. Follows table
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS follows (
+        id VARCHAR(36) PRIMARY KEY,
+        follower_id VARCHAR(36) NOT NULL,
+        following_id VARCHAR(36) NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE KEY unique_follow (follower_id, following_id)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    `);
+
+    // 6. Badges table
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS badges (
+        id VARCHAR(36) PRIMARY KEY,
+        user_id VARCHAR(36) NOT NULL,
+        name VARCHAR(100) NOT NULL,
+        icon VARCHAR(50),
+        description VARCHAR(255),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        INDEX idx_user_id (user_id)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    `);
+
+    // 7. Stories table
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS stories (
+        id VARCHAR(36) PRIMARY KEY,
+        user_id VARCHAR(36) NOT NULL,
+        content TEXT,
+        background_color VARCHAR(100),
+        views INT DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        expires_at TIMESTAMP NULL,
+        INDEX idx_user_id (user_id)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    `);
+
+    // 8. Guilds table
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS guilds (
+        id VARCHAR(36) PRIMARY KEY,
+        name VARCHAR(100) NOT NULL,
+        description TEXT,
+        category VARCHAR(50),
+        members_count INT DEFAULT 0,
+        icon VARCHAR(50),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    `);
+
+    // Seed default admin and user 'mohamed' from local_db.json if not exists
+    const [existingUsers] = await pool.query('SELECT COUNT(*) as count FROM users');
+    if (existingUsers[0].count === 0) {
+      console.log('🌱 Seeding initial users into MySQL...');
+      const localDbPath = path.join(__dirname, 'database', 'local_db.json');
+      if (fs.existsSync(localDbPath)) {
+        try {
+          const localData = JSON.parse(fs.readFileSync(localDbPath, 'utf8'));
+          if (Array.isArray(localData.users)) {
+            for (const u of localData.users) {
+              await pool.query(
+                `INSERT INTO users (id, username, email, password_hash, avatar, cover_image, role, bio, reputation, is_verified, followers_count, following_count, posts_count, answers_count)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                 ON DUPLICATE KEY UPDATE username = VALUES(username)`,
+                [u.id, u.username, u.email, u.password_hash || '$2a$10$CoWaByzUb2rm2aIH9z75Uemv8Lw0iJKc5uL0BqVsVBtobfFxOsjM.', u.avatar || 'M', u.cover_image || null, u.role || 'Mwanachama', u.bio || '', u.reputation || 0, u.is_verified || 0, u.followers_count || 0, u.following_count || 0, u.posts_count || 0, u.answers_count || 0]
+              );
+            }
+          }
+          if (Array.isArray(localData.posts)) {
+            for (const p of localData.posts) {
+              if (p.id.startsWith('post-') || p.id === 'd2401122-7827-4363-9a71-7beed04b6b1b') continue;
+              await pool.query(
+                `INSERT INTO posts (id, author_id, title, content, tags, category, upvotes, downvotes, comments_count, views, is_approved)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
+                 ON DUPLICATE KEY UPDATE title = VALUES(title)`,
+                [p.id, p.author_id, p.title, p.content, typeof p.tags === 'string' ? p.tags : JSON.stringify(p.tags || []), p.category || 'Teknolojia', p.upvotes || 0, p.downvotes || 0, p.comments_count || 0, p.views || 0]
+              );
+            }
+          }
+          console.log('✅ Local data seeded into MySQL successfully');
+        } catch (seedErr) {
+          console.error('Error seeding data:', seedErr.message);
+        }
+      }
+    }
+  } catch (err) {
+    console.error('❌ Error creating tables:', err.message);
   }
 }
 
